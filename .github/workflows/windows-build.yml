@@ -2,7 +2,30 @@ name: windows-build
 
 on:
   push:
+    branches: [master]
+    paths:
+      - 'Source/**'
+      - '!Source/Start_Emscripten.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'Projects/**'
+      - '!Projects/emscripten/**'
+      - 'vcpkg*.json'
+      - '.gitmodules'
+      - 'Run'
+      - '.github/workflows/windows-build.yml'
   pull_request:
+    paths:
+      - 'Source/**'
+      - '!Source/Start_Emscripten.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'Projects/**'
+      - '!Projects/emscripten/**'
+      - 'vcpkg*.json'
+      - '.gitmodules'
+      - 'Run'
+      - '.github/workflows/windows-build.yml'
 
 permissions:
   contents: read

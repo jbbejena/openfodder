@@ -2,7 +2,7 @@
 (function (root) {
   'use strict';
   const actions = { cancel: 0, selectSquad: 1, move: 2, fireStart: 3, fireAim: 4,
-    fireStop: 5, selectWeapon: 6, pan: 7, follow: 8, pause: 9 };
+    fireStop: 5, selectWeapon: 6, pan: 7, follow: 8, pause: 9, secondary: 10 };
   const errors = { '-1': 'invalid', '-2': 'uninitialized', '-3': 'not-battlefield',
     '-4': 'paused', '-5': 'no-squad', '-6': 'unavailable', '-7': 'busy', '-8': 'unsupported' };
   const rejected = reason => ({ ok: false, reason });
@@ -62,6 +62,8 @@
       fireAim: point => world(actions.fireAim, point),
       fireAimAt: (x, y) => at(actions.fireAim, x, y),
       fireStop: () => send(actions.fireStop),
+      secondaryTo: point => world(actions.secondary, point),
+      secondaryAt: (x, y) => at(actions.secondary, x, y),
       selectWeapon: weapon => weapon === 'grenade' || weapon === 'rocket' ?
         send(actions.selectWeapon, weapon === 'grenade' ? 1 : 3) : rejected('invalid'),
       pan: (x, y) => finite(x, y) ? send(actions.pan, Math.round(x), Math.round(y)) : rejected('invalid'),

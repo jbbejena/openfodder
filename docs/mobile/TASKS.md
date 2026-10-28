@@ -25,7 +25,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
 | MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `b9abafb`: CI/artifact/public preview with direct upstream demo loading, anonymous desktop menu/map passed; [B05 not run: no real iPhone](test-runs/phone-file-import.md) |
 | MOB-004 | M2 | done | MOB-002 | Codex / `mobile/command-bridge`, from `47e956d` | `d755c60`: [API contract](INPUT_API.md), [actual-engine DPR 1/2 + hosted checks](test-runs/command-bridge.md), [draft PR #3](https://github.com/jbbejena/openfodder/pull/3). B05/M1 still unpassed. |
-| MOB-005 | M2 | ready | MOB-004 | Unclaimed | Command foundation verified; next bounded task: touch modes/pointer ownership/secondary firing |
+| MOB-005 | M2 | active | MOB-004 | Codex / `mobile/touch-command-modes`, from `6afde21` | Visible squad/mode controls, single-owner pointer loop and deliberate secondary targeting; verification in progress |
 | MOB-006 | M2 | pending | MOB-004, MOB-005 | Unclaimed | — |
 | MOB-007 | M2 | ready | MOB-004 | Unclaimed | Engine state/coordinate contract exists; landscape phone shell/HUD remains to implement |
 | MOB-008 | M2 | pending | MOB-005, MOB-006, MOB-007 | Unclaimed | — |

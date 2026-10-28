@@ -1,4 +1,4 @@
-/* Opt-in MOB-004 diagnostics; the touch controller is a later task. */
+/* Opt-in MOB-004 diagnostics, separate from the production touch controller. */
 'use strict';
 function setupInputHarness(bridge) {
   const panel = document.getElementById('input-harness');

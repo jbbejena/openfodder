@@ -52,6 +52,7 @@ var Module = {
   onRuntimeInitialized() {
     runtimeReady = true;
     window.fodderInput = OpenFodderInput.create(Module, canvas);
+    OpenFodderTouch.mount(window.fodderInput, canvas);
     setupInputHarness(window.fodderInput);
     log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
     ready();

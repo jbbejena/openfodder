@@ -6,7 +6,7 @@
 
 namespace {
 using Json = nlohmann::json;
-enum Action { Cancel, SelectSquad, Move, FireStart, FireAim, FireStop, SelectWeapon, Pan, Follow, Pause };
+enum Action { Cancel, SelectSquad, Move, FireStart, FireAim, FireStop, SelectWeapon, Pan, Follow, Pause, Secondary };
 enum Result { Ok = 0, Invalid = -1, Uninitialized = -2, NotBattlefield = -3,
               Paused = -4, NoSquad = -5, Unavailable = -6, Busy = -7, Unsupported = -8 };
 struct Command { int action, a, b, id; };
@@ -15,6 +15,9 @@ WebInput::Stage stage = WebInput::Stage::Uninitialized;
 int nextId = 0, lastId = 0, lastResult = Ok;
 int pauseReasons = 0;
 bool lastPaused = false, fireHeld = false, manualCamera = false, ownsInput = false;
+bool secondaryPending = false;
+int secondarySquad = -1, secondaryWeapon = eWeapon_None;
+sSprite* secondaryLeader = nullptr;
 int fireX = 0, fireY = 0;
 
 int CurrentPauseReasons(const cFodder& e) {
@@ -42,7 +45,7 @@ bool WorldPoint(const cFodder& e, int x, int y) {
         y >= top && y < top + e.getMapVisibleHeightPixels() && x < 32700 && y < 32700;
 }
 void Release(cFodder& e) {
-    fireHeld = false;
+    fireHeld = secondaryPending = false;
     e.mMouse_EventLastButtonsPressed = e.mMouseButtonStatus = 0;
     e.mButtonPressLeft = e.mButtonPressRight = 0;
     e.mMouse_Button_Left_Toggle = e.mMouse_Button_Right_Toggle = 0;
@@ -71,12 +74,19 @@ int Validate(const cFodder& e, int action, int a, int b) {
         if (a != eWeapon_Grenade && a != eWeapon_Rocket) return Invalid;
         return (a == eWeapon_Grenade ? e.mSquad_Grenades[e.mSquad_Selected] : e.mSquad_Rockets[e.mSquad_Selected]) > 0 ? Ok : Unavailable;
     }
-    if (action == Move || action == FireStart || action == FireAim) {
+    if (action == Move || action == FireStart || action == FireAim || action == Secondary) {
         if (!WorldPoint(e, a, b)) return Invalid;
         // Vehicle-specific orders need their own contract; never silently issue
         // a different command to an embarked squad.
         if (e.mSquad_CurrentVehicle || e.mSquad_Leader->mInVehicle) return Unsupported;
         if (action == FireAim && !fireHeld) return Unavailable;
+        if ((action == Secondary || action == FireStart) && secondaryPending) return Busy;
+        if (action == Secondary) {
+            const int weapon = e.mSquad_CurrentWeapon[e.mSquad_Selected];
+            const int ammo = weapon == eWeapon_Grenade ? e.mSquad_Grenades[e.mSquad_Selected] :
+                weapon == eWeapon_Rocket ? e.mSquad_Rockets[e.mSquad_Selected] : 0;
+            if (ammo <= 0 || e.mSquad_Leader->mInWater) return Unavailable;
+        }
         if (action == Move && e.mSquad_Walk_Target_Indexes[e.mSquad_Selected] >= 28) return Busy;
         return Ok;
     }
@@ -126,6 +136,11 @@ void SetStage(Stage value) {
 }
 void ApplyPending(cFodder& e) {
     ownsInput = false;
+    // Native projectile creation (including a rejected shot) consumes this
+    // latch. Never re-arm it on a later input interrupt: one request, one shot.
+    if (secondaryPending && (!e.mMouse_Button_LeftRight_Toggle || !Selected(e) ||
+        e.mSquad_Selected != secondarySquad || e.mSquad_Leader != secondaryLeader ||
+        e.mSquad_CurrentWeapon[secondarySquad] != secondaryWeapon)) Release(e);
     // Preserve desktop P as the user pause reason. External reasons cannot be
     // cleared by a keyboard toggle or by releasing a different reason.
     pauseReasons = CurrentPauseReasons(e);
@@ -149,6 +164,15 @@ void ApplyPending(cFodder& e) {
             fireX = command.a; fireY = command.b;
             break;
         case FireAim: fireX = command.a; fireY = command.b; break;
+        case Secondary:
+            Release(e);
+            secondaryPending = true;
+            secondarySquad = e.mSquad_Selected;
+            secondaryWeapon = e.mSquad_CurrentWeapon[secondarySquad];
+            secondaryLeader = e.mSquad_Leader;
+            fireX = command.a; fireY = command.b;
+            e.mMouse_Button_LeftRight_Toggle = true;
+            break;
         case SelectWeapon:
             Release(e);
             if (command.a == eWeapon_Grenade) e.Squad_Select_Grenades();
@@ -167,15 +191,15 @@ void ApplyPending(cFodder& e) {
     e.mPhase_Paused = pauseReasons != 0;
     lastPaused = e.mPhase_Paused;
     if (!Battlefield(e) || !e.mInput_Enabled || e.mPhase_Paused || !Selected(e)) {
-        if (fireHeld) Release(e);
+        if (fireHeld || secondaryPending) Release(e);
         if (!Battlefield(e)) manualCamera = false;
     }
-    if (fireHeld) ownsInput = true;
+    if (fireHeld || secondaryPending) ownsInput = true;
 }
 bool OwnsCamera() { return manualCamera; }
 bool OwnsInput() { return ownsInput; }
 void Fire(cFodder& e) {
-    if (!fireHeld || !Selected(e) || e.mPhase_Paused || !Battlefield(e)) return;
+    if ((!fireHeld && !secondaryPending) || !Selected(e) || e.mPhase_Paused || !Battlefield(e)) return;
     // The public API uses map pixels. Only this adapter compensates for the
     // original target routine's legacy cursor hotspot; JS never repeats it.
     e.mMouseX = fireX - (e.mCameraX >> 16) + 16;
@@ -186,14 +210,17 @@ void Fire(cFodder& e) {
     e.mButtonPressRight = -1;
     e.mButtonPressLeft = 0;
     e.mMouse_Button_Right_Toggle = 1;
-    e.mMouse_Button_LeftRight_Toggle = e.mMouse_Button_LeftRight_Toggle2 = false;
+    // For secondary fire the original troop/weapon path owns and consumes the
+    // left+right latch. Do not clear it here or create/decrement ammo in JS.
+    if (!secondaryPending) e.mMouse_Button_LeftRight_Toggle = false;
+    e.mMouse_Button_LeftRight_Toggle2 = false;
     e.Squad_Member_Target_Set();
 }
 }
 
 extern "C" {
 EMSCRIPTEN_KEEPALIVE int of_web_command(int action, double a, double b) {
-    if (action < Cancel || action > Pause || !std::isfinite(a) || !std::isfinite(b) ||
+    if (action < Cancel || action > Secondary || !std::isfinite(a) || !std::isfinite(b) ||
         a != std::floor(a) || b != std::floor(b) || std::abs(a) > 32700 || std::abs(b) > 32700) return Invalid;
     if (!g_Fodder || stage == WebInput::Stage::Uninitialized)
         return action == Cancel || action == FireStop ? Ok : Uninitialized;
@@ -204,7 +231,7 @@ EMSCRIPTEN_KEEPALIVE int of_web_command(int action, double a, double b) {
         pending.erase(std::remove_if(pending.begin(), pending.end(), [&](const Command& c) {
             if (action == Pause) return c.action == Pause && c.b == b;
             if (action == Cancel) return c.action != Pause;
-            return c.action == FireStart || c.action == FireAim || c.action == FireStop;
+            return c.action == FireStart || c.action == FireAim || c.action == FireStop || c.action == Secondary;
         }), pending.end());
     }
     if (!safety && pending.size() >= 32) return Busy;
@@ -227,6 +254,7 @@ EMSCRIPTEN_KEEPALIVE const char* of_web_state() {
         state["pauseReasons"] = CurrentPauseReasons(e);
         state["paused"] = CurrentPauseReasons(e) != 0;
         state["fireHeld"] = fireHeld;
+        state["secondaryPending"] = secondaryPending;
         state["manualCamera"] = manualCamera;
         state["engineTick"] = e.mMission_EngineTicks;
         state["selectedSquad"] = e.mSquad_Selected;

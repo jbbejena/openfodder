@@ -3,6 +3,15 @@
 Updated 2026-10-28. **Phase 2 has begun: MOB-004 is implemented and desktop-verified.
 Actual iPhone Safari remains NOT RUN; M1 and M2 are not accepted.**
 
+## Active task: MOB-005
+
+Codex claimed `mobile/touch-command-modes` from current master
+`6afde21d77f11780d578f909ab609627c8b41a93` (user-merged PR #4). Scope: visible
+squad selection, explicit Move/Fire/Grenade/Rocket modes, pointer ownership and
+deliberate secondary firing through the existing engine boundary. Camera gestures,
+the full phone layout and mission menus remain separate tasks. Implementation and
+verification are in progress; the published build below is still MOB-004.
+
 ## Branch, review and exact build
 
 - Current follow-up branch: `ci/windows-web-guards`, from user-merged master

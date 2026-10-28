@@ -6,9 +6,9 @@ simulate troops. `Source/WebInput.cpp` applies queued commands at the start of
 `Phase_Loop_Interrupt`, before the existing input/mission update. It uses existing
 squad/path/weapon/camera routines. The browser remains single-threaded.
 
-This is the Phase 2 foundation and opt-in diagnostic harness. Production touch
-ownership/gestures, secondary-weapon firing, phone HUD and full mission menus
-remain MOB-005–008. Vehicles receive `unsupported` rather than an invented order.
+MOB-005 adds [touch command modes](TOUCH_CONTROLS.md) and deliberate secondary
+fire to this foundation. Camera gestures, the full phone HUD and mission menus
+remain MOB-006–008. Vehicles receive `unsupported` rather than an invented order.
 Native mouse/keyboard paths remain in use when the bridge does not own input.
 
 ## JavaScript surface
@@ -24,6 +24,7 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | `fireAim({x,y})` / `fireAimAt(clientX,clientY)` | Change the held primary-fire target; requires an applied fire start |
 | `fireStop()` | Release manual fire; safe repeatedly, also clears queued fire requests |
 | `selectWeapon('grenade'/'rocket')` | Select an available secondary weapon without firing/consuming ammo |
+| `secondaryTo({x,y})` / `secondaryAt(clientX,clientY)` | Request one shot with the selected available grenade/rocket; native weapon/projectile rules decide whether it fires |
 | `pan(dx,dy)` | Apply a bounded camera intent in map pixels, at most 128 per axis; clamps to map bounds; cancels held input |
 | `follow()` | Resume the engine's squad-follow camera |
 | `setPaused(boolean, reason='user')` | Set/clear one explicit pause reason: `user`, `visibility`, or `focus` |
@@ -33,7 +34,9 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 Commands return `{ok:true,id}` when accepted or `{ok:false,reason}` when rejected.
 A positive ID means queued, not completed; inspect `state().last` after an input
 boundary. A newer ID or changed stage may supersede an older command. Cancel and
-stop before engine initialization are safe no-ops (`id:0`). The underlying Wasm
+stop before engine initialization are safe no-ops (`id:0`). Secondary fire is
+additive action **10** in API version 1; existing action numbers are unchanged.
+The underlying Wasm
 exports are `of_web_command(action,a,b)` and `of_web_state()` (JSON string pointer,
 decoded/copied immediately). Arbitrary scripts, state writes and outcome mutation
 are not part of this API.
@@ -46,20 +49,20 @@ are not part of this API.
 | Menu, finished/aborted phase, or map overview | `not-battlefield`; cancel/stop safe |
 | Paused | Gameplay commands rejected as `paused`; explicit pause/resume/cancel/stop accepted |
 | Input disabled or camera start adjustment running | `busy`; retry only after state becomes ready |
-| Empty squad or unavailable secondary ammo | `unavailable` |
+| Empty squad, unavailable secondary ammo/weapon, or secondary fire while the leader is in water | `unavailable` |
 | Missing valid selected squad/leader | `no-squad` |
 | Invalid index, weapon, nonfinite/fractional raw argument, map target, or oversized pan | `invalid` |
 | Vehicle move/fire | `unsupported` |
-| Normal command queue has 32 entries, or native waypoint queue is near capacity | `busy` |
+| Normal queue has 32 entries, waypoint queue is near capacity, or another secondary request awaits its native weapon update | `busy` |
 
 Arguments are validated in JS and C++; C++ revalidates at application time because
 selection/phase/pause can change after enqueue. Safety commands coalesce and keep
 reserved capacity; cancel cannot be blocked by a full normal queue. Cancelling
-retains pending pause requests. Fire-stop removes pending fire starts/aims. An
+retains pending pause requests. Fire-stop removes pending fire starts/aims and secondary requests. An
 accepted order may therefore be superseded or rejected at the input boundary.
 
 `state()` includes API/stage/readiness, last applied ID/result, pending count,
-pause reasons/effective pause, held-fire/manual-camera state, actual mission tick,
+pause reasons/effective pause, held-fire/secondary-pending/manual-camera state, actual mission tick,
 selected squad, actual squad counts/ammo/secondary weapon, and leader
 position/destination/aim. The viewport and map bounds also come from the engine.
 The numeric applied result codes are 0 success, -1 invalid, -2 uninitialized,
@@ -71,6 +74,15 @@ edge on every frame. Native autonomous return fire and committed projectiles are
 not undone by releasing manual input. Selecting a squad/weapon, moving, panning,
 pausing, losing a valid phase/selection, or cancelling releases held fire.
 Camera pan owns the view until follow, cancel, selection, movement or pause.
+
+Secondary fire sets the original left+right weapon latch once and uses existing
+targeting/troop/projectile routines. Native ammo, cooldown, water, projectile
+capacity and terrain behavior remain authoritative. The latch is consumed by
+the native attempt and never re-armed by later input interrupts. An accepted
+request is an attempt, not a promise that a projectile was created. Inspect
+engine ammo/state; `secondaryPending` distinguishes the short pending attempt
+from a primary-fire hold. Changing squad/leader/weapon, stop/cancel or pause
+releases the request; a committed projectile is never undone.
 
 Pause reasons compose with OR. Setting user pause twice cannot resume the game;
 clearing user pause cannot clear a visibility/focus pause. Native P remains the
@@ -115,10 +127,12 @@ After selecting the campaign, expand **Control bridge test panel** below the
 canvas. Use the engine map coordinates, squad/weapon buttons, Move, held primary
 fire, camera arrows/follow, Pause/Resume and Cancel. The JSON readout reflects the
 actual engine. Empty squads and unavailable weapons are disabled. The panel is
-not the production touch combat layout; normal desktop canvas input still works.
+not the production touch combat layout. Leave **Touch commands** unchecked for
+the original desktop canvas controls; the checkbox defaults off for a fine
+pointer. Touch devices enable the production controller by default.
 
 ```sh
-node --test web/engine-bridge.test.cjs
+node --test web/*.test.cjs
 ./scripts/build-web.sh
 python3 scripts/check-web-artifact.py
 python3 -m http.server 8090 --directory build-web/cmake/dist

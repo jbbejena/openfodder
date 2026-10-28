@@ -1,7 +1,9 @@
 # Reproducible browser build (MOB-002/003)
 
-The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004).
-The [command API/test harness](INPUT_API.md) is implemented; a complete touch-playable release remains pending.
+The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004)
+and [touch command modes](TOUCH_CONTROLS.md) (MOB-005). The [command API](INPUT_API.md)
+and squad/Move/Fire/secondary controls are implemented; a complete phone mission
+and actual iPhone acceptance remain pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
 
@@ -30,7 +32,8 @@ python3 -m http.server 8080 --directory build-web/cmake/dist
 Open `http://localhost:8080/`. `file://` is unsupported. Use HTTPS for a hosted
 preview; localhost is a secure context for the pack's SHA-256 verification.
 The output entry point is `index.html`, with `index.js`, `index.wasm`, `index.data`,
-`bootstrap.js`, `style.css`, `content-manifest.json`, `build-info.json`,
+`bootstrap.js`, `engine-bridge.js`, `touch-controls.js`, `input-harness.js`,
+`style.css`, `content-manifest.json`, `build-info.json`,
 `source.zip`, `SOURCE.txt`, and `notices/`. Serve Wasm as `application/wasm`.
 No pthreads, cross-origin isolation headers or external asset services are needed.
 
@@ -175,12 +178,12 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 4, fork build `d755c600e2f2afe49cabba8cea264ff6f4c5ef31`.
-[Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648116);
-the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40775648116/artifacts/12855525161)
+Sites version 5, fork build `7809755786a7999b835c814b63c945beb5c12f66`.
+[Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40783411106);
+the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40783411106/artifacts/12856464683)
 contains source/notices and no game assets. The default upstream-download route
 passed hosted desktop menu/map verification. See [the follow-up record](test-runs/phone-file-import.md)
-for the earlier phone-loading change; [MOB-004's record](test-runs/command-bridge.md)
+for the earlier phone-loading change; [MOB-005's record](test-runs/touch-commands.md)
 contains current hosting identity/sizes and command checks. Original Phase 1 measurements are historical.
 
 ## Actual iPhone Safari checkpoint — NOT RUN
@@ -199,3 +202,13 @@ No real iPhone is attached to this environment. To perform B05:
 5. Record menu/map screenshots privately and loading/errors against that build.
    Full touch combat, mission completion, audio, saves and Home Screen/PWA checks
    are separate later milestones. B05 and M1 remain unpassed until this real test.
+
+## Try the touch commands — real-device verification still required
+
+After the battlefield loads, select the populated squad and tap ground in Move
+mode. Choose Fire, hold/slide on ground, then lift. Add a second finger or move
+outside the battlefield to confirm fire releases. HUD taps must never order troops.
+Touch commands enable automatically for touch devices; desktop can use the checkbox.
+The first demo mission has zero secondary ammo, so Grenade/Rocket stay disabled.
+The separate local ammo fixture is not published. [Control map and cancellation
+rules](TOUCH_CONTROLS.md). Camera gestures and full phone layout follow next.

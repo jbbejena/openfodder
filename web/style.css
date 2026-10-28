@@ -1,5 +1,6 @@
 :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111a18; color: #e4e8de; }
 body { margin: 0; }
+[hidden] { display: none !important; }
 header { padding: 12px 18px; background: #1d2923; display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline; border-bottom: 1px solid #526346; }
 header strong { letter-spacing: .15em; color: #d4e09e; }
 header span { font-size: .85rem; color: #b8c6b7; }
@@ -17,6 +18,22 @@ input[type=file] { display: block; max-width: 100%; }
 canvas { display: none; margin: auto; width: 100%; max-width: 960px; height: auto; background: black; image-rendering: pixelated; }
 canvas.running { display: block; }
 canvas { object-fit: contain; object-position: center; border: 0; padding: 0; }
+#playfield { position: relative; }
+canvas.touch-commands { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; max-height: max(160px, calc(100svh - 280px)); }
+#touch-commands { border-bottom: 1px solid #526346; padding: 6px 0; }
+.touch-heading, .touch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.touch-heading { justify-content: space-between; font-size: .85rem; color: #bbccba; }
+.touch-heading label { display: inline-flex; align-items: center; min-height: 44px; }
+#touch-selection { font-variant-numeric: tabular-nums; }
+.touch-row [role=group] { display: flex; flex-wrap: wrap; gap: 4px; }
+#touch-commands button { min-height: 44px; padding: 8px 10px; margin: 0; font-size: .85rem; touch-action: manipulation; }
+#touch-commands button[aria-pressed=true] { background: #d4e09e; color: #18231b; border-color: #e4e8de; }
+#touch-confirm { border-color: #eac57e; color: #ffe2ac; }
+#touch-feedback { font-size: .85rem; margin: 8px 0 2px; min-height: 1.3em; }
+#touch-target { position: absolute; width: 22px; height: 22px; border: 2px solid #ffe2ac; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 0 1px #18231b; }
+#touch-target::before, #touch-target::after { content: ''; position: absolute; background: #ffe2ac; }
+#touch-target::before { width: 30px; height: 2px; top: 10px; left: -4px; }
+#touch-target::after { width: 2px; height: 30px; top: -4px; left: 10px; }
 #input-harness { border: 1px solid #526346; padding: 0 12px 12px; }
 #input-harness .input-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 #input-harness input[type=number] { width: 6em; padding: 10px; font: inherit; }

@@ -1,179 +1,157 @@
 # Current handoff
 
-Updated 2026-10-28. **Phase 2 has begun: MOB-004 is implemented and desktop-verified.
-Actual iPhone Safari remains NOT RUN; M1 and M2 are not accepted.**
+Updated 2026-10-28. **MOB-005 touch command modes are implemented and verified
+with desktop/emulated input. Actual iPhone Safari and a full touch-only mission
+are NOT RUN. M1/B05 and M2 remain unpassed.**
 
-## Branch, review and exact build
+## Branch, commits and review
 
-- Current follow-up branch: `ci/windows-web-guards`, from user-merged master
-  `2b28829cb827388e8881c5c9c648a1c570107149`. Scope: correct Windows CI classification
-  for Emscripten-only sections in shared files; cancel redundant Windows runs.
-- MOB-004 branch `mobile/command-bridge` started at
-  `47e956dfcf316b1149a0e54c775197baa0df62af` from the phone-preview branch.
-- Implementation commit **`d755c600e2f2afe49cabba8cea264ff6f4c5ef31`**. Later
-  documentation commits do not change the tested/deployed artifact.
-- The user merged [PR #3](https://github.com/jbbejena/openfodder/pull/3) as `2b28829`,
-  after merging [PR #2](https://github.com/jbbejena/openfodder/pull/2) as `a9a7476`.
-- The user previously merged PR #1 (roadmap plus Phase 1) as `f27963c`.
-  No merge, force push, submodule repin or game-data upload was performed here.
+- Task/claim: Codex / **MOB-005**, `mobile/touch-command-modes`, from current
+  user-merged master `6afde21d77f11780d578f909ab609627c8b41a93` (PR #4).
+- `1dd9a2c80ca83fa052b21b2ad2e187327b0f3d02`: touch toolbar, modes, pointer
+  ownership and deliberate native secondary fire.
+- **Tested/published code:** `7809755786a7999b835c814b63c945beb5c12f66`, including
+  the desktop resize ownership fix. Later docs do not change that artifact.
+- [Draft PR #5](https://github.com/jbbejena/openfodder/pull/5), targeting master,
+  left unmerged. Prior roadmap/Phase 1, phone loader, command bridge and Windows
+  correction are already in master through the user's merges of PRs #1–4.
+- No merge, force push, repin, native control rewrite or game-data upload here.
 
-## Windows CI correction
+## Delivered behavior
 
-The prior gate classified any shared C++ file edit as native, including MOB-004's
-changes wholly inside Emscripten guards. A documentation push repeated that PR
-classification, and the user's merge started a third run on master. All three
-are now confirmed **cancelled**: [40775648016](https://github.com/jbbejena/openfodder/actions/runs/40775648016),
-[40777099594](https://github.com/jbbejena/openfodder/actions/runs/40777099594),
-[40778617067](https://github.com/jbbejena/openfodder/actions/runs/40778617067).
+The battlefield toolbar defaults on for touch devices and can be enabled with
+**Touch commands** on desktop. Squad buttons show engine counts/selection and
+reject empty squads. Move commits one tap on release; a drag cancels. Fire
+holds primary aiming until lift/cancel. Grenade/Rocket modes mark a world target
+then require an explicit Throw/Launch confirmation; one native shot is requested,
+then the browser returns to Move. Ammo and projectile creation stay in C++.
 
-`windows_scope.py` now compares native-visible C++ outside proven Emscripten
-guards, retaining native includes, macros, alternatives and other platform
-branches. Browser-only new files may have no native declarations. Ambiguous
-syntax fails closed to Windows validation; literal/macro whitespace is preserved.
-Workflow concurrency cancels superseded runs on the same PR/ref. The Windows
-compiler/test/package job and manual-dispatch behavior are unchanged.
+A second canvas finger cancels the active gesture and cannot inherit it. HUD
+pointers remain separate. Pointer cancellation/lost capture, leaving the visible
+battlefield, mode/squad changes, resize, blur/hidden/pagehide release input.
+Capture-phase handlers suppress duplicate SDL legacy touch/compatibility mouse
+commands. Unchecking the controller retains desktop SDL controls.
 
-Validation: all **12 git-fixture tests passed**; the actual diffs from `f27963c`
-to `d755c60`, `d9b35f0` and merged `2b28829` all return `native: false`. Real native
-changes remain covered by the fixture checks. The public preview remains at
-`d755c60`, with no engine, content, toolchain or hosting changes in this follow-up.
-Follow the CI-fix branch PR checks for the live scope decision; Phase 2 touch
-implementation remains the next separate task.
+The exact demo begins with four troops in Squad 1, empty Squads 2/3, and zero
+secondary ammo. Published weapon buttons are correctly disabled. Separate local
+browser-memory Grenades=3/Rockets=2 fixtures proved native firing/ammo changes;
+no fixture was committed or published. No squad splitting was added.
 
-## Delivered behavior and task status
+Changed implementation: `web/touch-controls.js` and nine tests, shell/CSS/bootstrap,
+additive `secondaryTo/At` bridge methods and Emscripten-only `Source/WebInput.cpp`
+one-shot latch. Packaging/artifact allowlist includes the new JS; web CI runs
+all browser Node test files. Real-engine touch smoke and desktop resize regression
+are in `scripts/smoke-web-touch.cjs` / `smoke-web-input.cjs`.
 
-The public launcher still loads the exact demo directly from its existing pinned
-upstream host. Normal cheats remain off. Before Start game, Diagnostics →
-**Show input API test panel** enables a panel below the battlefield. It exercises
-engine-backed squad selection, movement, held primary fire/aim/stop, available
-secondary-weapon selection, camera pan/follow, explicit pause/resume and cancel.
-The real engine provides counts, ammo, selection, positions and targets.
-
-Commands are validated and applied at `Phase_Loop_Interrupt`. Cancel clears
-pending physical commands and held input while preserving pause reasons. Repeated
-pause requests cannot resume play; user/visibility/focus reasons compose. Native
-P remains supported. The browser loop yields/polls SDL while paused and skips
-mission updates. CSS/canvas/camera/sidebar/DPR conversion happens in one boundary.
-
-| Task | Status | Evidence |
-| --- | --- | --- |
-| MOB-001/002 | Done | [Baseline](docs/mobile/BUILD_BASELINE.md), [build](docs/mobile/BUILD.md), [Phase 1 record](docs/mobile/test-runs/phase-1.md) |
-| MOB-003 | Blocked on actual phone | Public preview/CI/desktop delivered; B05 iPhone map load NOT RUN |
-| MOB-004 | Done | [API contract](docs/mobile/INPUT_API.md), [test record](docs/mobile/test-runs/command-bridge.md), commit `d755c60` |
-| MOB-005 | Ready / next | Touch command modes, pointer ownership, deliberate secondary firing |
-| MOB-007 | Ready | Landscape phone shell/HUD; separate bounded task |
-| MOB-006/008 | Pending | Depend on the remaining touch controls/layout work |
-
-This is the command foundation and an opt-in diagnostic harness. Production
-canvas touch modes/gestures, secondary firing, full phone HUD and mission menus
-remain MOB-005–008. No full mission, persistence, background-resume policy,
-phone performance, larger forces, cover/suppression or H Hour work is claimed.
-Vehicles explicitly return `unsupported` for movement/fire through this API.
-
-Changed implementation: `Source/WebInput.*`, Emscripten-only hooks in
-`Source/Fodder.cpp` and `Start_Emscripten.cpp`, the Emscripten runtime export,
-`web/engine-bridge.js`, its six Node tests, diagnostic harness/shell/CSS,
-packaging/artifact guard and actual-engine smoke script. Web CI runs the six Node
-checks. Shared/native validation remains enabled; no native CI gate was weakened.
+[Control map](docs/mobile/TOUCH_CONTROLS.md), [API contract](docs/mobile/INPUT_API.md),
+[full evidence/known limits](docs/mobile/test-runs/touch-commands.md).
 
 ## Commands and actual results
 
 ```sh
-node --test web/engine-bridge.test.cjs
+node web/engine-bridge.test.cjs
+node web/touch-controls.test.cjs
+node --test web/*.test.cjs
+python3 -m unittest discover -s scripts/ci -p 'test_*.py' -q
 ./scripts/build-web.sh
 python3 scripts/check-web-artifact.py
-python3 scripts/make-local-web-pack.py
+python3 scripts/ci/windows_scope.py --base origin/master --head HEAD
 python3 -m http.server 8090 --directory build-web/cmake/dist
 PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
-  node scripts/smoke-web-input.cjs http://127.0.0.1:8090/ \
-  build-web/local-only/christmas.ofdata build-web/local-only/command-bridge-committed-evidence
+  node scripts/smoke-web-touch.cjs http://127.0.0.1:8090/ \
+  build-web/local-only/christmas.ofdata build-web/local-only/touch-final-evidence
 PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
-  node scripts/smoke-web.cjs http://127.0.0.1:8090/ \
-  build-web/local-only/christmas.ofdata build-web/local-only/bridge-committed-regression-evidence
+  node scripts/smoke-web-input.cjs http://127.0.0.1:8090/ \
+  build-web/local-only/christmas.ofdata build-web/local-only/touch-final-bridge-evidence
 ```
 
-- Six Node tests passed. Committed build and artifact/source guard passed for
-  `d755c60`; `.data` still contains 47 GPL/config files, no game assets.
-- Actual-engine Chromium tests passed at DPR 1 and 2: real movement/aim, same
-  world target after pan/resize/letterboxing, queue overflow/cancel priority,
-  stop/cancel, idempotent pause with frozen mission ticks and separate reasons,
-  native menu/P/right-button input, and real diagnostic pointer down/up.
-- The pinned mission has zero secondary ammo: rejection passed. Valid grenade/
-  rocket selection passed with a clearly separate, local in-memory campaign
-  fixture (`Grenades=3`, `Rockets=2`), without consuming ammo or modifying Run/pins.
-- Launcher regression passed: menu/map, defaults, opt-in cheats, corrupt/partial
-  files, failed-download retry, real upstream loading and missing-Wasm feedback.
-  External-fetch QA used the environment proxy CA with TLS verification enabled.
-- Screenshots of committed local and hosted menu/map/harness were inspected and
-  retained locally. Logs: `/workspace/command-bridge-committed-build.log`,
-  `/workspace/command-bridge-committed-smoke.log`, `/workspace/bridge-committed-regression.log`.
-- A limited host syntax check of the changed translation units passed using
-  `c++ -std=c++14 -fsyntax-only -DOPENFODDER_NO_MIXER -ISource -Ibuild-web/cmake/Source -Ibuild-web/cache/ports/sdl3/SDL-release-3.2.22/include Source/Fodder.cpp Source/WebInput.cpp Source/Start_Emscripten.cpp`.
-  Full Linux CI also passed; this syntax check is not a full native runtime test.
+- All 15 Node cases and 12 Windows scope fixtures passed; task diff is web-only.
+- Committed pinned build/source guard passed for `7809755`; 47 GPL/config support
+  files, no game assets. Limited host syntax check passed; full Linux CI passed.
+- Chromium 154.0.8037.57 / Playwright 1.57.0, Linux SwiftShader/WebGL1. Actual Wasm
+  orders, leader movement/aim, command counts, native secondary ammo, HUD/multiple
+  fingers, exit/cancel and post-resize targeting passed with CDP touch emulation
+  at DPR 2, 915×600 then 844×390. This is not real iPhone input.
+- Desktop bridge DPR 1/2 passed, including native menu/right-fire/P, explicit pause
+  reasons/frozen ticks, queue/cancel and opt-in harness hold/release.
+- The initial desktop regression caught disabled touch controls cancelling camera
+  input on resize. Fixed in `7809755`; durable actual-engine regression passed.
+- Fresh anonymous hosted HTTP 200, exact clean ID, 20 verified upstream GETs,
+  menu/map and touch Move/primary Fire/release/second-finger cancellation passed.
+  No supplied credentials, authentication headers or page errors. One cold
+  engine-ready measurement: 2,440 ms, not a phone benchmark.
+- Initial hosted coordinate QA failed with an unlocked moving follow camera;
+  the final stationary-camera comparison passed. Details in the test record.
+- Final local and hosted screenshots were inspected and remain local. Logs and
+  JSON: `/workspace/touch-final-*.log`, `/workspace/touch-hosted-result.json`,
+  `/workspace/touch-hosted-smoke.log`, `build-web/local-only/touch-final-evidence/`
+  and `touch-final-bridge-evidence/`. No game-art screenshots uploaded.
 
-## Public preview and CI
+## Preview, artifact and CI
 
-- [Preview](https://openfodder-phase-one.zanysky263.chatgpt.site): **public, no sign-in**,
-  Sites version **4**, visible fork ID **`d755c600e2f2`**. Prior version 3 / `b9abafb`
-  was the Phase 1 phone-loading preview and is superseded.
-- Project `appgprj_6ae24fbe89788191a38778521e56e855`; deployment
-  `appgdep_6ae26f6757dc8191bc31d12a27d21ed0`: succeeded. Hosting source
-  `94fff4aa11982b84bbe9d5dfa75b155e8007b0fa`, checkout/manifest
-  `/workspace/sites/openfodder-phase-one/`. Source pushed before saving/deploying;
-  output was packaged separately, not committed. Audience stayed public.
-- Fresh anonymous hosted Chromium: HTTP 200, correct ID, 20 verified upstream
-  GET requests, menu/map, real panel pause twice with frozen ticks, resume and
-  held-fire cancellation. No supplied credentials/authorization headers. Engine
-  ready 1,534 ms on one cold desktop navigation, not a phone benchmark.
-- [Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648116);
-  [matching artifact](https://github.com/jbbejena/openfodder/actions/runs/40775648116/artifacts/12855525161),
-  30-day retention, includes matching source/notices and no player pack.
-- [Linux native CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648201).
-  The Windows runs were cancelled in the correction above; **no Windows pass
-  claimed**. The original file-level gate overclassified Emscripten-only edits
-  in shared `Source/Fodder.cpp`; native-visible changes still require validation.
-- PR path filters use the aggregate PR diff; a documentation follow-up to an
-  outstanding shared-C++ PR may trigger native CI again. Feature-push/PR build
-  duplication remains prevented. No check/protection was bypassed.
+- [Public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), **no sign-in**:
+  Sites version **5**, visible build **`7809755786a7`**; previous `d755c60` is superseded.
+- Saved version `appgprj_6ae24fbe89788191a38778521e56e855~appgver_48599b79f2408191865c305e452299bd`.
+  Deployment `appgdep_6ae27d0cf85881919e97fef47cbb4488` succeeded. Source commit
+  `1ccf34dced62f9a600542ff9fbad914934228040`, manifest/source checkout
+  `/workspace/sites/openfodder-phase-one/`, project
+  `appgprj_6ae24fbe89788191a38778521e56e855`. Public access preserved.
+- [Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40783411106),
+  [matching artifact](https://github.com/jbbejena/openfodder/actions/runs/40783411106/artifacts/12856464683),
+  source/notices included, 30-day retention, no player pack.
+- [Linux CI passed](https://github.com/jbbejena/openfodder/actions/runs/40783411112).
+- [Windows scope run](https://github.com/jbbejena/openfodder/actions/runs/40783411082):
+  scope job `123150494839` passed; compiler job `123150565587` **SKIPPED**. No
+  Windows runner was allocated. The user-merged PR #4 correctly recognizes this
+  file's Emscripten guards; native-visible edits/manual dispatch remain covered.
+- Follow PR #5 for the latest checks on the docs handoff. Aggregate PR diffs can
+  retrigger web/Linux validation; Windows stays gated. No protection bypassed.
 
-## Dependencies, data and publication boundary
+## Dependencies and publication
 
-- Run `070a6086c62164e859fc3274b75b5f536fa9d902`; Scripts
-  `dad04730860bcdd1189aa8562860e379b0f5d783`, unchanged recursive pins.
-- emsdk `c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`; Emscripten 4.0.23
-  (`7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`); SDL 3.2.22;
-  CMake 3.31.6 / Ninja 1.11.1. Full pins/commands in BUILD.md.
-- Current cold runtime 2,920,588 bytes; upstream two-mission demo 223,382 bytes,
-  roughly 3.14 MB total before compression. Optional source 1,819,812 bytes;
-  all hosted files 4,854,457 bytes. Full retail data was not measured/bundled.
-- Engine/GPL Scripts and game-data permissions remain separate. Our own demo
-  mirroring/bundling grant is unresolved. Data is loaded directly from the pinned
-  existing publisher or local files, hash-checked and held in browser memory.
-  Synthetic ammo edits exist only in the local test browser, never the preview.
-  No game assets, player packs, credentials or game-art screenshots were uploaded.
+Run `070a6086c62164e859fc3274b75b5f536fa9d902`, Scripts
+`dad04730860bcdd1189aa8562860e379b0f5d783`, emsdk
+`c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`, Emscripten 4.0.23
+(`7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`), SDL 3.2.22,
+CMake 3.31.6/Ninja 1.11.1: unchanged. See [BUILD.md](docs/mobile/BUILD.md).
 
-## Evidence limits and next checks
+Runtime 2,937,519 bytes; upstream demo 223,382 bytes; about 3.16 MB combined
+before compression. Optional source 1,840,045 bytes; all hosted files 4,891,621.
+The Site hosts engine/support/source only. Exact demo files load directly from
+the pinned existing upstream publisher or local files, hash-checked in memory.
+Our own data-mirroring grant remains unresolved; engine/GPL Scripts licensing
+is separate. Synthetic ammo never entered Run, the manifest or the public Site.
 
-Desktop: Linux Chromium 154.0.8037.57, Playwright Core 1.57.0,
-1100×1000 then 780×900, DPR 1/2, mouse/direct commands, WebGL1/SwiftShader.
-Synthetic blur supplements real pointer tests; it is not a phone interruption test.
-Actual iPhone Safari, full touch combat, mission completion and saves: **NOT RUN**.
-Audio remains disabled; the existing requestAnimationFrame warning remains.
+## Remaining tasks and gates
 
-Phone checkpoint: open the public preview in Safari and record model/iOS/build.
-Load demo → Start → select Christmas Special and confirm the battlefield (B05).
-To inspect this foundation, enable the diagnostic test panel before Start and
-try its explicit controls afterward. This does not substitute for touch-mode,
-gesture or full-mission acceptance. [Phone steps](docs/mobile/BUILD.md#actual-iphone-safari-checkpoint--not-run).
+| Task | Status / next action |
+| --- | --- |
+| MOB-001/002 | Done; historical [baseline](docs/mobile/BUILD_BASELINE.md), [Phase 1 evidence](docs/mobile/test-runs/phase-1.md) |
+| MOB-003 | Blocked on actual iPhone Safari B05 menu/map result |
+| MOB-004 | Done; [command foundation](docs/mobile/test-runs/command-bridge.md) |
+| MOB-005 | Done implementation/emulated checks; physical iPhone remains not run |
+| **MOB-006** | **Ready / next: safe touch camera gesture**, building on single-owner cancellation |
+| MOB-007 | Independently ready: full landscape phone layout/HUD, safe areas and dynamic browser bounds |
+| MOB-008 | Pending camera/layout: complete mission menus, retry/abort/results without keyboard |
 
-Next dependency-ready task: **MOB-005**, using this API for single-owner touch
-Move/Fire/secondary targeting and cancellation. MOB-007 is independently ready;
-MOB-006 follows MOB-005. M1/M2 stay unpassed until their real device/gameplay checks.
-Keep persistence/lifecycle/performance and H Hour at their documented later gates.
+The current basic toolbar makes the battlefield small on short viewports and
+can require scrolling. It is not the full MOB-007 phone shell. Camera pan is not
+available through touch; two fingers currently cancel. Audio remains disabled;
+vehicles remain unsupported through the API. Full mission, save persistence,
+real interruption recovery/performance, larger forces, tactical changes and
+H Hour were not implemented or accepted in this task.
+
+Phone steps: open the public URL in Safari and verify `7809755786a7`; Load demo →
+Start → briefly hold the Christmas campaign row. Record model/iOS and B05 map
+load. Then select Squad 1, Move/tap ground, Fire/hold/slide/lift, add a second
+finger, leave the battlefield and Cancel. HUD taps must never order troops;
+zero-ammo weapon buttons remain disabled. Record actual observations/failures.
+No ChatGPT login, PC or local demo files are needed. **These phone checks have
+not run**, and compilation/emulation/user merges cannot pass them.
 
 ## Future handoff template
 
-- Task/status, branch/base, final commits/PR and exact deployed build.
-- Changed behavior/files, actual commands/results, browser/device/input.
-- Preview/artifact/provenance, source-inspected/automated/emulated/real-device limits.
-- Failures/unperformed checks/blockers; next task and remaining dependencies.
+Task/status, branch/base, final commits/PR, deployed build; changed behavior/files;
+actual commands/results and input/device/browser; preview/artifact/provenance;
+source-inspected/automated/emulated/real-device distinctions; failures/unperformed
+checks/blockers; exact next dependency-ready task. Preserve user work and pins.

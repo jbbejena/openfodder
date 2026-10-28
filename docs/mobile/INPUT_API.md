@@ -7,8 +7,8 @@ simulate troops. `Source/WebInput.cpp` applies queued commands at the start of
 squad/path/weapon/camera routines. The browser remains single-threaded.
 
 MOB-005 adds [touch command modes](TOUCH_CONTROLS.md) and deliberate secondary
-fire to this foundation. Camera gestures, the full phone HUD and mission menus
-remain MOB-006–008. Vehicles receive `unsupported` rather than an invented order.
+fire to this foundation. MOB-006 adds touch camera gestures and Follow using the same existing
+engine intents. The full phone HUD and mission menus remain MOB-007–008. Vehicles receive `unsupported` rather than an invented order.
 Native mouse/keyboard paths remain in use when the bridge does not own input.
 
 ## JavaScript surface
@@ -30,6 +30,7 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | `setPaused(boolean, reason='user')` | Set/clear one explicit pause reason: `user`, `visibility`, or `focus` |
 | `cancel()` | Clear pending physical commands, held fire and native button/control latches; return camera ownership to the engine; preserve pause reasons and already-issued movement/projectiles |
 | `clientToWorld(x,y)` / `worldToClient(x,y)` | Read-only projection for the current canvas/view |
+| `clientDeltaToMap(dx,dy)` | Read-only CSS distance conversion using the contained image scale; returns fractional map pixels or null for missing geometry |
 
 Commands return `{ok:true,id}` when accepted or `{ok:false,reason}` when rejected.
 A positive ID means queued, not completed; inspect `state().last` after an input
@@ -117,7 +118,9 @@ by DPR a second time. Intrinsic canvas changes preserve this projection.
 
 Only the C++ fire adapter reverses the original targeting routine's cursor
 hotspot (+16 X, +8 Y); that adjustment must not appear in JS. Movement uses the
-existing map-target routine directly. Panning changes camera/render state, not
+existing map-target routine directly. Camera gestures convert distances with
+`clientDeltaToMap`; distances receive no camera/sidebar translation. The touch
+controller retains fractions and sends bounded integer pan intents. Panning changes camera/render state, not
 movement orders or simulation time.
 
 ## Diagnostic harness and checks

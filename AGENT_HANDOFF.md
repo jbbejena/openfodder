@@ -4,6 +4,14 @@ Updated 2026-10-28. **MOB-005 touch command modes are implemented and verified
 with desktop/emulated input. Actual iPhone Safari and a full touch-only mission
 are NOT RUN. M1/B05 and M2 remain unpassed.**
 
+## Active task: MOB-006
+
+Codex claimed `mobile/touch-camera` from user-merged master
+`ec0497aa4b565f1e09ee5c6391470522167a6fb0` (PR #5). Scope: safe touch camera
+gestures, explicit Pan mode, Follow squad, and input/coordinate validation.
+Implementation/testing are in progress. The public preview below remains the
+MOB-005 artifact until a new committed build is verified and published.
+
 ## Branch, commits and review
 
 - Task/claim: Codex / **MOB-005**, `mobile/touch-command-modes`, from current

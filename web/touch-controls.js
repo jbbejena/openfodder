@@ -2,32 +2,39 @@
 (function (root) {
   'use strict';
   const weapons = { grenade: 1, rocket: 3 };
-  const hints = { move: 'Tap ground to move. Dragging cancels the order.',
+  const hints = { move: 'Tap ground to move; drag two fingers to pan. A one-finger drag cancels the order.',
     fire: 'Hold ground to fire; slide to aim. Lift or leave the battlefield to stop.',
+    pan: 'Drag one finger to pan. Lift to hold the view; Follow squad returns the camera.',
     grenade: 'Tap a target, then confirm Throw grenade.', rocket: 'Tap a target, then confirm Launch rocket.' };
   function create(bridge, changed = () => {}) {
     let enabled = false, mode = 'move', owner = null, target = null, selecting = null;
+    let camera = null;
     let message = hints.move, previous = bridge.state(), lastAim = null;
     const pointers = new Set();
     const selected = state => state.squads?.[state.selectedSquad];
     const canAct = state => state.stage === 'battlefield' && state.ready && !state.paused && selected(state)?.count > 0;
-    function notify() { changed({ enabled, mode, target, message, owner: owner?.id ?? null }, bridge.state()); }
+    function notify() { changed({ enabled, mode, target, message, panning: Boolean(camera),
+      owner: owner?.id ?? camera?.points.keys().next().value ?? null }, bridge.state()); }
     function receipt(result, success) {
       message = result.ok ? success : `Command unavailable: ${result.reason}.`;
       notify();
       return result;
     }
-    function release() {
-      owner = target = selecting = lastAim = null;
+    function release(keepView = true) {
+      const state = bridge.state();
+      owner = target = selecting = lastAim = camera = null;
       // Keep physical IDs until their up/cancel. Changing modes cannot transfer
       // an already-held finger to a fresh command.
       bridge.cancel();
+      // Cancel releases engine camera ownership. Restore an already-panned view
+      // without moving it, so switching input modes cannot snap to the squad.
+      if (keepView && state.manualCamera && canAct(state)) bridge.pan(0, 0);
     }
     function cancel(text = 'Target cancelled. Tap fresh ground to continue.') {
       release(); mode = 'move'; message = text; notify();
     }
     function setMode(next) {
-      if (!['move', 'fire', 'grenade', 'rocket'].includes(next)) return false;
+      if (!['move', 'fire', 'pan', 'grenade', 'rocket'].includes(next)) return false;
       const state = bridge.state();
       if (!enabled || !canAct(state)) return false;
       if (weapons[next] && !(selected(state)[next === 'grenade' ? 'grenades' : 'rockets'] > 0)) return false;
@@ -39,14 +46,50 @@
       }
       mode = next; message = hints[mode]; notify(); return true;
     }
+    const client = event => ({ x: event.clientX, y: event.clientY });
+    function beginCamera(points, squad) {
+      release();
+      const values = points.map(([, point]) => point);
+      const mid = { x: values.reduce((sum, p) => sum + p.x, 0) / values.length,
+        y: values.reduce((sum, p) => sum + p.y, 0) / values.length };
+      camera = { points: new Map(points), start: mid, last: mid, dx: 0, dy: 0, active: false, squad };
+      message = points.length === 2 ? 'Camera gesture. Drag two fingers; lift both before another command.' : hints.pan;
+      notify();
+    }
+    function flushCamera() {
+      if (!camera) return;
+      const state = bridge.state();
+      if (!canAct(state) || state.selectedSquad !== camera.squad) { cancel('Battlefield changed. Camera gesture cancelled.'); return; }
+      // Coalesce physical events, retain subpixel motion, and respect the
+      // existing bounded engine pan command. No inertia or post-release input.
+      for (let i = 0; i < 4; i++) {
+        const dx = Math.max(-128, Math.min(128, Math.round(camera.dx)));
+        const dy = Math.max(-128, Math.min(128, Math.round(camera.dy)));
+        if (!dx && !dy) return;
+        const result = bridge.pan(dx, dy);
+        if (!result.ok) { cancel(`Camera unavailable: ${result.reason}. Input released.`); return; }
+        camera.dx -= dx; camera.dy -= dy;
+      }
+    }
     function down(event) {
       if (event.button !== 0 || pointers.has(event.pointerId)) return;
       pointers.add(event.pointerId);
-      if (pointers.size !== 1) { cancel('Multiple touches cancelled the command. Lift all fingers to try again.'); return; }
       const state = bridge.state();
+      if (pointers.size !== 1) {
+        // Only an uninterrupted Move tap may become a two-touch camera intent.
+        // Fire/secondary gestures and HUD-owned pointers never become panning.
+        if (pointers.size === 2 && owner?.mode === 'move' && mode === 'move' &&
+            owner.pointerType === 'touch' && event.pointerType === 'touch' && canAct(state) &&
+            state.selectedSquad === owner.squad && bridge.clientToWorld(event.clientX, event.clientY) &&
+            bridge.clientToWorld(owner.latest.x, owner.latest.y)) {
+          beginCamera([[owner.id, owner.latest], [event.pointerId, client(event)]], state.selectedSquad);
+        } else cancel('Multiple touches cancelled the command. Lift all fingers to try again.');
+        return;
+      }
       if (!enabled || !canAct(state) || selecting || !bridge.clientToWorld(event.clientX, event.clientY)) return;
+      if (mode === 'pan') { beginCamera([[event.pointerId, client(event)]], state.selectedSquad); return; }
       owner = { id: event.pointerId, x: event.clientX, y: event.clientY, mode,
-        latest: { x: event.clientX, y: event.clientY }, squad: state.selectedSquad };
+        latest: client(event), squad: state.selectedSquad, pointerType: event.pointerType };
       target = null;
       if (mode === 'fire') {
         const result = bridge.fireStartAt(event.clientX, event.clientY);
@@ -58,6 +101,19 @@
       notify();
     }
     function move(event) {
+      if (camera?.points.has(event.pointerId)) {
+        if (!bridge.clientToWorld(event.clientX, event.clientY)) { cancel('Outside battlefield. Camera gesture cancelled.'); return; }
+        camera.points.set(event.pointerId, client(event));
+        const points = [...camera.points.values()];
+        const mid = { x: points.reduce((sum, p) => sum + p.x, 0) / points.length,
+          y: points.reduce((sum, p) => sum + p.y, 0) / points.length };
+        if (!camera.active && Math.hypot(mid.x - camera.start.x, mid.y - camera.start.y) < 8) return;
+        camera.active = true;
+        const delta = bridge.clientDeltaToMap(camera.last.x - mid.x, camera.last.y - mid.y);
+        if (!delta) { cancel('Camera bounds changed. Gesture cancelled.'); return; }
+        camera.dx += delta.x; camera.dy += delta.y; camera.last = mid;
+        return;
+      }
       if (!owner || event.pointerId !== owner.id) return;
       if (!bridge.clientToWorld(event.clientX, event.clientY)) { cancel('Outside battlefield. Input released.'); return; }
       if (owner.mode !== 'fire' && Math.hypot(event.clientX - owner.x, event.clientY - owner.y) > 12) {
@@ -66,6 +122,15 @@
       owner.latest = { x: event.clientX, y: event.clientY };
     }
     function up(event) {
+      if (camera?.points.has(event.pointerId)) {
+        move(event); flushCamera();
+        if (camera) {
+          camera = null;
+          message = 'Camera held. Lift all fingers; Follow squad returns the camera.';
+          bridge.fireStop();
+        }
+        pointers.delete(event.pointerId); notify(); return;
+      }
       const active = owner?.id === event.pointerId ? owner : null;
       pointers.delete(event.pointerId);
       if (!active) return;
@@ -84,7 +149,7 @@
     }
     function lost(event) {
       pointers.delete(event.pointerId);
-      if (owner?.id === event.pointerId) cancel('Touch cancelled. Input released.');
+      if (owner?.id === event.pointerId || camera?.points.has(event.pointerId)) cancel('Touch cancelled. Input released.');
     }
     function confirm() {
       if (!target || !weapons[mode] || selecting || !enabled || !canAct(bridge.state())) return;
@@ -104,7 +169,7 @@
         selecting = null;
         if (!valid) cancel('Weapon selection changed. Choose a weapon again.');
       }
-      if ((owner || target) && !canAct(state)) cancel('Battlefield unavailable. Input released.');
+      if ((owner || target || camera) && !canAct(state)) cancel('Battlefield unavailable. Input released.');
       if (owner?.mode === 'fire' && state.last?.id >= owner.startId && !state.fireHeld) cancel('Fire ended. Lift and touch again to fire.');
       if (weapons[mode] && !selecting && (selected(state)?.weapon !== weapons[mode] ||
           !(selected(state)?.[mode === 'grenade' ? 'grenades' : 'rockets'] > 0))) cancel('Weapon unavailable. Move mode ready.');
@@ -115,19 +180,25 @@
         if (!result.ok) { cancel(`Aim unavailable: ${result.reason}. Input released.`); return; }
         lastAim = { ...point };
       }
+      flushCamera();
       notify();
     }
     return Object.freeze({ down, move, up, lost, confirm, tick, cancel, setMode,
       foreignDown(event) {
         pointers.add(event.pointerId);
-        if (owner) cancel('HUD or page touched. Input released.');
+        if (owner || camera) cancel('HUD or page touched. Input released.');
       },
-      setEnabled(value) { if (enabled === Boolean(value)) return; cancel(); enabled = Boolean(value); notify(); },
+      setEnabled(value) { if (enabled === Boolean(value)) return; release(false); mode = 'move'; enabled = Boolean(value); message = hints.move; notify(); },
       selectSquad(id) {
         if (!enabled || !canAct(bridge.state())) return;
         cancel(); receipt(bridge.selectSquad(id), 'Squad selection requested.');
       },
-      snapshot: () => ({ enabled, mode, target, owner: owner?.id ?? null, pointers: pointers.size, selecting })
+      followSquad() {
+        if (!enabled || !canAct(bridge.state())) return;
+        release(false); mode = 'move'; receipt(bridge.follow(), 'Following squad. Tap ground to move.');
+      },
+      snapshot: () => ({ enabled, mode, target, panning: Boolean(camera),
+        owner: owner?.id ?? camera?.points.keys().next().value ?? null, pointers: pointers.size, selecting })
     });
   }
 
@@ -158,9 +229,13 @@
         const mode = button.dataset.touchMode, secondary = weapons[mode];
         const ammo = secondary ? squad?.[mode === 'grenade' ? 'grenades' : 'rockets'] ?? 0 : null;
         button.disabled = !canAct || !squad?.count || (secondary && !ammo);
-        button.setAttribute('aria-pressed', String(ui.mode === mode));
-        button.textContent = secondary ? `${mode === 'grenade' ? 'Grenade' : 'Rocket'} · ${ammo}` : mode === 'move' ? 'Move' : 'Fire';
+        button.setAttribute('aria-pressed', String((ui.panning ? 'pan' : ui.mode) === mode));
+        button.textContent = secondary ? `${mode === 'grenade' ? 'Grenade' : 'Rocket'} · ${ammo}` :
+          { move: 'Move', fire: 'Fire', pan: 'Pan' }[mode];
       });
+      document.getElementById('touch-follow').disabled = !canAct || !squad?.count;
+      canvas.dataset.inputMode = ui.panning ? 'pan' : ui.mode;
+      canvas.dataset.panning = String(ui.panning);
       confirm.hidden = !ui.target;
       confirm.disabled = !canAct || !ui.target;
       confirm.textContent = ui.mode === 'grenade' ? 'Throw grenade' : 'Launch rocket';
@@ -221,6 +296,7 @@
     modeButtons.forEach(button => button.addEventListener('click', () => controller.setMode(button.dataset.touchMode)));
     confirm.addEventListener('click', controller.confirm);
     document.getElementById('touch-cancel').addEventListener('click', () => controller.cancel());
+    document.getElementById('touch-follow').addEventListener('click', controller.followSquad);
     function interrupt() {
       if (controller.snapshot().enabled) controller.cancel('Input released. Choose a mode to continue.');
     }

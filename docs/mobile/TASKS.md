@@ -26,7 +26,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `7809755`: current public preview with direct upstream demo loading, anonymous/emulated menu/map passed; [MOB-005 record](test-runs/touch-commands.md). B05 not run: no real iPhone |
 | MOB-004 | M2 | done | MOB-002 | Codex / `mobile/command-bridge`, from `47e956d` | `d755c60`: [API contract](INPUT_API.md), [actual-engine DPR 1/2 + hosted checks](test-runs/command-bridge.md), [merged PR #3](https://github.com/jbbejena/openfodder/pull/3). B05/M1 still unpassed. |
 | MOB-005 | M2 | done | MOB-004 | Codex / `mobile/touch-command-modes`, from `6afde21` | `1dd9a2c` + `7809755`: [control map](TOUCH_CONTROLS.md), [actual-engine emulated touch + desktop evidence](test-runs/touch-commands.md), [draft PR #5](https://github.com/jbbejena/openfodder/pull/5). Actual iPhone and M2 remain unpassed. |
-| MOB-006 | M2 | ready | MOB-004, MOB-005 | Unclaimed | Next: two-finger camera intent using verified single-owner cancellation |
+| MOB-006 | M2 | active | MOB-004, MOB-005 | Codex / `mobile/touch-camera`, from `ec0497a` | Two-finger Move-mode pan, explicit Pan mode, Follow squad, and safe ownership/coordinate checks in progress |
 | MOB-007 | M2 | ready | MOB-004 | Unclaimed | Engine state/coordinate contract and basic command toolbar exist; full landscape phone shell/HUD remains to implement |
 | MOB-008 | M2 | pending | MOB-005, MOB-006, MOB-007 | Unclaimed | — |
 | MOB-009 | M3 | pending | MOB-002, MOB-008 | Unclaimed | — |

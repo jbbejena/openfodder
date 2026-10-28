@@ -9,8 +9,9 @@ delivered. Actual iPhone Safari is NOT RUN; M1 remains unpassed.**
   `build/mobile-phase-1`, created from fetched roadmap tip
   `6b851862a77c3dd9556b5cadae7c88d370b6095f` on `docs/mobile-browser-roadmap`.
   Engine base: `4312ff7c1abe3b6750483921893651d9d3c55b33`.
-- [Draft PR #1](https://github.com/jbbejena/openfodder/pull/1), targeting `master`,
-  includes **the roadmap documents plus Phase 1 changes**. Leave it unmerged.
+- [PR #1](https://github.com/jbbejena/openfodder/pull/1) included the roadmap and
+  Phase 1 changes. The user merged it as `f27963c93db6c65e8c8138f9e0a1b869521d11a4`.
+  The phone-file helper below is a separate branch/preview update.
 - Focused commits: `0434d1e` (MOB-001 baseline), `570be27` (MOB-002 pinned build
   and local-file shell), `291de61` (MOB-003 CI/path filters). The subsequent
   documentation/handoff commit is visible at the PR head.
@@ -35,6 +36,28 @@ combat/force changes, persistent saves or H Hour implementation were added.
 Changed files: CMake/web startup, `scripts/` build/pack/verification helpers,
 `web/` launcher/config/manifest, legacy Windows helper (now WSL delegation), three
 CI workflows, build/evidence documentation and planning/handoff entry points.
+
+## Phone-only testing follow-up
+
+Current branch: `web/iphone-file-import`, from merged master `f27963c`. The user
+asked for a way to test on iPhone without a compiler/terminal.
+The launcher now accepts the 20 exact extracted demo files across separate Files
+picker visits. A pinned upstream ZIP link and on-page instructions replace the
+need to generate `.ofdata` on a computer. The existing pack route still works.
+
+Only web shell/import logic, desktop smoke coverage and docs changed. Engine
+C++/CMake, dependency/data pins and touch combat are unchanged. User-selected
+files are hash-checked before mounting, remain in memory, and are never uploaded.
+No game content has been added to hosting or source. Publication rights remain
+unresolved; linking the existing upstream download is not a new license grant.
+
+Local desktop checks passed for the original merged build and the new individual-
+file flow: 19 files cannot start; an unexpected script is rejected while retaining
+verified files; adding the campaign enables startup; menu and battlefield render
+with cheats off. Existing pack opt-in/error checks also passed. A narrow launcher
+layout check supplements this; it is not real iPhone Safari evidence. B05 stays
+NOT RUN until the user tests the published preview on actual hardware.
+See [the follow-up record](docs/mobile/test-runs/phone-file-import.md).
 
 ## CI follow-up: skip unnecessary Windows builds
 

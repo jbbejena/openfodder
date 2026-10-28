@@ -3,6 +3,9 @@
 const statusLine = document.getElementById('status');
 const startButton = document.getElementById('start');
 const packInput = document.getElementById('pack');
+const filesInput = document.getElementById('demo-files');
+const fileProgress = document.getElementById('file-progress');
+const localFiles = new Map();
 const canvas = document.getElementById('canvas');
 let runtimeReady = false;
 let pack = null;
@@ -26,7 +29,7 @@ function log(message) {
 }
 function ready() {
   startButton.disabled = failed || !runtimeReady || !pack || started;
-  if (runtimeReady && !pack) status('Engine ready. Select your local demo pack to continue.');
+  if (runtimeReady && !pack) status('Engine ready. Choose your local demo files or pack to continue.');
   if (runtimeReady && pack) status('Demo verified. Start game to open the campaign menu.');
 }
 // Defined before Emscripten's generated script. Boot the runtime/preloaded GPL
@@ -71,10 +74,59 @@ const metadataReady = Promise.all([
   document.getElementById('build-details').textContent = JSON.stringify(info, null, 2);
 }).catch(error => { fail(error.message); throw error; });
 
-packInput.addEventListener('change', async () => {
+async function checkFile(data, entry) {
+  const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)), b => b.toString(16).padStart(2, '0')).join('');
+  if (data.length !== entry.size || hash !== entry.sha256) throw Error(`Content mismatch: ${entry.path}`);
+}
+
+filesInput.addEventListener('change', async () => {
+  if (failed || started) return;
+  const batch = Array.from(filesInput.files);
+  if (!batch.length) return;
   pack = null;
   startButton.disabled = true;
-  if (failed) return;
+  // Snapshot before asynchronous reads so another picker selection cannot change
+  // this batch. Keep a previously verified batch if a replacement is invalid.
+  let accepted = false;
+  filesInput.disabled = packInput.disabled = true;
+  try {
+    await metadataReady;
+    if (batch.length > manifest.files.length) throw Error('Choose only the Christmas Special demo files.');
+    const candidate = new Map(localFiles);
+    for (const file of batch) {
+      const entry = manifest.files.find(item => item.path.split('/').pop() === file.name);
+      if (!entry) throw Error(`Not a Christmas Special file: ${file.name}. Unzip the archive first and choose its files.`);
+      if (file.size !== entry.size) throw Error(`Content mismatch: ${entry.path}`);
+      const data = new Uint8Array(await file.arrayBuffer());
+      await checkFile(data, entry);
+      candidate.set(entry.path, data);
+    }
+    localFiles.clear();
+    for (const [path, data] of candidate) localFiles.set(path, data);
+    accepted = true;
+  } catch (error) {
+    log(error.message);
+    status(`Cannot use these demo files: ${error.message}`);
+  } finally {
+    const missing = manifest ? manifest.files.filter(item => !localFiles.has(item.path)) : [];
+    fileProgress.textContent = `${localFiles.size} of 20 demo files verified.${missing.length === 1 ? ` Still needed: ${missing[0].path}` : ''}`;
+    if (accepted && localFiles.size < 20) status(fileProgress.textContent);
+    if (localFiles.size === 20) {
+      pack = manifest.files.map(entry => [entry.path, localFiles.get(entry.path)]);
+      ready();
+    }
+    // Clear the picker, not the verified map: subsequent selections add files.
+    filesInput.value = '';
+    filesInput.disabled = packInput.disabled = false;
+    startButton.disabled = failed || !runtimeReady || !pack || started;
+  }
+});
+
+packInput.addEventListener('change', async () => {
+  if (failed || started || !packInput.files.length) return;
+  pack = null;
+  startButton.disabled = true;
+  filesInput.disabled = packInput.disabled = true;
   try {
     await metadataReady;
     const file = packInput.files[0];
@@ -90,16 +142,19 @@ packInput.addEventListener('change', async () => {
       const encoded = candidate.files[entry.path];
       if (typeof encoded !== 'string') throw Error(`Missing ${entry.path}`);
       const data = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-      const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)), b => b.toString(16).padStart(2, '0')).join('');
-      if (data.length !== entry.size || hash !== entry.sha256) throw Error(`Content mismatch: ${entry.path}`);
+      await checkFile(data, entry);
       checked.push([entry.path, data]);
     }
     pack = checked;
+    localFiles.clear();
+    fileProgress.textContent = '20 of 20 demo files verified from the local pack.';
     ready();
   } catch (error) {
     // File validation is recoverable: keep the picker usable for another file.
     status(`Cannot use this demo pack: ${error.message}`);
     log(error.message);
+  } finally {
+    filesInput.disabled = packInput.disabled = false;
   }
 });
 startButton.addEventListener('click', () => {
@@ -118,6 +173,7 @@ startButton.addEventListener('click', () => {
     canvas.focus();
     Module.callMain(args);
     pack = null;
+    localFiles.clear();
   } catch (error) {
     fail(`Startup failed: ${error.message}. Check the log and reload.`);
   }

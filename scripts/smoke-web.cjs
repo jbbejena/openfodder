@@ -38,7 +38,22 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Content mismatch'));
     assert(await page.locator('#start').isDisabled());
     result.checks.corruptPack = 'pass';
-    await page.locator('#pack').setInputFiles(packFile);
+    // The iPhone path selects extracted files in separate picker visits, with
+    // no computer-generated pack. It is still desktop automation, not Safari QA.
+    const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../web/content-manifest.json'), 'utf8'));
+    const dataFiles = manifest.files.filter(item => item.path.startsWith('Data/'));
+    await page.locator('#demo-files').setInputFiles(dataFiles.map(item => path.join(__dirname, '../Run', item.path)));
+    await page.waitForFunction(() => document.querySelector('#file-progress').textContent.includes('19 of 20'));
+    assert(await page.locator('#start').isDisabled(), 'Incomplete local files must block startup');
+    assert((await page.locator('#file-progress').textContent()).includes('Campaigns/Amiga Format Christmas Special.ofc'));
+    await page.locator('#demo-files').setInputFiles({ name: 'Settings.js', mimeType: 'text/javascript', buffer: Buffer.from('throw Error("must not execute")') });
+    await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Not a Christmas Special file'));
+    assert(await page.locator('#start').isDisabled());
+    assert((await page.locator('#file-progress').textContent()).includes('19 of 20'), 'Rejected batch must retain verified files');
+    const campaign = manifest.files.find(item => item.path.startsWith('Campaigns/'));
+    await page.locator('#demo-files').setInputFiles(path.join(__dirname, '../Run', campaign.path));
+    await page.waitForFunction(() => document.querySelector('#file-progress').textContent.includes('20 of 20'));
+    result.checks.localFilesAcrossPickerVisits = 'pass; partial batch and unexpected script rejected';
     await page.locator('#start').click();
     await page.waitForFunction(() => document.body.dataset.gameState === 'menu');
     await page.waitForTimeout(1200); // wait for the canvas palette to settle
@@ -66,7 +81,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     assert.deepEqual(errors, [], 'No fatal browser errors in menu/map flow');
     // Explicit diagnostics opt-in is a separate launch, with the same local pack.
     await page.reload();
-    await page.locator('summary').first().click();
+    await page.locator('#launch-diagnostics > summary').click();
     await page.locator('#cheats').check();
     await page.locator('#pack').setInputFiles(packFile);
     await page.locator('#start').click();

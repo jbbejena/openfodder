@@ -66,6 +66,20 @@ from Run `070a6086c62164e859fc3274b75b5f536fa9d902`. The supported first map is
 Christmas Special / LAND OF HOPE AND GLORY / `mapm1`. Scripts remain at
 `dad04730860bcdd1189aa8562860e379b0f5d783`.
 
+For a phone-only check, open the hosted preview in Safari and use **On iPhone —
+no computer needed**. Download the linked pinned upstream ZIP, then tap that ZIP
+in Files → Downloads to extract it. Choose the 19 files in
+`Data/AmigaFormat_XMAS`, then use **Choose demo files** again to add
+`Campaigns/Amiga Format Christmas Special.ofc`. Choose **Browse** in the iOS file
+picker rather than the photo library. Selections accumulate; the page reports
+which file is still missing. All 20 exact hashes must pass before Start game is
+enabled. No Git, terminal, compiler, or generated `.ofdata` is required on the
+phone. The upstream download is not hosted by this Site and does not establish
+new redistribution permission. Actual iPhone Safari selection/map load is still
+not verified by desktop automation.
+
+The existing computer-generated pack remains supported:
+
 ```sh
 python3 scripts/make-local-web-pack.py
 ```
@@ -147,13 +161,16 @@ from untrusted PRs is configured.
 
 No real iPhone is attached to this environment. To perform B05:
 
-1. Prepare the exact local pack above on your own computer. Transfer it privately
-   to the iPhone's Files app; do not place it in the hosted Site.
+1. On iPhone, use the preview's pinned upstream ZIP link and extract it in Files.
+   Alternatively, transfer the exact existing local pack privately to Files.
+   Do not upload game content to the hosted Site.
 2. Open the deployed URL from the test run in **Safari** (sign in as the Site owner
    if required). Rotate to landscape. Record iPhone model, iOS/Safari version,
    viewport/orientation and visible fork commit.
-3. Choose the local `.ofdata` file, wait for “Demo verified”, leave cheats unchecked,
-   and choose Start game. Confirm the campaign menu is visible.
+3. Choose the 19 extracted Christmas demo files, then the campaign descriptor
+   from its separate folder (or choose the existing `.ofdata` pack). Wait for
+   “Demo verified”, leave cheats unchecked, and choose Start game. Confirm the
+   campaign menu is visible.
 4. Tap/briefly hold the Christmas Special row. Confirm the snow battlefield, troops
    and squad sidebar are displayed. If taps fail, record that failure; do not
    convert a desktop mouse pass into a phone pass.

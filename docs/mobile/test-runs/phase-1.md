@@ -140,3 +140,14 @@ MOB-001 and MOB-002 have acceptance evidence. MOB-003 has its CI, downloadable
 artifact and deployed preview; its actual-iPhone acceptance row remains blocked
 by missing hardware. M1 stays unpassed. The next Phase 1 check is B05. MOB-004 is
 dependency-ready for a separately authorized Phase 2 task; no Phase 2 work was done.
+
+## Subsequent Windows CI follow-up
+
+After the original record, the user requested skipping Windows for these web-only
+changes. Runs `40757427028` and `40759181284` were canceled; neither establishes a
+Windows pass. The workflow now gates Windows runners with a small Ubuntu native-
+input check. Seven git-fixture tests passed locally and the actual Phase 1 diff
+returned `native: false`. Shared C++/headers, native CMake/dependencies and Windows
+compiler-job edits retain coverage; ambiguous CMake runs Windows conservatively.
+Only CI/docs changed; the tested/deployed game build and unperformed phone gate
+above remain the same. [Details](../../../AGENT_HANDOFF.md#ci-follow-up-skip-unnecessary-windows-builds).

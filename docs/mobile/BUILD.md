@@ -123,10 +123,19 @@ PR builds identify the PR head commit rather than a temporary merge SHA. The
 downloadable Actions artifact expires after 30 days.
 
 Native workflows use matching PR/master-push strategy and relevant-path filters.
-Docs, browser shell/build scripts and the web-only entry point do not compile the
-native matrix; shared C++/headers, CMake, native projects/dependencies, and each
-workflow's own definition still do. No required check/protection was disabled.
-This change does not repin the native workflows' existing dependency/test setup.
+Docs, browser shell/build scripts and the web-only entry point do not require the
+Windows matrix. Windows first runs a small Ubuntu scope check against the PR's
+merge base (or a push's before/after commits). Shared C++/headers, native projects,
+dependencies and Windows compiler-job changes still run the full existing matrix.
+For CMake, only edits inside a literal `if(EMSCRIPTEN)` branch are excluded; native
+branches, changed guards, new/deleted files and ambiguous/dynamic syntax retain
+Windows coverage. Changes to CI triggers/routing run validation without starting
+Windows. Manual dispatch always requests Windows compilation. Scope decisions
+have focused git-fixture tests; no branch protection or required check is changed.
+Linux keeps its existing native CMake check. This change does not repin either
+native workflow's dependency/test setup. GitHub PR filters use the full PR diff;
+a PR with outstanding shared/native changes still receives Windows checks after
+a documentation update, rather than hiding an earlier native failure.
 
 Hosting details and URLs are in the test run/handoff. A local HTTP server or an
 Actions ZIP is not a deployed preview. GitHub Pages creation was attempted and

@@ -36,6 +36,26 @@ Changed files: CMake/web startup, `scripts/` build/pack/verification helpers,
 `web/` launcher/config/manifest, legacy Windows helper (now WSL delegation), three
 CI workflows, build/evidence documentation and planning/handoff entry points.
 
+## CI follow-up: skip unnecessary Windows builds
+
+User requested this after the Phase 1 handoff; starting revision `e615cfb` on the
+same draft PR/branch. Windows runs `40759181284` and `40757427028` were canceled
+because this PR changes only web-specific engine/CMake code and CI routing.
+
+`windows-build.yml` now runs a small Ubuntu scope check before allocating the
+Windows matrix. Shared/native C++ and headers, native CMake, Windows dependencies,
+and actual compiler/test job edits keep Windows coverage. Literal Emscripten-only
+CMake bodies and CI trigger/routing edits do not require Windows. Unknown CMake
+syntax is conservative: run Windows. Manual dispatch remains available.
+
+Validation: `python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v` passed
+all seven fixture tests, covering native changes, additions/deletions/renames,
+web-only changes, CMake guards/nesting/ambiguity and workflow build-step changes.
+`python3 scripts/ci/windows_scope.py --base origin/master --head HEAD` returned
+`native: false` for the actual Phase 1 PR. The Windows matrix/build/test/deployment
+steps were compared to the original job and are unchanged. This follow-up changes
+CI only; the deployed preview remains at `291de6153d68…` and B05 is still not run.
+
 ## Exact dependencies and content
 
 - Run/data `070a6086c62164e859fc3274b75b5f536fa9d902`; nested Scripts
@@ -100,13 +120,12 @@ Exact sizes/hashes/results are in [the test record](docs/mobile/test-runs/phase-
   has 30-day retention; GitHub login may be required. Source/notices included;
   no player pack. [Linux native CI: success](https://github.com/jbbejena/openfodder/actions/runs/40757427139).
   [Windows native CI](https://github.com/jbbejena/openfodder/actions/runs/40757427028)
-  was still installing existing vcpkg FFmpeg dependencies at handoff; do not claim
-  Windows build/tests passed. Check the run/PR for updates.
+  was canceled in the user-requested CI follow-up above; no Windows pass is claimed.
 - GitHub Pages setup returned HTTP 403 “Resource not accessible by integration”.
   No Pages site was created; Sites resolved the hosting requirement.
-- Filters exclude documentation-only PRs and cover shared C++/CMake. PR path
-  filters use the PR diff, so a docs update inside this implementation PR may
-  still compile. Feature push/PR duplication is avoided; no protection disabled.
+- Windows scope validation excludes this web-only Phase 1 diff while retaining
+  shared/native coverage. Linux/web path filters still use the PR diff. Feature
+  push/PR duplication is avoided; no protection was changed.
 
 ## Evidence limits and next checks
 

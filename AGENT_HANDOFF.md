@@ -1,5 +1,16 @@
 # Current handoff
 
+## Active Phase 2 task — MOB-004
+
+User authorized beginning the next phase. Branch `mobile/command-bridge` starts
+from the current phone-preview branch tip
+`47e956dfcf316b1149a0e54c775197baa0df62af`; master remains `f27963c` and draft PR #2
+is still open. Scope: a documented browser-to-engine command/state boundary and
+diagnostic harness, with focused behavioral and browser checks. Keep the existing
+C++/SDL engine and pins. MOB-005–008 follow this foundation in separate tasks.
+The public preview still serves `b9abafb` until a verified update is published.
+Actual iPhone B05/M1 remains NOT RUN/unpassed while independent Phase 2 work proceeds.
+
 Updated: 2026-10-28. **Phase 1 desktop build and standalone engine preview are
 delivered. Actual iPhone Safari is NOT RUN; M1 remains unpassed.**
 

@@ -24,7 +24,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
 | MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
 | MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `b9abafb`: CI/artifact/public preview with direct upstream demo loading, anonymous desktop menu/map passed; [B05 not run: no real iPhone](test-runs/phone-file-import.md) |
-| MOB-004 | M2 | ready | MOB-002 | Unclaimed; outside Phase 1 | MOB-002 desktop build evidence exists; Phase 2 needs a new scoped task |
+| MOB-004 | M2 | active | MOB-002 | Codex / `mobile/command-bridge`, from `47e956d` | User authorized next-phase work; explicit engine commands/state, coordinate contract and diagnostic harness in progress. B05/M1 still unpassed. |
 | MOB-005 | M2 | pending | MOB-004 | Unclaimed | — |
 | MOB-006 | M2 | pending | MOB-004, MOB-005 | Unclaimed | — |
 | MOB-007 | M2 | pending | MOB-004 | Unclaimed | — |

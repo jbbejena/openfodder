@@ -21,6 +21,9 @@
  */
 
 #include "stdafx.hpp"
+#ifdef EMSCRIPTEN
+#include "WebInput.hpp"
+#endif
 
 #ifdef WIN32
 #include <windows.h>
@@ -673,6 +676,9 @@ void cFodder::Interrupt_Sim_Tick()
 
 void cFodder::Phase_Loop_Interrupt()
 {
+#ifdef EMSCRIPTEN
+    WebInput::ApplyPending(*this);
+#endif
 
     // Input disabled or Mission not paused?
     if (!mInput_Enabled || !mPhase_Paused)
@@ -685,10 +691,18 @@ void cFodder::Phase_Loop_Interrupt()
 
         if (mInput_Enabled)
         {
+#ifdef EMSCRIPTEN
+            if (!WebInput::OwnsCamera())
+                Camera_Handle();
+            if (!mPhase_Finished) {
+                if (WebInput::OwnsInput()) WebInput::Fire(*this);
+                else Mouse_Inputs_Check();
+            }
+#else
             Camera_Handle();
-
             if (!mPhase_Finished)
                 Mouse_Inputs_Check();
+#endif
         }
     }
 

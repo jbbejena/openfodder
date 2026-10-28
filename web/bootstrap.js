@@ -1,4 +1,4 @@
-/* The hosted artifact contains no game assets. Import only an exact local pack. */
+/* The hosted artifact contains no game assets. Verify pinned upstream/local data. */
 'use strict';
 const statusLine = document.getElementById('status');
 const startButton = document.getElementById('start');
@@ -51,6 +51,8 @@ var Module = {
   onExit(code) { fail(`Engine exited (${code}). Check the log and reload to retry.`); },
   onRuntimeInitialized() {
     runtimeReady = true;
+    window.fodderInput = OpenFodderInput.create(Module, canvas);
+    setupInputHarness(window.fodderInput);
     log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
     ready();
   },

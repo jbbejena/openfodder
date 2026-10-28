@@ -1,0 +1,135 @@
+# Browser command boundary (MOB-004)
+
+The C++/SDL engine owns orders, selection, ammunition, targeting, simulation and
+pause. `web/engine-bridge.js` maps browser coordinates to commands; it does not
+simulate troops. `Source/WebInput.cpp` applies queued commands at the start of
+`Phase_Loop_Interrupt`, before the existing input/mission update. It uses existing
+squad/path/weapon/camera routines. The browser remains single-threaded.
+
+This is the Phase 2 foundation and opt-in diagnostic harness. Production touch
+ownership/gestures, secondary-weapon firing, phone HUD and full mission menus
+remain MOB-005–008. Vehicles receive `unsupported` rather than an invented order.
+Native mouse/keyboard paths remain in use when the bridge does not own input.
+
+## JavaScript surface
+
+After runtime initialization, `window.fodderInput` exposes these methods:
+
+| Method | Meaning |
+| --- | --- |
+| `state()` | Read the engine/adapter snapshot; never a writable engine object |
+| `selectSquad(0..2)` | Select a populated engine squad; clears held input |
+| `moveTo({x,y})` / `moveAt(clientX,clientY)` | Issue an on-foot engine movement order; preserves native path/waypoint rules |
+| `fireStart({x,y})` / `fireStartAt(clientX,clientY)` | Hold primary fire at a map target; repeated starts update aim without resetting the fire cooldown |
+| `fireAim({x,y})` / `fireAimAt(clientX,clientY)` | Change the held primary-fire target; requires an applied fire start |
+| `fireStop()` | Release manual fire; safe repeatedly, also clears queued fire requests |
+| `selectWeapon('grenade'/'rocket')` | Select an available secondary weapon without firing/consuming ammo |
+| `pan(dx,dy)` | Apply a bounded camera intent in map pixels, at most 128 per axis; clamps to map bounds; cancels held input |
+| `follow()` | Resume the engine's squad-follow camera |
+| `setPaused(boolean, reason='user')` | Set/clear one explicit pause reason: `user`, `visibility`, or `focus` |
+| `cancel()` | Clear pending physical commands, held fire and native button/control latches; return camera ownership to the engine; preserve pause reasons and already-issued movement/projectiles |
+| `clientToWorld(x,y)` / `worldToClient(x,y)` | Read-only projection for the current canvas/view |
+
+Commands return `{ok:true,id}` when accepted or `{ok:false,reason}` when rejected.
+A positive ID means queued, not completed; inspect `state().last` after an input
+boundary. A newer ID or changed stage may supersede an older command. Cancel and
+stop before engine initialization are safe no-ops (`id:0`). The underlying Wasm
+exports are `of_web_command(action,a,b)` and `of_web_state()` (JSON string pointer,
+decoded/copied immediately). Arbitrary scripts, state writes and outcome mutation
+are not part of this API.
+
+## Validation, state and ownership
+
+| Engine condition | Result |
+| --- | --- |
+| Runtime/engine not started | `uninitialized`; cancel/stop safe |
+| Menu, finished/aborted phase, or map overview | `not-battlefield`; cancel/stop safe |
+| Paused | Gameplay commands rejected as `paused`; explicit pause/resume/cancel/stop accepted |
+| Input disabled or camera start adjustment running | `busy`; retry only after state becomes ready |
+| Empty squad or unavailable secondary ammo | `unavailable` |
+| Missing valid selected squad/leader | `no-squad` |
+| Invalid index, weapon, nonfinite/fractional raw argument, map target, or oversized pan | `invalid` |
+| Vehicle move/fire | `unsupported` |
+| Normal command queue has 32 entries, or native waypoint queue is near capacity | `busy` |
+
+Arguments are validated in JS and C++; C++ revalidates at application time because
+selection/phase/pause can change after enqueue. Safety commands coalesce and keep
+reserved capacity; cancel cannot be blocked by a full normal queue. Cancelling
+retains pending pause requests. Fire-stop removes pending fire starts/aims. An
+accepted order may therefore be superseded or rejected at the input boundary.
+
+`state()` includes API/stage/readiness, last applied ID/result, pending count,
+pause reasons/effective pause, held-fire/manual-camera state, actual mission tick,
+selected squad, actual squad counts/ammo/secondary weapon, and leader
+position/destination/aim. The viewport and map bounds also come from the engine.
+The numeric applied result codes are 0 success, -1 invalid, -2 uninitialized,
+-3 not-battlefield, -4 paused, -5 no-squad, -6 unavailable, -7 busy, -8 unsupported.
+
+A primary-fire hold owns aiming until stopped/cancelled. Engine targeting and
+cooldowns remain authoritative; holding fire does not generate a new mouse-down
+edge on every frame. Native autonomous return fire and committed projectiles are
+not undone by releasing manual input. Selecting a squad/weapon, moving, panning,
+pausing, losing a valid phase/selection, or cancelling releases held fire.
+Camera pan owns the view until follow, cancel, selection, movement or pause.
+
+Pause reasons compose with OR. Setting user pause twice cannot resume the game;
+clearing user pause cannot clear a visibility/focus pause. Native P remains the
+user pause input. The Emscripten loop keeps rendering/yielding/polling SDL while
+paused and skips mission updates; it never enters the native blocking pause loop.
+The harness cancels input on blur, hidden visibility and pagehide. Full automatic
+background pause/resume, timing and restoration policy remains MOB-010.
+
+## Coordinate boundary
+
+Commands use **integer engine map pixels**, independent of camera/CSS/DPR.
+The engine exports logical viewport width/height, sidebar width, camera origin
+and visible map bounds. Rendering crops the surface's 16-pixel border; the
+playfield begins at `SIDEBAR_WIDTH` (48 at this baseline). Sprite ground positions
+render at `screenX = mapX - cameraX + sidebar`, `screenY = mapY - cameraY`.
+
+The canvas has zero border/padding and centered `object-fit:contain`. For a client
+point, compute its position within the contained image rectangle (reject its
+letterbox bands), then scale to the engine's logical viewport:
+
+```text
+screenX = (clientX - image.left) * view.width  / image.width
+screenY = (clientY - image.top)  * view.height / image.height
+mapX = floor(screenX - view.sidebar + view.cameraX)
+mapY = floor(screenY + view.cameraY)
+```
+
+Reject the sidebar, outside image and outside map. Read the rectangle and engine
+view for each command, including after scroll, resize and rotation. Client
+coordinates already reflect CSS scaling and device pixel ratio; never multiply
+by DPR a second time. Intrinsic canvas changes preserve this projection.
+
+Only the C++ fire adapter reverses the original targeting routine's cursor
+hotspot (+16 X, +8 Y); that adjustment must not appear in JS. Movement uses the
+existing map-target routine directly. Panning changes camera/render state, not
+movement orders or simulation time.
+
+## Diagnostic harness and checks
+
+Before Start game, expand Diagnostics and check **Show input API test panel**.
+After selecting the campaign, expand **Control bridge test panel** below the
+canvas. Use the engine map coordinates, squad/weapon buttons, Move, held primary
+fire, camera arrows/follow, Pause/Resume and Cancel. The JSON readout reflects the
+actual engine. Empty squads and unavailable weapons are disabled. The panel is
+not the production touch combat layout; normal desktop canvas input still works.
+
+```sh
+node --test web/engine-bridge.test.cjs
+./scripts/build-web.sh
+python3 scripts/check-web-artifact.py
+python3 -m http.server 8090 --directory build-web/cmake/dist
+PLAYWRIGHT_MODULE=/path/to/playwright-core \
+  node scripts/smoke-web-input.cjs http://127.0.0.1:8090/ \
+  build-web/local-only/christmas.ofdata build-web/local-only/input-evidence
+```
+
+Use `scripts/make-local-web-pack.py` for the local smoke fixture. The public
+launcher still fetches exact pinned files from the existing upstream host; no
+assets were added to the engine artifact or this repository. Screenshot evidence
+contains game art and remains local. Desktop DPR checks are not actual iPhone
+Safari acceptance. See the task test record/handoff for measured results and the
+precise preview identity.

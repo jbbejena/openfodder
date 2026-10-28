@@ -221,7 +221,9 @@
     modeButtons.forEach(button => button.addEventListener('click', () => controller.setMode(button.dataset.touchMode)));
     confirm.addEventListener('click', controller.confirm);
     document.getElementById('touch-cancel').addEventListener('click', () => controller.cancel());
-    function interrupt() { controller.cancel('Input released. Choose a mode to continue.'); }
+    function interrupt() {
+      if (controller.snapshot().enabled) controller.cancel('Input released. Choose a mode to continue.');
+    }
     window.addEventListener('blur', interrupt);
     window.addEventListener('pagehide', interrupt);
     window.addEventListener('resize', interrupt);

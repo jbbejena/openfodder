@@ -105,7 +105,12 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       await command('fireStop');await command('fireStop');
       assert.deepEqual(await page.evaluate(t=>fodderInput.fireAim(t),target),{ok:false,reason:'unavailable'});
       await page.evaluate(()=>{const c=document.querySelector('#canvas');c.style.width='';c.style.height='';});
+      await command('pan',0,0);
+      const beforeDesktopResize=(await state()).last.id;
       await page.setViewportSize({width:780,height:900});
+      await page.waitForTimeout(150);
+      assert.equal((await state()).last.id,beforeDesktopResize,'Disabled touch controls must not cancel desktop camera ownership on resize');
+      assert.equal((await state()).manualCamera,true);
       await command('pan',0,0); // establish manual ownership before measuring a delta
       s=await state();const beforePan={...s.view};const beforeTarget={...s.squads[selected].leader};
       const maxX=s.map.left+s.map.width-(s.view.width-s.view.sidebar);

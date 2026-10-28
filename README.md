@@ -2,7 +2,7 @@
 
 ## Mobile browser work in this fork
 
-This fork has a reproducible Phase 1 browser engine build and a [standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site) (owner sign-in; demo loads directly from pinned upstream GitHub). Desktop Chromium reaches the menu and battlefield. Actual iPhone Safari testing, touch combat, browser persistence and later H Hour integration remain pending; existing upstream badges/demo links do not establish mobile readiness for this fork.
+This fork has a reproducible Phase 1 browser engine build and a [standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site) (public; no sign-in required; demo loads directly from pinned upstream GitHub). Desktop Chromium reaches the menu and battlefield. Actual iPhone Safari testing, touch combat, browser persistence and later H Hour integration remain pending; existing upstream badges/demo links do not establish mobile readiness for this fork.
 
 - [Pinned web build and local demo-pack instructions](docs/mobile/BUILD.md)
 - [Phase 1 verification and remaining phone checkpoint](docs/mobile/test-runs/phase-1.md)

@@ -148,8 +148,10 @@ Exact sizes/hashes/results are in [the test record](docs/mobile/test-runs/phase-
 ## Preview, hosting and CI
 
 - [Standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site) is
-  **owner-private**: sign in with the owner's ChatGPT account, tap Load demo from
-  GitHub, then Start game. Local-file import remains an optional fallback.
+  **public, no sign-in required**, changed at the user's request on 2026-10-28
+  (Sites access revision 2). Tap Load demo from GitHub, then Start game.
+  Local-file import remains an optional fallback. This access-only change keeps
+  the same version 3 / `b9abafb` build; no data was uploaded or artifact replaced.
 - Sites version **3**, project `appgprj_6ae24fbe89788191a38778521e56e855`, deployment
   `appgdep_6ae2637a92308191ab3b39bbae1dc68b`: succeeded. Hosting source commit
   `945c954110b661daafb2948b148a273f9d22babc` mirrors engine/Scripts with its own
@@ -176,8 +178,11 @@ Exact sizes/hashes/results are in [the test record](docs/mobile/test-runs/phase-
   mouse, SDL `opengles2` / WebGL 1.0 / ANGLE SwiftShader. Local engine-ready 343 ms,
   hosted 2,965 ms on single cold navigations; not phone benchmarks.
 - **Deployed desktop:** actual menu/map and visible fork commit verified using
-  supported Sites service access with TLS verification. Not an interactive owner
-  sign-in or an iPhone test. Audience remains owner-only.
+  supported Sites service access with TLS verification before the access change.
+  After public access was enabled, a fresh anonymous Chromium context also passed:
+  HTTP 200, visible `b9abafba0601`, 20 verified upstream files, menu/battlefield,
+  cheats off; screenshots inspected. No credentials supplied or authorization
+  headers sent. Engine-ready 2,378 ms on one desktop navigation. Not an iPhone test.
 - **Actual iPhone Safari: NOT RUN** (no hardware). [Exact phone steps](docs/mobile/BUILD.md#actual-iphone-safari-checkpoint--not-run):
   open preview, record model/iOS/Safari/build, Load demo from GitHub, Start game,
   reach menu, tap/briefly hold campaign row, display battlefield. Record failure

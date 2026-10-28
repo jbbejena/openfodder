@@ -16,7 +16,7 @@ publication identity/results are recorded below and in [draft PR #2](https://git
 
 - Fork build: `b9abafba0601e1c6000658140e1d06ad4eae8296`, clean committed tree.
   Commits `c666734` and `b9abafb` add the fallback and direct-download launcher.
-- [Preview](https://openfodder-phase-one.zanysky263.chatgpt.site): owner-private,
+- [Preview](https://openfodder-phase-one.zanysky263.chatgpt.site): public, no sign-in required,
   Sites version 3; hosting source `945c954110b661daafb2948b148a273f9d22babc`;
   deployment `appgdep_6ae2637a92308191ab3b39bbae1dc68b` succeeded.
 - [Web CI](https://github.com/jbbejena/openfodder/actions/runs/40767915225) passed;
@@ -29,8 +29,18 @@ publication identity/results are recorded below and in [draft PR #2](https://git
   hash verification, menu and battlefield with cheats off. Menu/map screenshots
   were inspected locally. No Site authorization was sent to upstream.
   Engine-ready: 1,523 ms on one cold desktop navigation, not a phone benchmark.
-- Hosted checks used supported Sites service access with TLS verification;
-  interactive owner sign-in and actual iPhone Safari remain **NOT RUN**.
+- Initial hosted checks used supported Sites service access with TLS verification.
+  The user then requested access without ChatGPT sign-in. Sites access changed
+  to public (revision 2), preserving version 3 and its build/artifact.
+- Anonymous verification: fresh Chromium context with no initial cookies,
+  credentials supplied or authorization headers sent; HTTP 200, visible
+  `b9abafba0601`, 20 upstream GETs, verified files, menu/battlefield and cheats off.
+  Screenshots inspected locally. Engine-ready 2,378 ms on one desktop navigation.
+  Evidence: `/workspace/public-hosted-result.json` and
+  `/workspace/public-hosted-{menu,battlefield}.png`, not uploaded.
+  A separate Python urllib probe returned HTTP 403; its cause was not diagnosed.
+  The browser result above is a separate successful check, not a claim that every
+  non-browser HTTP client works. Actual iPhone Safari remains **NOT RUN**.
 
 | Check | Actual result |
 | --- | --- |
@@ -59,7 +69,7 @@ must match the existing manifest's names, lengths and SHA-256. No extra campaign
 retail files or executable scripts are accepted. Engine/Scripts/toolchain pins
 remain unchanged. No C++/CMake or game-control code changed.
 
-On the real phone: open the preview in Safari, sign in as its owner, tap Load
+On the real phone: open the public preview in Safari (no sign-in), tap Load
 demo from GitHub and wait for verification, then Start game. Rotate to landscape
 and tap/briefly hold the campaign row. Record visible build, iPhone/iOS/Safari,
 menu/map or the exact failure. Local-file import remains an optional fallback.

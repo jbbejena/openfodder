@@ -23,7 +23,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | --- | --- | --- | --- | --- | --- |
 | MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
 | MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
-| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `b9abafb`: CI/artifact/owner-private preview with direct upstream demo loading; [B05 not run: no real iPhone](test-runs/phone-file-import.md) |
+| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `b9abafb`: CI/artifact/public preview with direct upstream demo loading, anonymous desktop menu/map passed; [B05 not run: no real iPhone](test-runs/phone-file-import.md) |
 | MOB-004 | M2 | ready | MOB-002 | Unclaimed; outside Phase 1 | MOB-002 desktop build evidence exists; Phase 2 needs a new scoped task |
 | MOB-005 | M2 | pending | MOB-004 | Unclaimed | — |
 | MOB-006 | M2 | pending | MOB-004, MOB-005 | Unclaimed | — |
@@ -57,6 +57,7 @@ Do not populate evidence with planned commands, a test template, upstream behavi
 - MOB-003 CI follow-up requested by the user at `e615cfb`: cancel unnecessary Windows runs and gate the Windows matrix using native-input comparisons. Seven fixture tests and the actual Phase 1 diff classify correctly; shared/native changes retain Windows coverage. See [the current handoff](../../AGENT_HANDOFF.md#ci-follow-up-skip-unnecessary-windows-builds).
 - MOB-003 phone-only testing follow-up: `web/iphone-file-import` starts from merged master `f27963c`; commits `c666734`/`b9abafb` add direct loading from the pinned existing upstream host, plus local-file fallback. [Draft PR #2](https://github.com/jbbejena/openfodder/pull/2) remains unmerged. Sites version 3 visibly serves `b9abafba0601`; hosted desktop menu/map and [web CI](https://github.com/jbbejena/openfodder/actions/runs/40767915225) passed. No game assets mirrored/uploaded; no generated pack/computer required. Actual Safari remains not run. [Record](test-runs/phone-file-import.md).
 - Next Phase 1 check: B05 using the exact [phone steps](BUILD.md#actual-iphone-safari-checkpoint--not-run). M1 stays unpassed. No full mission, persistence, touch combat, force/tactical or H Hour change was implemented.
+- User-requested access follow-up: preview changed from owner-private to public (access revision 2), without rebuilding/redeploying version 3. Fresh anonymous Chromium passed the menu/map check; Safari no longer requires ChatGPT sign-in. Actual iPhone remains not run.
 
 ## MOB-001: Record the build and content baseline
 

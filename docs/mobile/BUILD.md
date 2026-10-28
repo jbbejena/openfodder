@@ -168,7 +168,7 @@ returned HTTP 403 “Resource not accessible by integration”; it was not enabl
 The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
-Current [owner-private preview](https://openfodder-phase-one.zanysky263.chatgpt.site):
+Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
 Sites version 3, fork build `b9abafba0601e1c6000658140e1d06ad4eae8296`.
 [Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40767915225);
 the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40767915225/artifacts/12850872585)
@@ -180,8 +180,8 @@ for exact hosting identity and sizes; original Phase 1 measurements are historic
 
 No real iPhone is attached to this environment. To perform B05:
 
-1. Open the deployed URL from the test run in **Safari** and sign in as the Site
-   owner. Record iPhone model, iOS/Safari version and the visible fork commit.
+1. Open the deployed URL from the test run in **Safari**. No ChatGPT sign-in is
+   required. Record iPhone model, iOS/Safari version and the visible fork commit.
 2. Tap **Load demo from GitHub**, wait for all 20 files to verify, and leave cheats
    unchecked. A failure should offer retry or local files; record its exact text.
 3. Rotate to landscape and choose **Start game**. Confirm the campaign menu is

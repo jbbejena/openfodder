@@ -37,6 +37,7 @@ void menu_loop() {
 		result = 0;
 		g_Fodder->Campaign_Select_Setup();
 		g_Fodder->MapTiles_ResetScrollState();
+		EM_ASM({ Module.onGameStatus && Module.onGameStatus('menu', $0); }, g_Fodder->mStartParams->mCheatsEnabled);
 		g_Fodder->mInterruptCallback = []() {
 			
 			if (!g_Fodder->mStartParams->mDisableVideo) {
@@ -134,6 +135,7 @@ void phase_loop() {
 		g_Fodder->Phase_EngineReset();
 		g_Fodder->Phase_SquadPrepare();
 		g_Fodder->Phase_Prepare();
+		EM_ASM({ Module.onGameStatus && Module.onGameStatus('battlefield', $0); }, g_Fodder->mStartParams->mCheatsEnabled);
 	}
 
 	// -1 = Phase Try Again 
@@ -158,9 +160,15 @@ int start(int argc, char *argv[]) {
 	if (Params->mShowHelp)
 		return 0;
 
-	Params->mCheatsEnabled = true;
+	// The shell passes --cheats only after explicit diagnostic opt-in.
+	// Never override the normal-play default from the controlled web ini.
+	EM_ASM({ Module.onGameStatus && Module.onGameStatus('starting', $0); }, Params->mCheatsEnabled);
 	Params->mMouseAlternative = true;
 	g_Fodder->Prepare(Params);
+	EM_ASM({
+		Module.renderer = UTF8ToString($0);
+		Module.print('SDL renderer: ' + Module.renderer);
+	}, SDL_GetRendererName(g_Window->GetRenderer()));
 	g_Fodder->Phase_SquadPrepare();
 
 	emscripten_set_main_loop(menu_loop, 0, true);

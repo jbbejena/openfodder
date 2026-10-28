@@ -1,0 +1,107 @@
+{
+  "id": "amiga-format-xmas-070a608",
+  "data_revision": "070a6086c62164e859fc3274b75b5f536fa9d902",
+  "campaign": "Amiga Format Christmas Special",
+  "files": [
+    {
+      "path": "Data/AmigaFormat_XMAS/AFXBASE.BLK",
+      "size": 17336,
+      "sha256": "aa464c4a7c053f4efd8ffb20689556f65cc3451b1f748a092b9763489a39d985"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/AFXBASE.INS",
+      "size": 44025,
+      "sha256": "c8a781c0cbe87e9454f74ebb3f3857395268e8b1f62dee761b5faf353d24d453"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/AFXBASE.SNG",
+      "size": 1020,
+      "sha256": "2e620ede771497cc505a0a65ef05b7dd0578aeb78b4a98432765866431a6b213"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/AFXSUB0.BLK",
+      "size": 9596,
+      "sha256": "157095e1916625c2c454e428ed8c9dc15475eac029d6970427ec568dbe511ced"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxarmy.lbm",
+      "size": 43980,
+      "sha256": "b7858e7c117b0dcae641278d76e21abb9cdcee63a4ae421df245e4dc5685aaa3"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxbase.bht",
+      "size": 1920,
+      "sha256": "579ecb5418ea8aa165f11ef0822a601a7cb7cef9ee37dd311494db9b043ecc17"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxbase.hit",
+      "size": 480,
+      "sha256": "9002889e988ce997b78e7e2801616a65878fb9d569de8d551203c158a869f326"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxbase.pal",
+      "size": 32,
+      "sha256": "8dae52fb022cbefb8301229dff8b64d82adcf92c7d5d0e3216f65a091fe6ba2d"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxbase.swp",
+      "size": 480,
+      "sha256": "fc9e7f3020575f496d52dc63fa64ec93cecc5e7317f7682495eef6bd73b88741"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxcopt.lbm",
+      "size": 40948,
+      "sha256": "b74eba5de36ccb5a5ac5d61fc505fa90ffb92ef06a444d3978a241d450846ff7"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxsub0.bht",
+      "size": 1280,
+      "sha256": "5088dbf799dcd5a3bb6ac7e960dda3ff376a494eeb65b4852fbab3ca8a079f95"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxsub0.hit",
+      "size": 320,
+      "sha256": "56bd63a012577105b0bc1a498460a4a816ea0230b0005ad514d45b60f782944e"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/afxsub0.swp",
+      "size": 320,
+      "sha256": "9917d6e65f4499d76f031ae2b391e211e7fa2e2e1f93d4d2be0636613f82ddba"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/apmenu.lbm",
+      "size": 21802,
+      "sha256": "5a1e1231792db2149d0b6e1dc8e698f1b2cd78c5f04adf49d88d0bef95489a0c"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/mapm1.map",
+      "size": 6816,
+      "sha256": "45f65930c3eea4173962d22f15a31901865f1b2f0ce4843b50fdc4734a9a3544"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/mapm1.spt",
+      "size": 300,
+      "sha256": "4e7ba7cca7d5ce2b10349dd8df2ab220785576b095d38994b68b88a58eee4007"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/mapm2.map",
+      "size": 5976,
+      "sha256": "fcef1fce09b4f17637fe76e5a6a350ae05027624b34704e1d45b89ba902de98c"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/mapm2.spt",
+      "size": 300,
+      "sha256": "a9a41e782048518d206fbd66948fa8f0c1775e8b674d7d0a94abc05196b7aa3c"
+    },
+    {
+      "path": "Data/AmigaFormat_XMAS/pstuff.lbm",
+      "size": 25892,
+      "sha256": "08b894d5744f259a153d719266b3c261c1bb8d7720714c1740481dd4ed795e65"
+    },
+    {
+      "path": "Campaigns/Amiga Format Christmas Special.ofc",
+      "size": 559,
+      "sha256": "75c8031dff027c9d9c04eb041134d3bd5cedb52d53e64b08b2e454dc48bb53c8"
+    }
+  ]
+}

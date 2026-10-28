@@ -1,0 +1,61 @@
+name: web-build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'Source/**'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - '.gitmodules'
+      - 'Run'
+      - 'scripts/**'
+      - 'web/**'
+      - 'COPYING*'
+      - '.github/workflows/web-build.yml'
+  pull_request:
+    paths:
+      - 'Source/**'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - '.gitmodules'
+      - 'Run'
+      - 'scripts/**'
+      - 'web/**'
+      - 'COPYING*'
+      - '.github/workflows/web-build.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/cache@v4
+        with:
+          path: |
+            build-web/tools
+            build-web/cache
+          key: web-${{ runner.os }}-${{ runner.arch }}-emsdk-4.0.23-cmake-3.31.6-ninja-1.11.1.4-v1
+      - name: Build pinned browser engine (no game assets)
+        run: ./scripts/build-web.sh
+      - name: Verify artifact publication boundary
+        run: python3 scripts/check-web-artifact.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openfodder-web-${{ github.event.pull_request.head.sha || github.sha }}
+          path: build-web/cmake/dist/
+          if-no-files-found: error
+          retention-days: 30

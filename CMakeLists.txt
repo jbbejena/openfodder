@@ -153,15 +153,24 @@ endif()
 if(EMSCRIPTEN)
     target_compile_definitions(openfodder PRIVATE EMSCRIPTEN OPENFODDER_NO_MIXER)
     target_compile_options(openfodder PRIVATE "-sUSE_SDL=3")
+    set(OPENFODDER_WEB_CONTENT "" CACHE PATH "Staged, allowlisted browser runtime files")
+    if(NOT EXISTS "${OPENFODDER_WEB_CONTENT}/openfodder.ini")
+        message(FATAL_ERROR "Use scripts/build-web.sh to stage the browser runtime")
+    endif()
     set_target_properties(openfodder PROPERTIES
-        OUTPUT_NAME "OpenFodder"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/RunE"
+        OUTPUT_NAME "index"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/dist"
         SUFFIX ".html")
+    file(GLOB_RECURSE _web_content_files "${OPENFODDER_WEB_CONTENT}/*")
+    set_property(TARGET openfodder APPEND PROPERTY LINK_DEPENDS
+        ${_web_content_files} "${CMAKE_SOURCE_DIR}/web/shell.html")
     target_link_options(openfodder PRIVATE
         "-sUSE_SDL=3"
         "-sALLOW_MEMORY_GROWTH=1"
         "-sASSERTIONS=1"
-        "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/Run@/")
+        "-sEXPORTED_RUNTIME_METHODS=FS,callMain"
+        "SHELL:--shell-file ${CMAKE_SOURCE_DIR}/web/shell.html"
+        "SHELL:--preload-file ${OPENFODDER_WEB_CONTENT}@/")
 else()
     target_link_libraries(openfodder PRIVATE SDL3::SDL3 SDL3_mixer::SDL3_mixer Threads::Threads)
 endif()

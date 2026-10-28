@@ -1,14 +1,59 @@
 name: windows-build
 
 on:
+  workflow_dispatch:
   push:
+    branches: [master]
+    paths:
+      - 'Source/**'
+      - '!Source/Start_Emscripten.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'Projects/**'
+      - '!Projects/emscripten/**'
+      - 'vcpkg*.json'
+      - '.gitmodules'
+      - 'Run'
+      - '.github/workflows/windows-build.yml'
+      - 'scripts/ci/**'
   pull_request:
+    paths:
+      - 'Source/**'
+      - '!Source/Start_Emscripten.cpp'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - 'Projects/**'
+      - '!Projects/emscripten/**'
+      - 'vcpkg*.json'
+      - '.gitmodules'
+      - 'Run'
+      - '.github/workflows/windows-build.yml'
+      - 'scripts/ci/**'
 
 permissions:
   contents: read
 
 jobs:
+  scope:
+    name: Check Windows build scope
+    runs-on: ubuntu-24.04
+    outputs:
+      native: ${{ steps.scope.outputs.native }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install scope-check dependency
+        run: python3 -m pip install PyYAML==6.0.2
+      - name: Verify scope decisions
+        run: python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v
+      - name: Check Windows compiler inputs
+        id: scope
+        run: python3 scripts/ci/windows_scope.py
   build:
+    needs: scope
+    if: needs.scope.outputs.native == 'true'
     runs-on: windows-latest
     strategy:
       fail-fast: false

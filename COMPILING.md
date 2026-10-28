@@ -2,6 +2,10 @@
 
 This document describes how to build Open Fodder from source.
 
+For the pinned Emscripten browser build, run `./scripts/build-web.sh` on Linux/WSL
+and follow [the web build instructions](docs/mobile/BUILD.md). The standalone
+preview requires a player-supplied local demo pack; game assets are not hosted.
+
 ## Windows (Visual Studio 2022 + CMake)
 
 Open Fodder uses CMake's FetchContent to download SDL3 and SDL3_mixer on Windows,

@@ -23,7 +23,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | --- | --- | --- | --- | --- | --- |
 | MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
 | MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
-| MOB-003 | M1 | blocked | MOB-002 | Codex / `build/mobile-phase-1` | `291de61`: CI/artifact/owner-private preview delivered; [B05 not run: no real iPhone](test-runs/phase-1.md) |
+| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `b9abafb`: CI/artifact/owner-private preview with direct upstream demo loading; [B05 not run: no real iPhone](test-runs/phone-file-import.md) |
 | MOB-004 | M2 | ready | MOB-002 | Unclaimed; outside Phase 1 | MOB-002 desktop build evidence exists; Phase 2 needs a new scoped task |
 | MOB-005 | M2 | pending | MOB-004 | Unclaimed | — |
 | MOB-006 | M2 | pending | MOB-004, MOB-005 | Unclaimed | — |
@@ -50,12 +50,12 @@ Do not populate evidence with planned commands, a test template, upstream behavi
 
 ## Phase 1 completion record
 
-- Start: `6b85186`; baseline `0434d1e`; reproducible engine/shell `570be27`; focused CI `291de61`. [PR #1](https://github.com/jbbejena/openfodder/pull/1) includes the roadmap plus these changes and remains draft/unmerged.
+- Start: `6b85186`; baseline `0434d1e`; reproducible engine/shell `570be27`; focused CI `291de61`. [PR #1](https://github.com/jbbejena/openfodder/pull/1) included the roadmap plus these changes; the user merged it as `f27963c`.
 - MOB-001: recursive revisions verified, smallest suitable startup campaign inventoried, forced cheats/audio exclusions recorded, redistribution blocker explicit in [BUILD_BASELINE.md](BUILD_BASELINE.md).
 - MOB-002: pinned command built clean/incremental; desktop menu/map screenshots reviewed; defaults/error checks passed. [BUILD.md](BUILD.md) and [test record](test-runs/phase-1.md) contain commands, sizes, timings and exact device/build identity.
 - MOB-003: cached web workflow, native path filters, [engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40757426969/artifacts/12846461740), and [standalone owner-private preview](https://openfodder-phase-one.zanysky263.chatgpt.site) delivered. Actual iPhone Safari map load remains **not run** (no hardware), so this card is not marked done. No demo/campaign files uploaded; local player-pack route verified on desktop.
 - MOB-003 CI follow-up requested by the user at `e615cfb`: cancel unnecessary Windows runs and gate the Windows matrix using native-input comparisons. Seven fixture tests and the actual Phase 1 diff classify correctly; shared/native changes retain Windows coverage. See [the current handoff](../../AGENT_HANDOFF.md#ci-follow-up-skip-unnecessary-windows-builds).
-- MOB-003 phone-only testing follow-up: `web/iphone-file-import` starts from merged master `f27963c`, adds a default Load demo button that fetches the exact files from the pinned existing upstream host, plus local-file fallback. No game assets mirrored/uploaded; no generated pack/computer required. Direct-download/retry and desktop menu/map smoke passed; actual Safari remains not run. [Record](test-runs/phone-file-import.md).
+- MOB-003 phone-only testing follow-up: `web/iphone-file-import` starts from merged master `f27963c`; commits `c666734`/`b9abafb` add direct loading from the pinned existing upstream host, plus local-file fallback. [Draft PR #2](https://github.com/jbbejena/openfodder/pull/2) remains unmerged. Sites version 3 visibly serves `b9abafba0601`; hosted desktop menu/map and [web CI](https://github.com/jbbejena/openfodder/actions/runs/40767915225) passed. No game assets mirrored/uploaded; no generated pack/computer required. Actual Safari remains not run. [Record](test-runs/phone-file-import.md).
 - Next Phase 1 check: B05 using the exact [phone steps](BUILD.md#actual-iphone-safari-checkpoint--not-run). M1 stays unpassed. No full mission, persistence, touch combat, force/tactical or H Hour change was implemented.
 
 ## MOB-001: Record the build and content baseline

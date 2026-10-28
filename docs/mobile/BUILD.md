@@ -168,6 +168,14 @@ returned HTTP 403 “Resource not accessible by integration”; it was not enabl
 The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
+Current [owner-private preview](https://openfodder-phase-one.zanysky263.chatgpt.site):
+Sites version 3, fork build `b9abafba0601e1c6000658140e1d06ad4eae8296`.
+[Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40767915225);
+the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40767915225/artifacts/12850872585)
+contains source/notices and no game assets. The default upstream-download route
+passed hosted desktop menu/map verification. See [the follow-up record](test-runs/phone-file-import.md)
+for exact hosting identity and sizes; original Phase 1 measurements are historical.
+
 ## Actual iPhone Safari checkpoint — NOT RUN
 
 No real iPhone is attached to this environment. To perform B05:

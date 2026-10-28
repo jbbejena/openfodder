@@ -10,7 +10,27 @@ passed the existing desktop menu/map smoke test. The new shell then passed
 `./scripts/build-web.sh`, `python3 scripts/check-web-artifact.py --allow-dirty`
 and the updated `scripts/smoke-web.cjs` against the same pinned content.
 The committed preview is rebuilt with its own visible fork commit before hosting;
-publication identity/results are also linked from the follow-up draft PR.
+publication identity/results are recorded below and in [draft PR #2](https://github.com/jbbejena/openfodder/pull/2).
+
+## Published build and evidence
+
+- Fork build: `b9abafba0601e1c6000658140e1d06ad4eae8296`, clean committed tree.
+  Commits `c666734` and `b9abafb` add the fallback and direct-download launcher.
+- [Preview](https://openfodder-phase-one.zanysky263.chatgpt.site): owner-private,
+  Sites version 3; hosting source `945c954110b661daafb2948b148a273f9d22babc`;
+  deployment `appgdep_6ae2637a92308191ab3b39bbae1dc68b` succeeded.
+- [Web CI](https://github.com/jbbejena/openfodder/actions/runs/40767915225) passed;
+  [artifact](https://github.com/jbbejena/openfodder/actions/runs/40767915225/artifacts/12850872585).
+  No native Windows build was triggered by this web-only follow-up.
+- Committed build: `./scripts/build-web.sh` and
+  `python3 scripts/check-web-artifact.py` passed; updated desktop smoke passed
+  including failed-upstream retry and real pinned upstream loading.
+- Hosted Chromium verified visible `b9abafba0601`, 20 upstream GET requests,
+  hash verification, menu and battlefield with cheats off. Menu/map screenshots
+  were inspected locally. No Site authorization was sent to upstream.
+  Engine-ready: 1,523 ms on one cold desktop navigation, not a phone benchmark.
+- Hosted checks used supported Sites service access with TLS verification;
+  interactive owner sign-in and actual iPhone Safari remain **NOT RUN**.
 
 | Check | Actual result |
 | --- | --- |
@@ -27,8 +47,11 @@ publication identity/results are also linked from the follow-up draft PR.
 
 Desktop: Chromium 154.0.8037.57, Playwright Core 1.57.0, Linux x86_64,
 1100×900 DPR 1, mouse, SDL opengles2/WebGL1/SwiftShader. Evidence retained under
-`build-web/local-only/iphone-import-evidence/`; screenshots contain game art and
-are not uploaded. The 390×844 launcher screenshot is viewport-only evidence.
+`build-web/local-only/iphone-import-evidence/` (individual files) and
+`build-web/local-only/direct-final-evidence/` (committed direct loading).
+Hosted evidence is retained locally at `/workspace/direct-hosted-result.json`
+and `/workspace/direct-hosted-{menu,battlefield}.png`. Screenshots contain game art
+and are not uploaded. The 390×844 launcher screenshot is viewport-only evidence.
 
 The Site hosts no demo or campaign data. The default Load demo button fetches
 all 20 files directly from the existing upstream raw GitHub host at Run `070a6086c62164e859fc3274b75b5f536fa9d902`; all 20 imported files
@@ -41,8 +64,9 @@ demo from GitHub and wait for verification, then Start game. Rotate to landscape
 and tap/briefly hold the campaign row. Record visible build, iPhone/iOS/Safari,
 menu/map or the exact failure. Local-file import remains an optional fallback.
 
-Measured size: approximately 2.9 MB cold runtime files plus 223,382 bytes for the
-two-mission demo, around 3.1 MB before compression. Matching source is an optional
-separate download (around 1.8 MB). Full retail content was not bundled/measured.
+Measured size: 2,896,387 bytes (approximately 2.9 MB) cold runtime files plus
+223,382 bytes for the two-mission demo, 3,119,769 bytes total before compression.
+Matching source is an optional separate download (1,799,416 bytes). All hosted
+files total 4,809,860 bytes, including source/notices. Full retail content was not bundled/measured.
 A new grant is still needed to mirror/bundle the game data on our own host;
 this implementation keeps those bytes at their existing upstream publisher.

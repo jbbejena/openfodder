@@ -56,7 +56,7 @@ def main():
         'emsdk': 'c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56',
         'sdk_bundle': 'aaa43392544d695232b70eda706d751f18980c2a',
         'sdl': '3.2.22', 'cmake': '3.31.6', 'ninja': '1.11.1',
-        'content': 'Player-supplied Amiga Format Christmas Special; no game assets hosted',
+        'content': 'Christmas Special from pinned upstream or local files; no game assets hosted',
     }
     write(DIST / 'build-info.json', (json.dumps(metadata, indent=2) + '\n').encode())
     for name in ['content-manifest.json', 'bootstrap.js', 'style.css']:
@@ -80,7 +80,8 @@ def main():
     write(DIST / 'SOURCE.txt', (
         f"Open Fodder, GPL-3.0-or-later. Build {metadata['commit']}, dirty={metadata['dirty']}\n"
         'Complete matching engine, browser shell, build scripts and GPL Scripts source: source.zip\n'
-        'Game data is player-supplied and is not in this artifact. No data redistribution grant established.\n'
+        'Game data loads in the browser from pinned upstream or local files; it is not in this artifact.\n'
+        'No data redistribution grant established for bundling or mirroring on this host.\n'
         'Build instructions: openfodder/docs/mobile/BUILD.md in source.zip\n'
         'Pinned system toolchain: https://github.com/emscripten-core/emsdk/tree/c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56\n'
         'SDL source: https://github.com/libsdl-org/SDL/tree/release-3.2.22 (zlib)\n'

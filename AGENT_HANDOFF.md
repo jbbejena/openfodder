@@ -40,8 +40,15 @@ CI workflows, build/evidence documentation and planning/handoff entry points.
 ## Phone-only testing follow-up
 
 Current branch: `web/iphone-file-import`, from merged master `f27963c`. The user
-asked for a way to test on iPhone without a compiler/terminal.
-The launcher now accepts the 20 exact extracted demo files across separate Files
+asked for a way to test on iPhone without a compiler/terminal, then requested
+hosted files to simplify testing. The default launcher now offers **Load demo
+from GitHub**: it fetches the 20 exact files directly from their existing pinned
+upstream host, without sending Site credentials, and verifies all hashes before
+startup. Browser runtime + demo is roughly 3.1 MB before compression. No game
+content is mirrored or bundled on our host. Our own redistribution terms remain
+unresolved. Download errors are retryable and partial data cannot start.
+
+As an alternative, the launcher accepts the 20 exact extracted demo files across separate Files
 picker visits. A pinned upstream ZIP link and on-page instructions replace the
 need to generate `.ofdata` on a computer. The existing pack route still works.
 
@@ -51,8 +58,8 @@ files are hash-checked before mounting, remain in memory, and are never uploaded
 No game content has been added to hosting or source. Publication rights remain
 unresolved; linking the existing upstream download is not a new license grant.
 
-Local desktop checks passed for the original merged build and the new individual-
-file flow: 19 files cannot start; an unexpected script is rejected while retaining
+Local desktop checks passed for the original merged build, direct upstream
+loading (including failed-download retry), and individual-file fallback: 19 files cannot start; an unexpected script is rejected while retaining
 verified files; adding the campaign enables startup; menu and battlefield render
 with cheats off. Existing pack opt-in/error checks also passed. A narrow launcher
 layout check supplements this; it is not real iPhone Safari evidence. B05 stays

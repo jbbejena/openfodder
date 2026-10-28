@@ -103,3 +103,9 @@ before starting the engine. The local pack is not uploaded or persisted. Build
 and local desktop testing can use the pinned recursive checkout. A preview using
 this route must say that data must be supplied, and must not promise that a phone
 can display the map without those files. No iPhone hardware result exists here.
+
+The phone-preview follow-up also verifies direct browser fetching from the same
+pinned upstream public host, with CORS and all 20 hashes checked. This removes
+manual Files import from the default startup while keeping the files at their
+existing publisher. No game bytes are mirrored/bundled on the Site; the grant
+needed for our own data publication remains unresolved.

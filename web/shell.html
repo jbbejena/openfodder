@@ -14,12 +14,17 @@
   <main>
     <p id="status" role="status" aria-live="polite">Loading browser engine…</p>
     <section id="launch" aria-label="Start preview">
-      <h1>Start with your demo files</h1>
-      <p>This preview includes the engine. Choose the Christmas Special demo files
-        from your device to reach the campaign menu. Files stay in this tab's memory
-        and are never uploaded. Reloading clears them.</p>
-      <details id="phone-help" open>
-        <summary>On iPhone — no computer needed</summary>
+      <h1>Play the Christmas demo</h1>
+      <p>Load the two-mission demo from its existing upstream GitHub host.
+        The demo is 223 KB; the browser engine is about 2.9 MB.
+        Reloading clears this preview's game state.</p>
+      <button id="load-demo" disabled>Load demo from GitHub</button>
+      <p id="file-progress" role="status" aria-live="polite">Demo not loaded.</p>
+      <details id="local-import">
+        <summary>Use local files instead</summary>
+        <p>Selected files stay in browser memory and are never uploaded.</p>
+      <details id="phone-help">
+        <summary>Get local files on iPhone</summary>
         <ol>
           <li><a href="https://github.com/OpenFodder/data/archive/070a6086c62164e859fc3274b75b5f536fa9d902.zip" target="_blank" rel="noopener noreferrer">Download the upstream demo ZIP</a>.
             In Files → Downloads, tap the ZIP to unzip it.</li>
@@ -29,10 +34,10 @@
         <p>The ZIP is supplied by the upstream data repository; this site hosts no game assets.</p>
       </details>
       <label class="file">Choose demo files <input id="demo-files" type="file" multiple></label>
-      <p id="file-progress" role="status" aria-live="polite">0 of 20 demo files selected.</p>
       <details>
         <summary>Already have christmas.ofdata?</summary>
         <label class="file">Local demo pack <input id="pack" type="file" accept=".ofdata,application/json"></label>
+      </details>
       </details>
       <button id="start" disabled>Start game</button>
       <p>Start the game, then tap or click and briefly hold the Christmas Special campaign row. Phase 1 tests

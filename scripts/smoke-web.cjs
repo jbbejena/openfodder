@@ -21,7 +21,12 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
   try {
     const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
     page.on('pageerror', error => errors.push(error.message));
-    page.on('request', request => assert.equal(request.method(), 'GET', 'Player pack must not be uploaded'));
+    page.on('request', request => {
+      assert.equal(request.method(), 'GET', 'Player files must not be uploaded');
+      if (new URL(request.url()).hostname === 'raw.githubusercontent.com') {
+        assert(!request.headers().authorization && !request.headers()['oai-sites-authorization'], 'Public demo downloads must not carry credentials');
+      }
+    });
     const boot = Date.now();
     await page.goto(url);
     await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Engine ready'), null, { timeout: 30000 });
@@ -88,6 +93,35 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     await page.waitForFunction(() => document.body.dataset.gameState === 'menu');
     assert.equal(await page.getAttribute('body', 'data-cheats'), 'on');
     result.checks.optInCheats = 'pass';
+    // Real cross-origin downloads from the pinned existing publisher. A network
+    // failure must be retryable without allowing a partial data set to start.
+    await page.reload();
+    await page.route('https://raw.githubusercontent.com/**', route => route.abort());
+    await page.locator('#load-demo').click();
+    await page.waitForFunction(() => document.querySelector('#status').textContent.includes('Could not load the demo'));
+    assert(await page.locator('#start').isDisabled());
+    assert(await page.locator('#load-demo').isEnabled());
+    result.checks.upstreamFailure = 'pass; retry available and partial startup blocked';
+    await page.unroute('https://raw.githubusercontent.com/**');
+    const downloadStarted = Date.now();
+    await page.locator('#load-demo').click();
+    await page.waitForFunction(() => document.querySelector('#file-progress').textContent.includes('20 of 20 demo files downloaded and verified'), null, { timeout: 35000 });
+    result.upstreamDownloadMs = Date.now() - downloadStarted;
+    await page.locator('#start').click();
+    await page.waitForFunction(() => document.body.dataset.gameState === 'menu');
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: path.join(evidenceDir, 'upstream-menu.png') });
+    const rect = await page.locator('#canvas').boundingBox();
+    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height * 0.315);
+    await page.mouse.down();
+    await page.waitForTimeout(200);
+    await page.mouse.up();
+    await page.waitForFunction(() => document.body.dataset.gameState === 'battlefield');
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(evidenceDir, 'upstream-battlefield.png') });
+    assert.equal(await page.getAttribute('body', 'data-cheats'), 'off');
+    result.checks.upstreamMenuAndBattlefield = 'pass (screenshots require review)';
+    assert.deepEqual(errors, [], 'No fatal errors after download retry and direct upstream startup');
     await page.close();
     const broken = await browser.newPage();
     await broken.route('**/index.wasm', route => route.abort());

@@ -59,24 +59,35 @@ The web SDL pin comes from the tested SDK, not Windows' SDL 3.4.0. The SDK calls
 its SDL3 port experimental. FFmpeg auto-detection is disabled for this build.
 Existing `OPENFODDER_NO_MIXER` behavior is retained: the browser engine is silent.
 
-## Supply local test data
+## Load the test demo
 
 The selected pack has 20 files (223,382 bytes): 19 demo files and one campaign
 from Run `070a6086c62164e859fc3274b75b5f536fa9d902`. The supported first map is
 Christmas Special / LAND OF HOPE AND GLORY / `mapm1`. Scripts remain at
 `dad04730860bcdd1189aa8562860e379b0f5d783`.
 
-For a phone-only check, open the hosted preview in Safari and use **On iPhone —
-no computer needed**. Download the linked pinned upstream ZIP, then tap that ZIP
-in Files → Downloads to extract it. Choose the 19 files in
-`Data/AmigaFormat_XMAS`, then use **Choose demo files** again to add
-`Campaigns/Amiga Format Christmas Special.ofc`. Choose **Browse** in the iOS file
-picker rather than the photo library. Selections accumulate; the page reports
-which file is still missing. All 20 exact hashes must pass before Start game is
-enabled. No Git, terminal, compiler, or generated `.ofdata` is required on the
-phone. The upstream download is not hosted by this Site and does not establish
-new redistribution permission. Actual iPhone Safari selection/map load is still
-not verified by desktop automation.
+The default phone-only route is **Load demo from GitHub → Start game** in the
+hosted preview. All 20 exact files download directly from the existing upstream
+publisher at the pinned Run commit. The browser checks each size/SHA-256 before
+allowing startup; there are no Site credentials/cookies on those public requests.
+A failed or timed-out download can be retried; partial data cannot start the game.
+No ZIP, Files-app selection, Git, terminal or compiler is needed on the phone.
+
+Cold runtime files are about **2.9 MB**, plus **223 KB** of demo content: roughly
+**3.1 MB before compression**. The roughly 1.8 MB source archive is an optional
+separate download, not required to start. These sizes describe the selected two-
+mission demo; the full retail campaign is not bundled or measured.
+
+The Site continues to host no game data. The browser fetches files from their
+existing upstream GitHub location; this does not establish permission to bundle
+or mirror those files on our own host. That publication question remains open.
+
+If upstream access is unavailable, expand **Use local files instead**. The local
+route accepts the 19 extracted `Data/AmigaFormat_XMAS` files and
+`Campaigns/Amiga Format Christmas Special.ofc` across separate picker visits,
+or the existing computer-generated pack. On iPhone, **Get local files on iPhone**
+links the pinned upstream ZIP for extraction in Files → Downloads. Choose Browse
+rather than the photo library. Files stay in browser memory and are never uploaded.
 
 The existing computer-generated pack remains supported:
 
@@ -161,16 +172,12 @@ from untrusted PRs is configured.
 
 No real iPhone is attached to this environment. To perform B05:
 
-1. On iPhone, use the preview's pinned upstream ZIP link and extract it in Files.
-   Alternatively, transfer the exact existing local pack privately to Files.
-   Do not upload game content to the hosted Site.
-2. Open the deployed URL from the test run in **Safari** (sign in as the Site owner
-   if required). Rotate to landscape. Record iPhone model, iOS/Safari version,
-   viewport/orientation and visible fork commit.
-3. Choose the 19 extracted Christmas demo files, then the campaign descriptor
-   from its separate folder (or choose the existing `.ofdata` pack). Wait for
-   “Demo verified”, leave cheats unchecked, and choose Start game. Confirm the
-   campaign menu is visible.
+1. Open the deployed URL from the test run in **Safari** and sign in as the Site
+   owner. Record iPhone model, iOS/Safari version and the visible fork commit.
+2. Tap **Load demo from GitHub**, wait for all 20 files to verify, and leave cheats
+   unchecked. A failure should offer retry or local files; record its exact text.
+3. Rotate to landscape and choose **Start game**. Confirm the campaign menu is
+   visible. No Files-app import is required for the default route.
 4. Tap/briefly hold the Christmas Special row. Confirm the snow battlefield, troops
    and squad sidebar are displayed. If taps fail, record that failure; do not
    convert a desktop mouse pass into a phone pass.

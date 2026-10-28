@@ -92,7 +92,11 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       await touch('touchStart',2,{x:point.x+10,y:point.y+10});await page.waitForFunction(()=>!fodderInput.state().fireHeld);
       await touch('touchMove',2,{x:point.x-20,y:point.y+10});await touch('touchEnd',2);await touch('touchEnd',1);
       assert.equal((await counts()).pan,0,'Fire mode must not promote a second finger to camera intent');
-      await page.locator('#touch-follow').tap();await ready();await page.waitForFunction(()=>!fodderInput.state().manualCamera);
+      await page.locator('#touch-follow').tap();
+      await page.waitForFunction(v=>{
+        const s=fodderInput.state();
+        return s.ready&&!s.manualCamera&&(s.view.cameraX!==v.cameraX||s.view.cameraY!==v.cameraY);
+      },held);
       const followed={...(await state()).view};assert.notDeepEqual(followed,held);
       await command('pan',0,0);await mode('fire');point=await project(target);await touch('touchStart',1,point);
       await page.waitForFunction(p=>{const s=fodderInput.state(),l=s.squads[s.selectedSquad]?.leader;return s.fireHeld&&l?.aimX===p.x&&l?.aimY===p.y;},target);

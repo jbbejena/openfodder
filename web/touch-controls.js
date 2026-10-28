@@ -126,7 +126,7 @@
         move(event); flushCamera();
         if (camera) {
           camera = null;
-          message = 'Camera held. Lift all fingers; Follow squad returns the camera.';
+          message = 'Camera gesture ended. Lift all fingers; Follow squad returns the camera.';
           bridge.fireStop();
         }
         pointers.delete(event.pointerId); notify(); return;

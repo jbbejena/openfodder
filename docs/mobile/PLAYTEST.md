@@ -1,6 +1,6 @@
 # Mobile acceptance checklist
 
-Status: template only; no acceptance run has been performed for this fork by the roadmap task.
+Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). No actual iPhone Safari test has run. Later milestone rows remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -33,13 +33,13 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 
 | ID | Check | Initial status |
 | --- | --- | --- |
-| B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Not run |
-| B02 | Incremental rebuild and documented startup work from the recorded revisions | Not run |
-| B03 | The preview identifies the fork commit and loads the intended content | Not run |
-| B04 | A desktop browser reaches the menu and loads a map | Not run |
-| B05 | Actual iPhone Safari reaches the menu and displays the map | Not run |
-| B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Not run |
-| B07 | Normal-play cheats are off; diagnostics are explicit | Not run |
+| B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
+| B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — owner-private, player-supplied pack |
+| B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
+| B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
+| B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
+| B07 | Normal-play cheats are off; diagnostics are explicit | Pass — normal off / explicit checkbox opt-in |
 
 ## M2: touch controls, layout and mission flow
 

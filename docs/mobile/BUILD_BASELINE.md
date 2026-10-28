@@ -56,10 +56,15 @@ updates or latest dependency substitution. There was no pre-existing local work.
 ## Small test content
 
 Selected **Amiga Format Christmas Special**, mission 1 **LAND OF HOPE AND GLORY**,
-`mapm1.map` + `mapm1.spt`. This is the smallest complete included Amiga demo
-directory (222,823 bytes in 19 files), already required by the web menu's startup.
-Its two single-phase missions avoid retail assets and a larger demo. This is a
-small suitable existing campaign, not a claim that its combat is phone-playable.
+`mapm1.map` + `mapm1.spt`. This is the smallest self-contained set suitable for the existing web startup:
+its 19 required files (222,823 bytes) already supply the Christmas menu art. Its
+two single-phase missions avoid retail assets and additional demo dependencies.
+`AmigaAlienLevels` has fewer raw bytes (166,342 in 34 files), but is a CF2 set and
+cannot replace the Christmas menu resources without changing the startup/menu
+path or bundling another demo. Directory `du` block sizes are not payload sizes.
+This selection minimizes the tested startup's required content rather than
+claiming Christmas is the smallest demo by byte count. It is not a claim that its
+combat is phone-playable.
 
 Required local pack: all 19 files in `Run/Data/AmigaFormat_XMAS/` and
 `Run/Campaigns/Amiga Format Christmas Special.ofc` (Sensible Software attribution;

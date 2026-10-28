@@ -1,6 +1,6 @@
 # Agent task ledger and specifications
 
-Updated: 2026-10-28. Phase 1 claimed by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. Status below reflects evidence, not the original planning snapshot.
+Updated: 2026-10-28. Phase 1 implemented by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. [Verification record](test-runs/phase-1.md) and [draft PR #1](https://github.com/jbbejena/openfodder/pull/1). The actual iPhone gate remains unpassed.
 
 Read [ROADMAP.md](ROADMAP.md), [PLAYTEST.md](PLAYTEST.md), the root [AGENTS.md](../../AGENTS.md) and [handoff](../../AGENT_HANDOFF.md) before claiming work.
 
@@ -13,7 +13,7 @@ Read [ROADMAP.md](ROADMAP.md), [PLAYTEST.md](PLAYTEST.md), the root [AGENTS.md](
 - **done:** deliverables and acceptance checks have linked evidence. A successful build does not satisfy device or gameplay checks.
 - **deferred:** later integration scope, intentionally held until a standalone mobile baseline and fit assessment.
 
-Only MOB-001 is ready at the initial planning snapshot. Update ready/pending states as evidence changes. Later tasks can be investigated independently when useful, but dependency gates still control completion/release claims. Read the current user request before changing another repository or publishing anything.
+Only MOB-001 was ready at the initial planning snapshot. MOB-001/002 now have evidence; MOB-003 awaits its real iPhone check. Update ready/pending states as evidence changes. Later tasks can be investigated independently when useful, but dependency gates still control completion/release claims. Read the current user request before changing another repository or publishing anything.
 
 Use the claim/evidence columns for an agent/session + branch and a commit/PR/test-record link. Do not overwrite a different active claim. Branch names in task cards are proposals and are not created by this document.
 
@@ -22,9 +22,9 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | Task | Milestone | Status | Dependencies | Claim / branch | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
-| MOB-002 | M1 | active | MOB-001 | Codex / `build/mobile-phase-1` | Build and browser verification in progress |
-| MOB-003 | M1 | active | MOB-002 | Codex / `build/mobile-phase-1` | Independent CI/hosting investigation; completion depends on MOB-002 |
-| MOB-004 | M2 | pending | MOB-002 | Unclaimed | — |
+| MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
+| MOB-003 | M1 | blocked | MOB-002 | Codex / `build/mobile-phase-1` | `291de61`: CI/artifact/owner-private preview delivered; [B05 not run: no real iPhone](test-runs/phase-1.md) |
+| MOB-004 | M2 | ready | MOB-002 | Unclaimed; outside Phase 1 | MOB-002 desktop build evidence exists; Phase 2 needs a new scoped task |
 | MOB-005 | M2 | pending | MOB-004 | Unclaimed | — |
 | MOB-006 | M2 | pending | MOB-004, MOB-005 | Unclaimed | — |
 | MOB-007 | M2 | pending | MOB-004 | Unclaimed | — |
@@ -47,6 +47,14 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 Append a concise record near its task card or link a versioned test/handoff record: task ID, branch, starting/final revision, delivered behavior, actual checks and results, device/build/content identities, artifact/preview, remaining limitations, blockers and next task.
 
 Do not populate evidence with planned commands, a test template, upstream behavior or results from an unrelated build. Proposed new files are created by the implementation task, not by this plan.
+
+## Phase 1 completion record
+
+- Start: `6b85186`; baseline `0434d1e`; reproducible engine/shell `570be27`; focused CI `291de61`. [PR #1](https://github.com/jbbejena/openfodder/pull/1) includes the roadmap plus these changes and remains draft/unmerged.
+- MOB-001: recursive revisions verified, smallest suitable startup campaign inventoried, forced cheats/audio exclusions recorded, redistribution blocker explicit in [BUILD_BASELINE.md](BUILD_BASELINE.md).
+- MOB-002: pinned command built clean/incremental; desktop menu/map screenshots reviewed; defaults/error checks passed. [BUILD.md](BUILD.md) and [test record](test-runs/phase-1.md) contain commands, sizes, timings and exact device/build identity.
+- MOB-003: cached web workflow, native path filters, [engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40757426969/artifacts/12846461740), and [standalone owner-private preview](https://openfodder-phase-one.zanysky263.chatgpt.site) delivered. Actual iPhone Safari map load remains **not run** (no hardware), so this card is not marked done. No demo/campaign files uploaded; local player-pack route verified on desktop.
+- Next Phase 1 check: B05 using the exact [phone steps](BUILD.md#actual-iphone-safari-checkpoint--not-run). M1 stays unpassed. No full mission, persistence, touch combat, force/tactical or H Hour change was implemented.
 
 ## MOB-001: Record the build and content baseline
 

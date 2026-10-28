@@ -1,6 +1,6 @@
 # Mobile browser roadmap
 
-Status: planning only. Updated: 2026-10-28.
+Status: Phase 1 desktop build/preview implemented; actual iPhone gate not run. Updated: 2026-10-28. See [the verification record](test-runs/phase-1.md); later milestones remain planned.
 
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 
@@ -25,7 +25,7 @@ The later target is one H Hour story-to-combat-to-results cycle with stable sold
 
 ## Current baseline and facts
 
-The planning base is `4312ff7c1abe3b6750483921893651d9d3c55b33` on `master`, inspected 2026-10-28.
+The planning base is `4312ff7c1abe3b6750483921893651d9d3c55b33` on `master`, inspected 2026-10-28. The table below preserves those original source observations; [BUILD_BASELINE.md](BUILD_BASELINE.md), [BUILD.md](BUILD.md) and [the Phase 1 record](test-runs/phase-1.md) supersede its build/preview unknowns with measured evidence.
 
 | Area | Inspected state | What remains to establish |
 | --- | --- | --- |
@@ -46,7 +46,7 @@ Read the source again if the baseline changes. Upstream website/demo versions, n
 
 | Milestone | Tasks | Exit evidence |
 | --- | --- | --- |
-| M1 — Build and preview | MOB-001–003 | Exact dependency chain, reproducible artifact, fork preview URL, desktop smoke result and real iPhone Safari map load |
+| M1 — Build and preview | MOB-001–003 | Exact dependency chain/artifact/preview and desktop smoke recorded; **real iPhone Safari map load not run** |
 | M2 — Touch-playable mission flow | MOB-004–008 | Select/move/fire/weapons/camera/pause/menus work through touch without stray or stuck commands |
 | M3 — Browser reliability | MOB-009–011 | A supported checkpoint survives reopening; interruption policy works; phone performance is measured |
 | M4 — Standalone mobile baseline | MOB-012–013 | Full checklist with real-device evidence and a reproducible accepted candidate |

@@ -1,6 +1,6 @@
 # Agent task ledger and specifications
 
-Updated: 2026-10-28. All implementation tasks are unclaimed. This documentation branch does not implement any task below.
+Updated: 2026-10-28. Phase 1 claimed by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. Status below reflects evidence, not the original planning snapshot.
 
 Read [ROADMAP.md](ROADMAP.md), [PLAYTEST.md](PLAYTEST.md), the root [AGENTS.md](../../AGENTS.md) and [handoff](../../AGENT_HANDOFF.md) before claiming work.
 
@@ -21,9 +21,9 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 
 | Task | Milestone | Status | Dependencies | Claim / branch | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| MOB-001 | M1 | ready | None | Unclaimed | — |
-| MOB-002 | M1 | pending | MOB-001 | Unclaimed | — |
-| MOB-003 | M1 | pending | MOB-002 | Unclaimed | — |
+| MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
+| MOB-002 | M1 | active | MOB-001 | Codex / `build/mobile-phase-1` | Build and browser verification in progress |
+| MOB-003 | M1 | active | MOB-002 | Codex / `build/mobile-phase-1` | Independent CI/hosting investigation; completion depends on MOB-002 |
 | MOB-004 | M2 | pending | MOB-002 | Unclaimed | — |
 | MOB-005 | M2 | pending | MOB-004 | Unclaimed | — |
 | MOB-006 | M2 | pending | MOB-004, MOB-005 | Unclaimed | — |

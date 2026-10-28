@@ -33,6 +33,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: windows-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scope:
     name: Check Windows build scope

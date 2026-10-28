@@ -5,15 +5,40 @@ Actual iPhone Safari remains NOT RUN; M1 and M2 are not accepted.**
 
 ## Branch, review and exact build
 
-- Branch `mobile/command-bridge`, starting revision
+- Current follow-up branch: `ci/windows-web-guards`, from user-merged master
+  `2b28829cb827388e8881c5c9c648a1c570107149`. Scope: correct Windows CI classification
+  for Emscripten-only sections in shared files; cancel redundant Windows runs.
+- MOB-004 branch `mobile/command-bridge` started at
   `47e956dfcf316b1149a0e54c775197baa0df62af` from the phone-preview branch.
 - Implementation commit **`d755c600e2f2afe49cabba8cea264ff6f4c5ef31`**. Later
   documentation commits do not change the tested/deployed artifact.
-- [Draft PR #3](https://github.com/jbbejena/openfodder/pull/3), target `master`,
-  remains unmerged. It includes the pending phone-preview changes from
-  [draft PR #2](https://github.com/jbbejena/openfodder/pull/2), as well as MOB-004.
+- The user merged [PR #3](https://github.com/jbbejena/openfodder/pull/3) as `2b28829`,
+  after merging [PR #2](https://github.com/jbbejena/openfodder/pull/2) as `a9a7476`.
 - The user previously merged PR #1 (roadmap plus Phase 1) as `f27963c`.
   No merge, force push, submodule repin or game-data upload was performed here.
+
+## Windows CI correction
+
+The prior gate classified any shared C++ file edit as native, including MOB-004's
+changes wholly inside Emscripten guards. A documentation push repeated that PR
+classification, and the user's merge started a third run on master. All three
+are now confirmed **cancelled**: [40775648016](https://github.com/jbbejena/openfodder/actions/runs/40775648016),
+[40777099594](https://github.com/jbbejena/openfodder/actions/runs/40777099594),
+[40778617067](https://github.com/jbbejena/openfodder/actions/runs/40778617067).
+
+`windows_scope.py` now compares native-visible C++ outside proven Emscripten
+guards, retaining native includes, macros, alternatives and other platform
+branches. Browser-only new files may have no native declarations. Ambiguous
+syntax fails closed to Windows validation; literal/macro whitespace is preserved.
+Workflow concurrency cancels superseded runs on the same PR/ref. The Windows
+compiler/test/package job and manual-dispatch behavior are unchanged.
+
+Validation: all **12 git-fixture tests passed**; the actual diffs from `f27963c`
+to `d755c60`, `d9b35f0` and merged `2b28829` all return `native: false`. Real native
+changes remain covered by the fixture checks. The public preview remains at
+`d755c60`, with no engine, content, toolchain or hosting changes in this follow-up.
+Follow the CI-fix branch PR checks for the live scope decision; Phase 2 touch
+implementation remains the next separate task.
 
 ## Delivered behavior and task status
 
@@ -104,10 +129,9 @@ PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
   [matching artifact](https://github.com/jbbejena/openfodder/actions/runs/40775648116/artifacts/12855525161),
   30-day retention, includes matching source/notices and no player pack.
 - [Linux native CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648201).
-  [Windows native CI](https://github.com/jbbejena/openfodder/actions/runs/40775648016)
-  was still installing FFmpeg when recorded; **no Windows pass claimed**.
-  Check the latest PR checks for subsequent/superseding head results. Shared
-  `Source/Fodder.cpp` correctly triggers the preserved native validation.
+  The Windows runs were cancelled in the correction above; **no Windows pass
+  claimed**. The original file-level gate overclassified Emscripten-only edits
+  in shared `Source/Fodder.cpp`; native-visible changes still require validation.
 - PR path filters use the aggregate PR diff; a documentation follow-up to an
   outstanding shared-C++ PR may trigger native CI again. Feature-push/PR build
   duplication remains prevented. No check/protection was bypassed.

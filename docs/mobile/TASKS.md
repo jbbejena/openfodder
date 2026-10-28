@@ -64,8 +64,8 @@ Do not populate evidence with planned commands, a test template, upstream behavi
 The user authorized beginning the next phase. `mobile/command-bridge` preserves
 the pending phone-preview work from `47e956d`; implementation `d755c60` adds the
 engine command/state API, one coordinate boundary, explicit pause/cancel and an
-opt-in browser harness. [Draft PR #3](https://github.com/jbbejena/openfodder/pull/3)
-targets master, includes pending PR #2's changes, and remains unmerged.
+opt-in browser harness. [PR #3](https://github.com/jbbejena/openfodder/pull/3)
+included PR #2's changes; the user merged PR #2 as `a9a7476` and PR #3 as `2b28829`.
 
 Six Node tests, the committed pinned build/artifact guard, actual-engine Chromium
 at DPR 1/2, launcher regression, anonymous hosted menu/map/pause/cancel and Linux
@@ -75,6 +75,14 @@ Public Sites version 4 serves `d755c600e2f2`; no game data was uploaded. Windows
 compilation was still pending when recorded; follow latest PR checks. MOB-005 and
 MOB-007 are ready. Touch gestures/combat UI and full mission flow remain unfinished;
 M1/M2 and actual iPhone Safari remain unpassed.
+
+CI correction after user merges: `ci/windows-web-guards` starts from `2b28829`.
+The original shared-file check overclassified Emscripten-only C++ edits, so both
+PR runs and the master run were cancelled (`40775648016`, `40777099594`,
+`40778617067`). Twelve git-fixture tests and the actual Phase 2/merge comparisons
+pass with native-visible C++ classification; genuine native changes retain the
+matrix. Windows concurrency now cancels superseded runs. Engine/preview unchanged;
+see [the current handoff](../../AGENT_HANDOFF.md#windows-ci-correction).
 
 ## MOB-001: Record the build and content baseline
 

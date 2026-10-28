@@ -153,11 +153,16 @@ Docs, browser shell/build scripts and the web-only entry point do not require th
 Windows matrix. Windows first runs a small Ubuntu scope check against the PR's
 merge base (or a push's before/after commits). Shared C++/headers, native projects,
 dependencies and Windows compiler-job changes still run the full existing matrix.
+For C++ sources/headers, the gate compares native-visible code after removing only
+proven Emscripten-only branches. Native alternatives and other platform guards
+remain relevant; unsupported preprocessing falls back to Windows compilation.
+Thus a web-only hook in a shared file does not require the Windows matrix.
 For CMake, only edits inside a literal `if(EMSCRIPTEN)` branch are excluded; native
 branches, changed guards, new/deleted files and ambiguous/dynamic syntax retain
 Windows coverage. Changes to CI triggers/routing run validation without starting
 Windows. Manual dispatch always requests Windows compilation. Scope decisions
 have focused git-fixture tests; no branch protection or required check is changed.
+Windows workflow concurrency cancels superseded runs on the same PR/ref.
 Linux keeps its existing native CMake check. This change does not repin either
 native workflow's dependency/test setup. GitHub PR filters use the full PR diff;
 a PR with outstanding shared/native changes still receives Windows checks after

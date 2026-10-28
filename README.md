@@ -1,4 +1,15 @@
 # Open Fodder
+
+## Mobile browser work in this fork
+
+This fork is planning a standalone, landscape-first iPhone Safari version before later H Hour integration. Mobile implementation and real-device acceptance are pending; existing upstream badges/demo links do not establish mobile readiness for this fork.
+
+- [Codex agent instructions](AGENTS.md)
+- [Current handoff and next task](AGENT_HANDOFF.md)
+- [Detailed roadmap](docs/mobile/ROADMAP.md)
+- [Task ledger and specifications](docs/mobile/TASKS.md)
+- [Mobile acceptance checklist](docs/mobile/PLAYTEST.md)
+
 [![windows-build](https://github.com/OpenFodder/openfodder/actions/workflows/windows-build.yml/badge.svg)](https://github.com/OpenFodder/openfodder/actions/workflows/windows-build.yml)
 [![linux-build](https://github.com/OpenFodder/openfodder/actions/workflows/linux-build.yml/badge.svg)](https://github.com/OpenFodder/openfodder/actions/workflows/linux-build.yml)
 

@@ -1,6 +1,7 @@
 # Reproducible browser build (MOB-002/003)
 
-This is a Phase 1 engine preview, not a touch-playable mobile release.
+The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004).
+The [command API/test harness](INPUT_API.md) is implemented; a complete touch-playable release remains pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
 
@@ -169,12 +170,13 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 3, fork build `b9abafba0601e1c6000658140e1d06ad4eae8296`.
-[Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40767915225);
-the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40767915225/artifacts/12850872585)
+Sites version 4, fork build `d755c600e2f2afe49cabba8cea264ff6f4c5ef31`.
+[Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648116);
+the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40775648116/artifacts/12855525161)
 contains source/notices and no game assets. The default upstream-download route
 passed hosted desktop menu/map verification. See [the follow-up record](test-runs/phone-file-import.md)
-for exact hosting identity and sizes; original Phase 1 measurements are historical.
+for the earlier phone-loading change; [MOB-004's record](test-runs/command-bridge.md)
+contains current hosting identity/sizes and command checks. Original Phase 1 measurements are historical.
 
 ## Actual iPhone Safari checkpoint — NOT RUN
 

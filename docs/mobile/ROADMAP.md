@@ -1,6 +1,6 @@
 # Mobile browser roadmap
 
-Status: Phase 1 desktop build/preview implemented; actual iPhone gate not run. Updated: 2026-10-28. See [the verification record](test-runs/phase-1.md); later milestones remain planned.
+Status: Phase 1 desktop build/preview and Phase 2 command foundation (MOB-004) implemented; actual iPhone gate not run. Updated: 2026-10-28. See [Phase 1 evidence](test-runs/phase-1.md) and [MOB-004 verification](test-runs/command-bridge.md); remaining touch/UI/mission tasks are planned.
 
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 

@@ -6,7 +6,7 @@ This fork is being prepared for a standalone, landscape-first mobile-browser ver
 
 The engine remains C++/SDL compiled with Emscripten. Keep combat, simulation timing, soldiers, objectives and outcomes authoritative in the engine. Use a small browser interface and explicit engine adapter for controls and readable UI. This is an existing-engine port, not a Phaser or other engine rewrite.
 
-The roadmap began as planning documents only. Phase 1 now has a pinned build, standalone engine preview and desktop menu/map evidence in [the test record](docs/mobile/test-runs/phase-1.md). Actual iPhone Safari, browser persistence and H Hour remain unverified/unimplemented. The roadmap describes later work; the active user request determines which work is authorized.
+The roadmap began as planning documents only. Phase 1 has a pinned build, public preview and [desktop menu/map evidence](docs/mobile/test-runs/phase-1.md). Phase 2's [MOB-004 command foundation](docs/mobile/test-runs/command-bridge.md) is implemented; touch controls/gestures, phone HUD and full mission flow remain next. Actual iPhone Safari, browser persistence and H Hour remain unverified/unimplemented. The active user request determines which work is authorized.
 
 ## Read first
 

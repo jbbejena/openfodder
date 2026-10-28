@@ -16,7 +16,7 @@ head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root).decode().
 assert info['commit'] == head, 'Stale build identity'
 assert args.allow_dirty or not info['dirty'], 'Publish a committed build, not a dirty tree'
 required = {'index.html', 'index.js', 'index.wasm', 'index.data', 'bootstrap.js',
-            'style.css', 'build-info.json', 'content-manifest.json', 'source.zip', 'SOURCE.txt'}
+            'style.css', 'engine-bridge.js', 'input-harness.js', 'build-info.json', 'content-manifest.json', 'source.zip', 'SOURCE.txt'}
 assert required == {p.name for p in dist.iterdir() if p.is_file()}, 'Unexpected or missing artifact file'
 assert {p.name for p in dist.iterdir() if p.is_dir()} == {'notices'}
 assert (dist / 'index.wasm').read_bytes()[:4] == b'\0asm'

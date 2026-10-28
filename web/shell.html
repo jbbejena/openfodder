@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Open Fodder · Phase 1 preview</title>
+  <title>Open Fodder · Phase 2 input preview</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <strong>OPEN FODDER</strong> <span>Phase 1 · engine preview</span>
+    <strong>OPEN FODDER</strong> <span>Phase 2 · command bridge</span>
     <span id="identity">Reading build identity…</span>
   </header>
   <main>
@@ -46,16 +46,46 @@
       <details id="launch-diagnostics">
         <summary>Diagnostics (optional)</summary>
         <label><input id="cheats" type="checkbox"> Enable cheat keys for this launch</label>
+        <label><input id="input-test" type="checkbox"> Show input API test panel</label>
         <p>Normal play leaves cheat keys off. Audio is disabled in this web baseline.</p>
       </details>
     </section>
     <canvas id="canvas" width="960" height="600" tabindex="0" aria-label="Open Fodder game"></canvas>
+    <details id="input-harness" hidden>
+      <summary>Control bridge test panel</summary>
+      <p>Development controls for MOB-004. Map coordinates come from the engine.
+        The touch combat interface is a later task. Fire here uses the primary weapon;
+        grenade/rocket buttons select the secondary weapon only.</p>
+      <div class="input-row" aria-label="Select squad">
+        <button data-squad="0">Squad 1</button><button data-squad="1">Squad 2</button><button data-squad="2">Squad 3</button>
+      </div>
+      <div class="input-row">
+        <label>Map X <input id="input-x" type="number" step="1"></label>
+        <label>Map Y <input id="input-y" type="number" step="1"></label>
+        <button id="input-move">Move</button><button id="input-fire">Hold primary fire</button>
+      </div>
+      <div class="input-row" aria-label="Select secondary weapon">
+        <button data-weapon="grenade">Select grenade</button><button data-weapon="rocket">Select rocket</button>
+      </div>
+      <div class="input-row" aria-label="Camera intent">
+        <button data-pan="[-32,0]">Pan left</button><button data-pan="[32,0]">Pan right</button>
+        <button data-pan="[0,-32]">Pan up</button><button data-pan="[0,32]">Pan down</button>
+        <button id="input-follow">Follow squad</button>
+      </div>
+      <div class="input-row">
+        <button id="input-pause">Pause</button><button id="input-resume">Resume</button><button id="input-cancel">Cancel input</button>
+      </div>
+      <p id="input-result" role="status" aria-live="polite">No bridge command sent.</p>
+      <pre id="input-state" aria-label="Engine control state"></pre>
+    </details>
     <details id="diagnostics">
       <summary>Build details &amp; log</summary>
       <pre id="build-details"></pre>
       <pre id="log" aria-label="Runtime log"></pre>
     </details>
   </main>
+  <script src="engine-bridge.js"></script>
+  <script src="input-harness.js"></script>
   <script src="bootstrap.js"></script>
   {{{ SCRIPT }}}
 </body>

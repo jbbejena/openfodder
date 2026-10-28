@@ -22,6 +22,7 @@
 
 #ifdef EMSCRIPTEN
 #include "stdafx.hpp"
+#include "WebInput.hpp"
 
 cAbout* About = 0;
 
@@ -31,6 +32,7 @@ void menu_loop() {
 
 	static int16 result = -1;
 	if (result == -1) {
+		WebInput::SetStage(WebInput::Stage::Menu);
 		g_Fodder->VersionSwitch(g_Fodder->mVersions->GetForCampaign("Amiga Format Christmas Special"));
 		g_Fodder->mGame_Data.mCampaign.Clear();
 
@@ -135,6 +137,7 @@ void phase_loop() {
 		g_Fodder->Phase_EngineReset();
 		g_Fodder->Phase_SquadPrepare();
 		g_Fodder->Phase_Prepare();
+		WebInput::SetStage(WebInput::Stage::Battlefield);
 		EM_ASM({ Module.onGameStatus && Module.onGameStatus('battlefield', $0); }, g_Fodder->mStartParams->mCheatsEnabled);
 	}
 
@@ -142,7 +145,10 @@ void phase_loop() {
 	//  0 = Phase Won
 	//  1 = Phase Running
 
-	result = g_Fodder->Phase_Cycle();
+	// Keep yielding/rendering/polling SDL while paused. The native blocking pause
+	// loop cannot run on the browser thread; never advance mission ticks here.
+	if (!g_Fodder->mPhase_Paused)
+		result = g_Fodder->Phase_Cycle();
 	g_Fodder->Video_Sleep();
 	Sleep(10);
 }

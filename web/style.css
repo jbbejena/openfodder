@@ -16,6 +16,12 @@ button:disabled { opacity: .45; }
 input[type=file] { display: block; max-width: 100%; }
 canvas { display: none; margin: auto; width: 100%; max-width: 960px; height: auto; background: black; image-rendering: pixelated; }
 canvas.running { display: block; }
+canvas { object-fit: contain; object-position: center; border: 0; padding: 0; }
+#input-harness { border: 1px solid #526346; padding: 0 12px 12px; }
+#input-harness .input-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+#input-harness input[type=number] { width: 6em; padding: 10px; font: inherit; }
+#input-harness button { min-height: 44px; touch-action: none; }
+#input-fire { user-select: none; -webkit-user-select: none; }
 details { margin-top: 12px; }
 summary { cursor: pointer; padding: 8px 0; }
 pre { overflow: auto; white-space: pre-wrap; font-size: .78rem; max-height: 240px; color: #bbccba; }

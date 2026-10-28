@@ -35,7 +35,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `b9abafba0601`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `d755c600e2f2`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
@@ -45,16 +45,16 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 
 | ID | Check | Initial status |
 | --- | --- | --- |
-| I01 | Select every available squad; selection feedback matches engine state | Not run |
-| I02 | Move each squad to an intended destination | Not run |
-| I03 | Hold fire, aim at another location, release; no stuck fire | Not run |
-| I04 | Use available secondary weapons deliberately; displayed ammo matches engine state | Not run |
+| I01 | Select every available squad; selection feedback matches engine state | Desktop bridge: populated squad selected, empty rejected; real touch interface pending |
+| I02 | Move each squad to an intended destination | Desktop bridge: real order/leader movement passed; phone pending |
+| I03 | Hold fire, aim at another location, release; no stuck fire | Desktop primary-fire bridge passed; real touch mode pending |
+| I04 | Use available secondary weapons deliberately; displayed ammo matches engine state | Selection/rejection tested with original zero ammo and separate local fixture; secondary firing pending |
 | I05 | A HUD tap cannot move/fire troops and one touch does not generate duplicate commands | Not run |
-| I06 | Pan the camera without a stray movement/fire action | Not run |
+| I06 | Pan the camera without a stray movement/fire action | Desktop camera intent passed; touch gestures pending |
 | I07 | Add/remove a second finger during a gesture without leaking an unintended command | Not run |
-| I08 | Aim/move coordinates stay correct after pan, resize and rotation | Not run |
-| I09 | Open help/menu, pause/resume, cancel targeting and return to play using touch only | Not run |
-| I10 | Finger cancellation, leaving the canvas and switching modes release held inputs | Not run |
+| I08 | Aim/move coordinates stay correct after pan, resize and rotation | Desktop pan/resize/letterbox/DPR 1/2 bridge passed; real Safari rotation pending |
+| I09 | Open help/menu, pause/resume, cancel targeting and return to play using touch only | Desktop explicit pause/cancel and native P passed; complete touch menus pending |
+| I10 | Finger cancellation, leaving the canvas and switching modes release held inputs | Desktop API cancel, pause, synthetic blur and real harness pointer release passed; phone gestures pending |
 | U01 | Controls are readable and reachable around cutouts and the home indicator | Not run |
 | U02 | Center battlefield stays usable; menus collapse and do not obstruct live combat | Not run |
 | U03 | Portrait guidance is usable; rotating back restores a working landscape layout | Not run |
@@ -62,7 +62,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | G01 | Start and complete the selected mission entirely with touch | Not run |
 | G02 | Lose/retry a mission and return to the menu without keyboard input | Not run |
 | G03 | Abort has a clear outcome distinct from victory/defeat | Not run |
-| G04 | Original desktop mouse/keyboard controls still work | Not run |
+| G04 | Original desktop mouse/keyboard controls still work | SDL menu, right-button aim and P passed; full native mission/hotkey coverage not run |
 
 ## M3/M4: persistence, interruptions and performance
 

@@ -6,6 +6,7 @@ This fork has a reproducible Phase 1 browser engine build and a [standalone prev
 
 - [Pinned web build and local demo-pack instructions](docs/mobile/BUILD.md)
 - [Phase 1 verification and remaining phone checkpoint](docs/mobile/test-runs/phase-1.md)
+- [Phase 2 command API and diagnostic harness](docs/mobile/INPUT_API.md) — MOB-004 implemented; [desktop/hosted results](docs/mobile/test-runs/command-bridge.md). Touch combat remains the next task.
 - [Codex agent instructions](AGENTS.md)
 - [Current handoff and next task](AGENT_HANDOFF.md)
 - [Detailed roadmap](docs/mobile/ROADMAP.md)

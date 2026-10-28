@@ -1,223 +1,155 @@
 # Current handoff
 
-## Active Phase 2 task — MOB-004
+Updated 2026-10-28. **Phase 2 has begun: MOB-004 is implemented and desktop-verified.
+Actual iPhone Safari remains NOT RUN; M1 and M2 are not accepted.**
 
-User authorized beginning the next phase. Branch `mobile/command-bridge` starts
-from the current phone-preview branch tip
-`47e956dfcf316b1149a0e54c775197baa0df62af`; master remains `f27963c` and draft PR #2
-is still open. Scope: a documented browser-to-engine command/state boundary and
-diagnostic harness, with focused behavioral and browser checks. Keep the existing
-C++/SDL engine and pins. MOB-005–008 follow this foundation in separate tasks.
-The public preview still serves `b9abafb` until a verified update is published.
-Actual iPhone B05/M1 remains NOT RUN/unpassed while independent Phase 2 work proceeds.
+## Branch, review and exact build
 
-Updated: 2026-10-28. **Phase 1 desktop build and standalone engine preview are
-delivered. Actual iPhone Safari is NOT RUN; M1 remains unpassed.**
+- Branch `mobile/command-bridge`, starting revision
+  `47e956dfcf316b1149a0e54c775197baa0df62af` from the phone-preview branch.
+- Implementation commit **`d755c600e2f2afe49cabba8cea264ff6f4c5ef31`**. Later
+  documentation commits do not change the tested/deployed artifact.
+- [Draft PR #3](https://github.com/jbbejena/openfodder/pull/3), target `master`,
+  remains unmerged. It includes the pending phone-preview changes from
+  [draft PR #2](https://github.com/jbbejena/openfodder/pull/2), as well as MOB-004.
+- The user previously merged PR #1 (roadmap plus Phase 1) as `f27963c`.
+  No merge, force push, submodule repin or game-data upload was performed here.
 
-## Branch, commits and review
+## Delivered behavior and task status
 
-- [jbbejena/openfodder](https://github.com/jbbejena/openfodder), branch
-  `build/mobile-phase-1`, created from fetched roadmap tip
-  `6b851862a77c3dd9556b5cadae7c88d370b6095f` on `docs/mobile-browser-roadmap`.
-  Engine base: `4312ff7c1abe3b6750483921893651d9d3c55b33`.
-- [PR #1](https://github.com/jbbejena/openfodder/pull/1) included the roadmap and
-  Phase 1 changes. The user merged it as `f27963c93db6c65e8c8138f9e0a1b869521d11a4`.
-  The phone-file helper below is a separate branch/preview update.
-- Focused commits: `0434d1e` (MOB-001 baseline), `570be27` (MOB-002 pinned build
-  and local-file shell), `291de61` (MOB-003 CI/path filters). The subsequent
-  documentation/handoff commit is visible at the PR head.
-- **Current tested/deployed fork build: `b9abafba0601e1c6000658140e1d06ad4eae8296`**,
-  Sites version 3. Original Phase 1 evidence at `291de61` is historical.
-  Later documentation commits do not silently replace the preview.
-- Implementation uses review branches; the user merged PR #1. No upstream
-  repositories, pinned gitlinks or unrelated work were changed.
+The public launcher still loads the exact demo directly from its existing pinned
+upstream host. Normal cheats remain off. Before Start game, Diagnostics →
+**Show input API test panel** enables a panel below the battlefield. It exercises
+engine-backed squad selection, movement, held primary fire/aim/stop, available
+secondary-weapon selection, camera pan/follow, explicit pause/resume and cancel.
+The real engine provides counts, ammo, selection, positions and targets.
 
-## Task status and player-visible behavior
+Commands are validated and applied at `Phase_Loop_Interrupt`. Cancel clears
+pending physical commands and held input while preserving pause reasons. Repeated
+pause requests cannot resume play; user/visibility/focus reasons compose. Native
+P remains supported. The browser loop yields/polls SDL while paused and skips
+mission updates. CSS/canvas/camera/sidebar/DPR conversion happens in one boundary.
 
 | Task | Status | Evidence |
 | --- | --- | --- |
-| MOB-001 | Done | [Baseline](docs/mobile/BUILD_BASELINE.md): recursive revisions, exact file inventory/provenance, cheat/audio audit |
-| MOB-002 | Done | [Build instructions](docs/mobile/BUILD.md), [test record](docs/mobile/test-runs/phase-1.md): clean/incremental build, desktop menu/map, normal cheats off and explicit diagnostic opt-in |
-| MOB-003 | Blocked on final phone row | Cached web CI, artifact, native filters and deployed preview delivered; actual iPhone Safari map load not run because no phone is available |
+| MOB-001/002 | Done | [Baseline](docs/mobile/BUILD_BASELINE.md), [build](docs/mobile/BUILD.md), [Phase 1 record](docs/mobile/test-runs/phase-1.md) |
+| MOB-003 | Blocked on actual phone | Public preview/CI/desktop delivered; B05 iPhone map load NOT RUN |
+| MOB-004 | Done | [API contract](docs/mobile/INPUT_API.md), [test record](docs/mobile/test-runs/command-bridge.md), commit `d755c60` |
+| MOB-005 | Ready / next | Touch command modes, pointer ownership, deliberate secondary firing |
+| MOB-007 | Ready | Landscape phone shell/HUD; separate bounded task |
+| MOB-006/008 | Pending | Depend on the remaining touch controls/layout work |
 
-The player taps Load demo from GitHub, waits for the exact files to verify,
-starts the engine with cheats off, chooses Christmas Special and sees its first battlefield. Loading,
-file/download failures and context loss have readable feedback. Diagnostics can
-explicitly enable cheat keys. Browser audio remains disabled. No touch controls,
-combat/force changes, persistent saves or H Hour implementation were added.
+This is the command foundation and an opt-in diagnostic harness. Production
+canvas touch modes/gestures, secondary firing, full phone HUD and mission menus
+remain MOB-005–008. No full mission, persistence, background-resume policy,
+phone performance, larger forces, cover/suppression or H Hour work is claimed.
+Vehicles explicitly return `unsupported` for movement/fire through this API.
 
-Changed files: CMake/web startup, `scripts/` build/pack/verification helpers,
-`web/` launcher/config/manifest, legacy Windows helper (now WSL delegation), three
-CI workflows, build/evidence documentation and planning/handoff entry points.
-
-## Phone-only testing follow-up
-
-Current branch: `web/iphone-file-import`, from merged master `f27963c`. The user
-asked for a way to test on iPhone without a compiler/terminal, then requested
-hosted files to simplify testing. The default launcher now offers **Load demo
-from GitHub**: it fetches the 20 exact files directly from their existing pinned
-upstream host, without sending Site credentials, and verifies all hashes before
-startup. Browser runtime + demo is roughly 3.1 MB before compression. No game
-content is mirrored or bundled on our host. Our own redistribution terms remain
-unresolved. Download errors are retryable and partial data cannot start.
-
-Commits: `c666734` (individual-file fallback), `b9abafb` (direct pinned upstream
-loading). [Draft PR #2](https://github.com/jbbejena/openfodder/pull/2) targets
-master and remains unmerged. Current hosted desktop verification passed: visible
-`b9abafba0601`, 20 upstream GET requests without Site credentials, menu and
-battlefield, cheats off. Screenshots were inspected locally. Engine-ready was
-1,523 ms on one cold desktop navigation, not a phone benchmark.
-
-As an alternative, the launcher accepts the 20 exact extracted demo files across separate Files
-picker visits. A pinned upstream ZIP link and on-page instructions replace the
-need to generate `.ofdata` on a computer. The existing pack route still works.
-
-Only web shell/import logic, desktop smoke coverage and docs changed. Engine
-C++/CMake, dependency/data pins and touch combat are unchanged. User-selected
-files are hash-checked before mounting, remain in memory, and are never uploaded.
-No game content has been added to hosting or source. Publication rights remain
-unresolved; linking the existing upstream download is not a new license grant.
-
-Local desktop checks passed for the original merged build, direct upstream
-loading (including failed-download retry), and individual-file fallback: 19 files cannot start; an unexpected script is rejected while retaining
-verified files; adding the campaign enables startup; menu and battlefield render
-with cheats off. Existing pack opt-in/error checks also passed. A narrow launcher
-layout check supplements this; it is not real iPhone Safari evidence. B05 stays
-NOT RUN until the user tests the published preview on actual hardware.
-See [the follow-up record](docs/mobile/test-runs/phone-file-import.md).
-
-## CI follow-up: skip unnecessary Windows builds
-
-User requested this after the Phase 1 handoff; starting revision `e615cfb` on the
-same draft PR/branch. Windows runs `40759181284` and `40757427028` were canceled
-because this PR changes only web-specific engine/CMake code and CI routing.
-
-`windows-build.yml` now runs a small Ubuntu scope check before allocating the
-Windows matrix. Shared/native C++ and headers, native CMake, Windows dependencies,
-and actual compiler/test job edits keep Windows coverage. Literal Emscripten-only
-CMake bodies and CI trigger/routing edits do not require Windows. Unknown CMake
-syntax is conservative: run Windows. Manual dispatch remains available.
-
-Validation: `python3 -m unittest discover -s scripts/ci -p 'test_*.py' -v` passed
-all seven fixture tests, covering native changes, additions/deletions/renames,
-web-only changes, CMake guards/nesting/ambiguity and workflow build-step changes.
-`python3 scripts/ci/windows_scope.py --base origin/master --head HEAD` returned
-`native: false` for the actual Phase 1 PR. The Windows matrix/build/test/deployment
-steps were compared to the original job and are unchanged. This follow-up changes
-CI only; at that point the deployed preview remained at `291de6153d68…` and B05
-was not run. The current phone-only preview is recorded above.
-
-## Exact dependencies and content
-
-- Run/data `070a6086c62164e859fc3274b75b5f536fa9d902`; nested Scripts
-  `dad04730860bcdd1189aa8562860e379b0f5d783`. No `--remote` updates.
-- emsdk `c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`, Emscripten 4.0.23
-  (`7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`), web SDL **3.2.22**,
-  CMake 3.31.6 / Ninja 1.11.1. Full pins in BUILD.md.
-- Christmas Special / LAND OF HOPE AND GLORY / `mapm1`: 20 files, 223,382 decoded
-  bytes; [manifest](web/content-manifest.json) records every path/hash.
-- **Game-data publication remains unresolved.** GPL engine/Scripts permissions do
-  not cover the demo/campaign. No grant for those exact files was found. Do not
-  host the local pack, game assets or game-art screenshots. The browser now loads
-  directly from the existing upstream host; our own mirror/bundle remains blocked.
+Changed implementation: `Source/WebInput.*`, Emscripten-only hooks in
+`Source/Fodder.cpp` and `Start_Emscripten.cpp`, the Emscripten runtime export,
+`web/engine-bridge.js`, its six Node tests, diagnostic harness/shell/CSS,
+packaging/artifact guard and actual-engine smoke script. Web CI runs the six Node
+checks. Shared/native validation remains enabled; no native CI gate was weakened.
 
 ## Commands and actual results
 
 ```sh
-git submodule update --init --recursive
+node --test web/engine-bridge.test.cjs
 ./scripts/build-web.sh
 python3 scripts/check-web-artifact.py
 python3 scripts/make-local-web-pack.py
-python3 -m http.server 8080 --directory build-web/cmake/dist
-```
-
-The single build command installs/checks its pins and packages engine/Scripts,
-source and notices. Output: `build-web/cmake/dist/`; player pack:
-`build-web/local-only/christmas.ofdata`, outside the served directory. Generated
-output/downloads are ignored and uncommitted. Windows WSL wrapper was not tested.
-
-- Clean CMake/object/output build with toolchain/SDL cache: **69.82 s**, 68/68 steps.
-- Incremental: **2.34 s**, “no work to do”; identical hashes for all ten top-level
-  output files. Fresh CI bootstrap/build: **150 s**, success.
-- Artifact/source guard passed locally and in CI. Original hosted files totaled
-  **4,783,792 bytes**; support `.data` contains 47 GPL/config files and no game assets.
-  Current `b9abafb` artifact: **4,809,860 bytes** including optional source/notices;
-  cold runtime **2,896,387 bytes**, plus **223,382 bytes** fetched from upstream.
-- Desktop smoke command with installed Playwright Core 1.57.0:
-
-```sh
+python3 -m http.server 8090 --directory build-web/cmake/dist
 PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
-  node scripts/smoke-web.cjs http://127.0.0.1:8080/ \
-  build-web/local-only/christmas.ofdata build-web/local-only/clean-evidence
+  node scripts/smoke-web-input.cjs http://127.0.0.1:8090/ \
+  build-web/local-only/christmas.ofdata build-web/local-only/command-bridge-committed-evidence
+PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
+  node scripts/smoke-web.cjs http://127.0.0.1:8090/ \
+  build-web/local-only/christmas.ofdata build-web/local-only/bridge-committed-regression-evidence
 ```
 
-Menu/map, visible commit, cheats off/explicit opt-in, missing/corrupt pack and
-failed Wasm download checks passed. Actual WebGL context loss was also exercised:
-readable reload/error feedback. Screenshots reviewed locally, not published.
-Exact sizes/hashes/results are in [the test record](docs/mobile/test-runs/phase-1.md).
+- Six Node tests passed. Committed build and artifact/source guard passed for
+  `d755c60`; `.data` still contains 47 GPL/config files, no game assets.
+- Actual-engine Chromium tests passed at DPR 1 and 2: real movement/aim, same
+  world target after pan/resize/letterboxing, queue overflow/cancel priority,
+  stop/cancel, idempotent pause with frozen mission ticks and separate reasons,
+  native menu/P/right-button input, and real diagnostic pointer down/up.
+- The pinned mission has zero secondary ammo: rejection passed. Valid grenade/
+  rocket selection passed with a clearly separate, local in-memory campaign
+  fixture (`Grenades=3`, `Rockets=2`), without consuming ammo or modifying Run/pins.
+- Launcher regression passed: menu/map, defaults, opt-in cheats, corrupt/partial
+  files, failed-download retry, real upstream loading and missing-Wasm feedback.
+  External-fetch QA used the environment proxy CA with TLS verification enabled.
+- Screenshots of committed local and hosted menu/map/harness were inspected and
+  retained locally. Logs: `/workspace/command-bridge-committed-build.log`,
+  `/workspace/command-bridge-committed-smoke.log`, `/workspace/bridge-committed-regression.log`.
+- A limited host syntax check of the changed translation units passed using
+  `c++ -std=c++14 -fsyntax-only -DOPENFODDER_NO_MIXER -ISource -Ibuild-web/cmake/Source -Ibuild-web/cache/ports/sdl3/SDL-release-3.2.22/include Source/Fodder.cpp Source/WebInput.cpp Source/Start_Emscripten.cpp`.
+  Full Linux CI also passed; this syntax check is not a full native runtime test.
 
-## Preview, hosting and CI
+## Public preview and CI
 
-- [Standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site) is
-  **public, no sign-in required**, changed at the user's request on 2026-10-28
-  (Sites access revision 2). Tap Load demo from GitHub, then Start game.
-  Local-file import remains an optional fallback. This access-only change keeps
-  the same version 3 / `b9abafb` build; no data was uploaded or artifact replaced.
-- Sites version **3**, project `appgprj_6ae24fbe89788191a38778521e56e855`, deployment
-  `appgdep_6ae2637a92308191ab3b39bbae1dc68b`: succeeded. Hosting source commit
-  `945c954110b661daafb2948b148a273f9d22babc` mirrors engine/Scripts with its own
-  manifest/provenance; shipped fork build ID is `b9abafba0601…`.
-- Hosting checkout/manifest: `/workspace/sites/openfodder-phase-one/`. Bundled
-  filesystem helpers were unavailable, so native Sites tools, authenticated
-  ordinary Git and a deployment archive were used. No credential or generated
-  output is committed in either source repository.
-- [Current web CI: success](https://github.com/jbbejena/openfodder/actions/runs/40767915225).
-  [Matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40767915225/artifacts/12850872585)
-  has 30-day retention; GitHub login may be required. Source/notices included;
-  no player pack. [Original Phase 1 Linux native CI: success](https://github.com/jbbejena/openfodder/actions/runs/40757427139).
-  [Windows native CI](https://github.com/jbbejena/openfodder/actions/runs/40757427028)
-  was canceled in the user-requested CI follow-up above; no Windows pass is claimed.
-- GitHub Pages setup returned HTTP 403 “Resource not accessible by integration”.
-  No Pages site was created; Sites resolved the hosting requirement.
-- Windows scope validation excludes this web-only Phase 1 diff while retaining
-  shared/native coverage. Linux/web path filters still use the PR diff. Feature
-  push/PR duplication is avoided; no protection was changed.
+- [Preview](https://openfodder-phase-one.zanysky263.chatgpt.site): **public, no sign-in**,
+  Sites version **4**, visible fork ID **`d755c600e2f2`**. Prior version 3 / `b9abafb`
+  was the Phase 1 phone-loading preview and is superseded.
+- Project `appgprj_6ae24fbe89788191a38778521e56e855`; deployment
+  `appgdep_6ae26f6757dc8191bc31d12a27d21ed0`: succeeded. Hosting source
+  `94fff4aa11982b84bbe9d5dfa75b155e8007b0fa`, checkout/manifest
+  `/workspace/sites/openfodder-phase-one/`. Source pushed before saving/deploying;
+  output was packaged separately, not committed. Audience stayed public.
+- Fresh anonymous hosted Chromium: HTTP 200, correct ID, 20 verified upstream
+  GET requests, menu/map, real panel pause twice with frozen ticks, resume and
+  held-fire cancellation. No supplied credentials/authorization headers. Engine
+  ready 1,534 ms on one cold desktop navigation, not a phone benchmark.
+- [Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648116);
+  [matching artifact](https://github.com/jbbejena/openfodder/actions/runs/40775648116/artifacts/12855525161),
+  30-day retention, includes matching source/notices and no player pack.
+- [Linux native CI passed](https://github.com/jbbejena/openfodder/actions/runs/40775648201).
+  [Windows native CI](https://github.com/jbbejena/openfodder/actions/runs/40775648016)
+  was still installing FFmpeg when recorded; **no Windows pass claimed**.
+  Check the latest PR checks for subsequent/superseding head results. Shared
+  `Source/Fodder.cpp` correctly triggers the preserved native validation.
+- PR path filters use the aggregate PR diff; a documentation follow-up to an
+  outstanding shared-C++ PR may trigger native CI again. Feature-push/PR build
+  duplication remains prevented. No check/protection was bypassed.
+
+## Dependencies, data and publication boundary
+
+- Run `070a6086c62164e859fc3274b75b5f536fa9d902`; Scripts
+  `dad04730860bcdd1189aa8562860e379b0f5d783`, unchanged recursive pins.
+- emsdk `c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`; Emscripten 4.0.23
+  (`7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`); SDL 3.2.22;
+  CMake 3.31.6 / Ninja 1.11.1. Full pins/commands in BUILD.md.
+- Current cold runtime 2,920,588 bytes; upstream two-mission demo 223,382 bytes,
+  roughly 3.14 MB total before compression. Optional source 1,819,812 bytes;
+  all hosted files 4,854,457 bytes. Full retail data was not measured/bundled.
+- Engine/GPL Scripts and game-data permissions remain separate. Our own demo
+  mirroring/bundling grant is unresolved. Data is loaded directly from the pinned
+  existing publisher or local files, hash-checked and held in browser memory.
+  Synthetic ammo edits exist only in the local test browser, never the preview.
+  No game assets, player packs, credentials or game-art screenshots were uploaded.
 
 ## Evidence limits and next checks
 
-- **Original desktop record:** Linux x86_64 Chromium 154.0.8037.57, 1100×900 CSS viewport, DPR 1,
-  mouse, SDL `opengles2` / WebGL 1.0 / ANGLE SwiftShader. Local engine-ready 343 ms,
-  hosted 2,965 ms on single cold navigations; not phone benchmarks.
-- **Deployed desktop:** actual menu/map and visible fork commit verified using
-  supported Sites service access with TLS verification before the access change.
-  After public access was enabled, a fresh anonymous Chromium context also passed:
-  HTTP 200, visible `b9abafba0601`, 20 verified upstream files, menu/battlefield,
-  cheats off; screenshots inspected. No credentials supplied or authorization
-  headers sent. Engine-ready 2,378 ms on one desktop navigation. Not an iPhone test.
-- **Actual iPhone Safari: NOT RUN** (no hardware). [Exact phone steps](docs/mobile/BUILD.md#actual-iphone-safari-checkpoint--not-run):
-  open preview, record model/iOS/Safari/build, Load demo from GitHub, Start game,
-  reach menu, tap/briefly hold campaign row, display battlefield. Record failure
-  if touch cannot select it. Full touch combat is Phase 2.
-- No full mission, checkpoint/save round trip, lifecycle, phone performance,
-  Home Screen/PWA or H Hour test. Reload loses data/state. Audio disabled.
-- Zero-delay clicks can miss the sampled menu input; a brief hold was tested.
-  A requestAnimationFrame warning remains; timing/performance is not certified.
+Desktop: Linux Chromium 154.0.8037.57, Playwright Core 1.57.0,
+1100×1000 then 780×900, DPR 1/2, mouse/direct commands, WebGL1/SwiftShader.
+Synthetic blur supplements real pointer tests; it is not a phone interruption test.
+Actual iPhone Safari, full touch combat, mission completion and saves: **NOT RUN**.
+Audio remains disabled; the existing requestAnimationFrame warning remains.
 
-Next Phase 1 check: **B05 actual iPhone Safari menu/map**, then close MOB-003/M1
-only with that evidence. MOB-004 is dependency-ready for a separately authorized
-Phase 2 task. Keep touch combat, cover/suppression, larger forces and H Hour deferred.
+Phone checkpoint: open the public preview in Safari and record model/iOS/build.
+Load demo → Start → select Christmas Special and confirm the battlefield (B05).
+To inspect this foundation, enable the diagnostic test panel before Start and
+try its explicit controls afterward. This does not substitute for touch-mode,
+gesture or full-mission acceptance. [Phone steps](docs/mobile/BUILD.md#actual-iphone-safari-checkpoint--not-run).
 
-| Gate | Status |
-| --- | --- |
-| M1: reproducible preview + phone map load | Blocked on phone; build/CI/preview/desktop passed |
-| M2: touch-only mission | Not run / no Phase 2 implementation |
-| M3: persistence/lifecycle/phone performance | Not run |
-| M4: standalone mobile baseline | Not run; depends on M1–M3 |
-| M5/M6: H Hour fit/harness/round trip | Deferred |
+Next dependency-ready task: **MOB-005**, using this API for single-owner touch
+Move/Fire/secondary targeting and cancellation. MOB-007 is independently ready;
+MOB-006 follows MOB-005. M1/M2 stay unpassed until their real device/gameplay checks.
+Keep persistence/lifecycle/performance and H Hour at their documented later gates.
 
 ## Future handoff template
 
-- Task/status, starting revision/branch, final commit/PR, changed behavior/files.
-- Actual commands/results, build/content identity, preview/artifact, device/input.
-- Source-inspected / automated / emulated / real-device evidence and checkpoint limits.
+- Task/status, branch/base, final commits/PR and exact deployed build.
+- Changed behavior/files, actual commands/results, browser/device/input.
+- Preview/artifact/provenance, source-inspected/automated/emulated/real-device limits.
 - Failures/unperformed checks/blockers; next task and remaining dependencies.

@@ -12,6 +12,101 @@ import yaml
 WORKFLOW = '.github/workflows/windows-build.yml'
 
 
+def cpp_native_source(text):
+    """Remove only proven Emscripten-only branches; retain unknown native guards.
+
+    This is a conservative projection, not a general C++ preprocessor. Native
+    includes, definitions and other platform branches remain compiler inputs.
+    Unsupported lexical/preprocessor constructs request the native build.
+    """
+    if (re.search(r'\b(?:u8|u|U|L)?R"', text) or re.search(r'\\\r?\n', text)
+            or re.search(r'\?\?[=()/\'!<>-]|%:', text)):
+        raise ValueError('Unsupported C++ lexical construct requires native validation')
+    clean, pos = [], 0
+    while pos < len(text):
+        if text.startswith('//', pos):
+            end = text.find('\n', pos)
+            pos = len(text) if end < 0 else end
+            clean.append(' ')
+        elif text.startswith('/*', pos):
+            end = text.find('*/', pos + 2)
+            if end < 0:
+                raise ValueError('Unclosed C++ comment')
+            clean.append(' ' + '\n' * text[pos:end + 2].count('\n'))
+            pos = end + 2
+        elif text[pos] in ('"', "'"):
+            start, quote = pos, text[pos]
+            pos += 1
+            while pos < len(text) and text[pos] != quote:
+                if text[pos] in '\r\n':
+                    raise ValueError('Unclosed C++ literal')
+                pos += 2 if text[pos] == '\\' else 1
+            if pos >= len(text):
+                raise ValueError('Unclosed C++ literal')
+            pos += 1
+            clean.append(text[start:pos])
+        else:
+            clean.append(text[pos])
+            pos += 1
+
+    output, stack = [], []
+    def visible():
+        return all(frame['active'] for frame in stack)
+    for line in ''.join(clean).splitlines():
+        directive = re.match(r'^\s*#\s*(\w+)\b(.*)$', line)
+        if not directive:
+            if visible():
+                output.append(line)
+            continue
+        name, argument = directive[1], directive[2].strip()
+        if name in ('if', 'ifdef', 'ifndef'):
+            condition = re.sub(r'\s+', '', argument)
+            known = None
+            for macro in ('EMSCRIPTEN', '__EMSCRIPTEN__'):
+                if name in ('ifdef', 'ifndef') and condition == macro:
+                    known = name == 'ifndef'
+                if name == 'if':
+                    match = re.fullmatch(r'(!\s*)?defined(?:\s*\(\s*' + macro + r'\s*\)|\s+' + macro + r')', argument)
+                    if match:
+                        known = bool(match[1])
+            if known is None and visible():
+                output.append(line)
+            stack.append({'known': known, 'active': known is not False, 'else': False})
+        elif name in ('else', 'elif', 'endif'):
+            if not stack:
+                raise ValueError('Unbalanced C++ conditional')
+            frame = stack.pop()
+            if name == 'endif' and argument:
+                raise ValueError('Malformed C++ endif')
+            if frame['known'] is None and visible():
+                output.append(line)
+            if name == 'endif':
+                continue
+            if frame['else'] or (name == 'else' and argument):
+                raise ValueError('Malformed C++ alternative')
+            if frame['known'] is not None and name == 'elif':
+                raise ValueError('Mixed Emscripten elif requires native validation')
+            if name == 'else':
+                frame['else'] = True
+                if frame['known'] is not None:
+                    frame['active'] = not frame['known']
+            stack.append(frame)
+        elif visible():
+            if name in ('define', 'undef') and re.match(r'(?:__EMSCRIPTEN__|EMSCRIPTEN)\b', argument):
+                raise ValueError('Overridden Emscripten macro requires native validation')
+            output.append(line)
+    if stack:
+        raise ValueError('Unclosed C++ conditional')
+    native = '\n'.join(output)
+    # An otherwise empty, browser-only header has no native declarations.
+    if re.fullmatch(r'\s*(?:#\s*pragma\s+once\s*)?', native):
+        return []
+    # Preserve internal whitespace, literal contents and directive spelling.
+    # Whitespace affects macro definitions/stringification and token boundaries;
+    # only indentation/empty lines introduced by projection can be ignored.
+    return [line.strip() for line in output if line.strip()]
+
+
 def git(*args):
     return subprocess.check_output(['git', *args], stderr=subprocess.DEVNULL)
 
@@ -103,7 +198,14 @@ def needs_windows(base, head):
     paths = git('diff', '--name-only', '-z', '--no-renames', base, head).decode().split('\0')
     for path in filter(relevant_path, paths):
         try:
-            if path == 'CMakeLists.txt' or path.endswith('.cmake') or path == WORKFLOW:
+            if path.startswith('Source/') and path.endswith(('.cpp', '.hpp', '.h', '.c')):
+                def source_at(ref):
+                    if git('ls-tree', ref, '--', path):
+                        return git('show', f'{ref}:{path}').decode()
+                    return ''
+                if cpp_native_source(source_at(base)) == cpp_native_source(source_at(head)):
+                    continue
+            elif path == 'CMakeLists.txt' or path.endswith('.cmake') or path == WORKFLOW:
                 before = git('show', f'{base}:{path}').decode()
                 after = git('show', f'{head}:{path}').decode()
                 normalize = windows_job if path == WORKFLOW else cmake_native_commands

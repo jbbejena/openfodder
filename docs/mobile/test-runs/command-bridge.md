@@ -3,7 +3,9 @@
 Branch `mobile/command-bridge`, base `47e956dfcf316b1149a0e54c775197baa0df62af`;
 implementation/build **`d755c600e2f2afe49cabba8cea264ff6f4c5ef31`**.
 [Draft PR #3](https://github.com/jbbejena/openfodder/pull/3) targets master and
-includes pending PR #2's phone-preview improvements. Leave unmerged.
+included PR #2's phone-preview improvements. This was initially handed off as an
+unmerged draft; the user subsequently merged it as `2b28829`. Current CI status
+and corrections are in the handoff.
 
 The [API contract](../INPUT_API.md) defines commands, validation, state,
 coordinates, asynchronous application and remaining scope. [Current handoff](../../../AGENT_HANDOFF.md)

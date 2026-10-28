@@ -9,14 +9,17 @@ delivered. Actual iPhone Safari is NOT RUN; M1 remains unpassed.**
   `build/mobile-phase-1`, created from fetched roadmap tip
   `6b851862a77c3dd9556b5cadae7c88d370b6095f` on `docs/mobile-browser-roadmap`.
   Engine base: `4312ff7c1abe3b6750483921893651d9d3c55b33`.
-- [Draft PR #1](https://github.com/jbbejena/openfodder/pull/1), targeting `master`,
-  includes **the roadmap documents plus Phase 1 changes**. Leave it unmerged.
+- [PR #1](https://github.com/jbbejena/openfodder/pull/1) included the roadmap and
+  Phase 1 changes. The user merged it as `f27963c93db6c65e8c8138f9e0a1b869521d11a4`.
+  The phone-file helper below is a separate branch/preview update.
 - Focused commits: `0434d1e` (MOB-001 baseline), `570be27` (MOB-002 pinned build
   and local-file shell), `291de61` (MOB-003 CI/path filters). The subsequent
   documentation/handoff commit is visible at the PR head.
-- **Tested/deployed fork build: `291de6153d68fce44d88d5cc95d3746e24667ec9`.**
+- **Current tested/deployed fork build: `b9abafba0601e1c6000658140e1d06ad4eae8296`**,
+  Sites version 3. Original Phase 1 evidence at `291de61` is historical.
   Later documentation commits do not silently replace the preview.
-- No changes to master, upstream repositories, pinned gitlinks or unrelated work.
+- Implementation uses review branches; the user merged PR #1. No upstream
+  repositories, pinned gitlinks or unrelated work were changed.
 
 ## Task status and player-visible behavior
 
@@ -26,8 +29,8 @@ delivered. Actual iPhone Safari is NOT RUN; M1 remains unpassed.**
 | MOB-002 | Done | [Build instructions](docs/mobile/BUILD.md), [test record](docs/mobile/test-runs/phase-1.md): clean/incremental build, desktop menu/map, normal cheats off and explicit diagnostic opt-in |
 | MOB-003 | Blocked on final phone row | Cached web CI, artifact, native filters and deployed preview delivered; actual iPhone Safari map load not run because no phone is available |
 
-The player selects the exact local demo pack, starts the engine normally with
-cheats off, chooses Christmas Special and sees its first battlefield. Loading,
+The player taps Load demo from GitHub, waits for the exact files to verify,
+starts the engine with cheats off, chooses Christmas Special and sees its first battlefield. Loading,
 file/download failures and context loss have readable feedback. Diagnostics can
 explicitly enable cheat keys. Browser audio remains disabled. No touch controls,
 combat/force changes, persistent saves or H Hour implementation were added.
@@ -35,6 +38,42 @@ combat/force changes, persistent saves or H Hour implementation were added.
 Changed files: CMake/web startup, `scripts/` build/pack/verification helpers,
 `web/` launcher/config/manifest, legacy Windows helper (now WSL delegation), three
 CI workflows, build/evidence documentation and planning/handoff entry points.
+
+## Phone-only testing follow-up
+
+Current branch: `web/iphone-file-import`, from merged master `f27963c`. The user
+asked for a way to test on iPhone without a compiler/terminal, then requested
+hosted files to simplify testing. The default launcher now offers **Load demo
+from GitHub**: it fetches the 20 exact files directly from their existing pinned
+upstream host, without sending Site credentials, and verifies all hashes before
+startup. Browser runtime + demo is roughly 3.1 MB before compression. No game
+content is mirrored or bundled on our host. Our own redistribution terms remain
+unresolved. Download errors are retryable and partial data cannot start.
+
+Commits: `c666734` (individual-file fallback), `b9abafb` (direct pinned upstream
+loading). [Draft PR #2](https://github.com/jbbejena/openfodder/pull/2) targets
+master and remains unmerged. Current hosted desktop verification passed: visible
+`b9abafba0601`, 20 upstream GET requests without Site credentials, menu and
+battlefield, cheats off. Screenshots were inspected locally. Engine-ready was
+1,523 ms on one cold desktop navigation, not a phone benchmark.
+
+As an alternative, the launcher accepts the 20 exact extracted demo files across separate Files
+picker visits. A pinned upstream ZIP link and on-page instructions replace the
+need to generate `.ofdata` on a computer. The existing pack route still works.
+
+Only web shell/import logic, desktop smoke coverage and docs changed. Engine
+C++/CMake, dependency/data pins and touch combat are unchanged. User-selected
+files are hash-checked before mounting, remain in memory, and are never uploaded.
+No game content has been added to hosting or source. Publication rights remain
+unresolved; linking the existing upstream download is not a new license grant.
+
+Local desktop checks passed for the original merged build, direct upstream
+loading (including failed-download retry), and individual-file fallback: 19 files cannot start; an unexpected script is rejected while retaining
+verified files; adding the campaign enables startup; menu and battlefield render
+with cheats off. Existing pack opt-in/error checks also passed. A narrow launcher
+layout check supplements this; it is not real iPhone Safari evidence. B05 stays
+NOT RUN until the user tests the published preview on actual hardware.
+See [the follow-up record](docs/mobile/test-runs/phone-file-import.md).
 
 ## CI follow-up: skip unnecessary Windows builds
 
@@ -54,7 +93,8 @@ web-only changes, CMake guards/nesting/ambiguity and workflow build-step changes
 `python3 scripts/ci/windows_scope.py --base origin/master --head HEAD` returned
 `native: false` for the actual Phase 1 PR. The Windows matrix/build/test/deployment
 steps were compared to the original job and are unchanged. This follow-up changes
-CI only; the deployed preview remains at `291de6153d68…` and B05 is still not run.
+CI only; at that point the deployed preview remained at `291de6153d68…` and B05
+was not run. The current phone-only preview is recorded above.
 
 ## Exact dependencies and content
 
@@ -67,8 +107,8 @@ CI only; the deployed preview remains at `291de6153d68…` and B05 is still not 
   bytes; [manifest](web/content-manifest.json) records every path/hash.
 - **Game-data publication remains unresolved.** GPL engine/Scripts permissions do
   not cover the demo/campaign. No grant for those exact files was found. Do not
-  host the local pack, game assets or game-art screenshots. Instant play without
-  supplying a local pack remains blocked by that permission question.
+  host the local pack, game assets or game-art screenshots. The browser now loads
+  directly from the existing upstream host; our own mirror/bundle remains blocked.
 
 ## Commands and actual results
 
@@ -88,8 +128,10 @@ output/downloads are ignored and uncommitted. Windows WSL wrapper was not tested
 - Clean CMake/object/output build with toolchain/SDL cache: **69.82 s**, 68/68 steps.
 - Incremental: **2.34 s**, “no work to do”; identical hashes for all ten top-level
   output files. Fresh CI bootstrap/build: **150 s**, success.
-- Artifact/source guard passed locally and in CI. Hosted files total **4,783,792
-  bytes**; support `.data` contains 47 GPL/config files and no game assets.
+- Artifact/source guard passed locally and in CI. Original hosted files totaled
+  **4,783,792 bytes**; support `.data` contains 47 GPL/config files and no game assets.
+  Current `b9abafb` artifact: **4,809,860 bytes** including optional source/notices;
+  cold runtime **2,896,387 bytes**, plus **223,382 bytes** fetched from upstream.
 - Desktop smoke command with installed Playwright Core 1.57.0:
 
 ```sh
@@ -106,19 +148,22 @@ Exact sizes/hashes/results are in [the test record](docs/mobile/test-runs/phase-
 ## Preview, hosting and CI
 
 - [Standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site) is
-  **owner-private**: sign in with the owner's ChatGPT account, supply the local pack.
-- Sites version **1**, project `appgprj_6ae24fbe89788191a38778521e56e855`, deployment
-  `appgdep_6ae251e240cc819185866b937294f5c9`: succeeded. Hosting source commit
-  `e37ada656c7d0432072f588338f7dbb32a1dab03` mirrors engine/Scripts with its own
-  manifest/provenance; shipped fork build ID is `291de6153d68…`.
+  **public, no sign-in required**, changed at the user's request on 2026-10-28
+  (Sites access revision 2). Tap Load demo from GitHub, then Start game.
+  Local-file import remains an optional fallback. This access-only change keeps
+  the same version 3 / `b9abafb` build; no data was uploaded or artifact replaced.
+- Sites version **3**, project `appgprj_6ae24fbe89788191a38778521e56e855`, deployment
+  `appgdep_6ae2637a92308191ab3b39bbae1dc68b`: succeeded. Hosting source commit
+  `945c954110b661daafb2948b148a273f9d22babc` mirrors engine/Scripts with its own
+  manifest/provenance; shipped fork build ID is `b9abafba0601…`.
 - Hosting checkout/manifest: `/workspace/sites/openfodder-phase-one/`. Bundled
   filesystem helpers were unavailable, so native Sites tools, authenticated
   ordinary Git and a deployment archive were used. No credential or generated
   output is committed in either source repository.
-- [Web CI: success](https://github.com/jbbejena/openfodder/actions/runs/40757426969).
-  [Matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40757426969/artifacts/12846461740)
+- [Current web CI: success](https://github.com/jbbejena/openfodder/actions/runs/40767915225).
+  [Matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40767915225/artifacts/12850872585)
   has 30-day retention; GitHub login may be required. Source/notices included;
-  no player pack. [Linux native CI: success](https://github.com/jbbejena/openfodder/actions/runs/40757427139).
+  no player pack. [Original Phase 1 Linux native CI: success](https://github.com/jbbejena/openfodder/actions/runs/40757427139).
   [Windows native CI](https://github.com/jbbejena/openfodder/actions/runs/40757427028)
   was canceled in the user-requested CI follow-up above; no Windows pass is claimed.
 - GitHub Pages setup returned HTTP 403 “Resource not accessible by integration”.
@@ -129,14 +174,17 @@ Exact sizes/hashes/results are in [the test record](docs/mobile/test-runs/phase-
 
 ## Evidence limits and next checks
 
-- **Desktop:** Linux x86_64 Chromium 154.0.8037.57, 1100×900 CSS viewport, DPR 1,
+- **Original desktop record:** Linux x86_64 Chromium 154.0.8037.57, 1100×900 CSS viewport, DPR 1,
   mouse, SDL `opengles2` / WebGL 1.0 / ANGLE SwiftShader. Local engine-ready 343 ms,
   hosted 2,965 ms on single cold navigations; not phone benchmarks.
 - **Deployed desktop:** actual menu/map and visible fork commit verified using
-  supported Sites service access with TLS verification. Not an interactive owner
-  sign-in or an iPhone test. Audience remains owner-only.
+  supported Sites service access with TLS verification before the access change.
+  After public access was enabled, a fresh anonymous Chromium context also passed:
+  HTTP 200, visible `b9abafba0601`, 20 verified upstream files, menu/battlefield,
+  cheats off; screenshots inspected. No credentials supplied or authorization
+  headers sent. Engine-ready 2,378 ms on one desktop navigation. Not an iPhone test.
 - **Actual iPhone Safari: NOT RUN** (no hardware). [Exact phone steps](docs/mobile/BUILD.md#actual-iphone-safari-checkpoint--not-run):
-  open preview, record model/iOS/Safari/build, select pack from Files, Start game,
+  open preview, record model/iOS/Safari/build, Load demo from GitHub, Start game,
   reach menu, tap/briefly hold campaign row, display battlefield. Record failure
   if touch cannot select it. Full touch combat is Phase 2.
 - No full mission, checkpoint/save round trip, lifecycle, phone performance,

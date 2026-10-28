@@ -2,13 +2,18 @@
 'use strict';
 const statusLine = document.getElementById('status');
 const startButton = document.getElementById('start');
+const loadButton = document.getElementById('load-demo');
 const packInput = document.getElementById('pack');
+const filesInput = document.getElementById('demo-files');
+const fileProgress = document.getElementById('file-progress');
+const localFiles = new Map();
 const canvas = document.getElementById('canvas');
 let runtimeReady = false;
 let pack = null;
 let manifest;
 let started = false;
 let failed = false;
+let importing = false;
 const bootStarted = performance.now();
 
 function status(message) {
@@ -18,15 +23,20 @@ function fail(message) {
   failed = true;
   statusLine.classList.add('error');
   statusLine.textContent = message;
-  startButton.disabled = true;
+  updateControls();
 }
 function log(message) {
   const output = document.getElementById('log');
   output.textContent = (output.textContent + String(message) + '\n').slice(-16000);
 }
+function updateControls() {
+  startButton.disabled = failed || !runtimeReady || !pack || started || importing;
+  loadButton.disabled = failed || !runtimeReady || started || importing;
+  filesInput.disabled = packInput.disabled = failed || started || importing;
+}
 function ready() {
-  startButton.disabled = failed || !runtimeReady || !pack || started;
-  if (runtimeReady && !pack) status('Engine ready. Select your local demo pack to continue.');
+  updateControls();
+  if (runtimeReady && !pack && !importing) status('Engine ready. Tap Load demo from GitHub to continue.');
   if (runtimeReady && pack) status('Demo verified. Start game to open the campaign menu.');
 }
 // Defined before Emscripten's generated script. Boot the runtime/preloaded GPL
@@ -71,10 +81,103 @@ const metadataReady = Promise.all([
   document.getElementById('build-details').textContent = JSON.stringify(info, null, 2);
 }).catch(error => { fail(error.message); throw error; });
 
-packInput.addEventListener('change', async () => {
+async function checkFile(data, entry) {
+  const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)), b => b.toString(16).padStart(2, '0')).join('');
+  if (data.length !== entry.size || hash !== entry.sha256) throw Error(`Content mismatch: ${entry.path}`);
+}
+
+loadButton.addEventListener('click', async () => {
+  if (failed || started || importing || !runtimeReady) return;
+  importing = true;
+  pack = null;
+  updateControls();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  let loaded = 0;
+  try {
+    await metadataReady;
+    status('Downloading the demo from upstream GitHub…');
+    fileProgress.textContent = '0 of 20 demo files downloaded.';
+    // Data stays at its existing publisher. Nothing is bundled or mirrored on
+    // the Site. Public cross-origin requests must never carry Site credentials.
+    const base = `https://raw.githubusercontent.com/OpenFodder/data/${manifest.data_revision}/`;
+    const candidate = await Promise.all(manifest.files.map(async entry => {
+      const url = base + entry.path.split('/').map(encodeURIComponent).join('/');
+      const response = await fetch(url, {
+        mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer', signal: controller.signal
+      });
+      if (!response.ok) throw Error(`GitHub returned ${response.status} for ${entry.path}`);
+      const data = new Uint8Array(await response.arrayBuffer());
+      await checkFile(data, entry);
+      if (controller.signal.aborted) throw new DOMException('Download canceled', 'AbortError');
+      fileProgress.textContent = `${++loaded} of 20 demo files downloaded and verified.`;
+      return [entry.path, data];
+    }));
+    pack = candidate;
+    localFiles.clear();
+    ready();
+  } catch (error) {
+    controller.abort();
+    const reason = error.name === 'AbortError' ? 'The download timed out.' : error.message;
+    status(`Could not load the demo: ${reason} Tap Load demo to retry, or choose local files.`);
+    log(reason);
+  } finally {
+    clearTimeout(timeout);
+    importing = false;
+    updateControls();
+  }
+});
+
+filesInput.addEventListener('change', async () => {
+  if (failed || started || importing) return;
+  const batch = Array.from(filesInput.files);
+  if (!batch.length) return;
   pack = null;
   startButton.disabled = true;
-  if (failed) return;
+  // Snapshot before asynchronous reads so another picker selection cannot change
+  // this batch. Keep a previously verified batch if a replacement is invalid.
+  let accepted = false;
+  importing = true;
+  updateControls();
+  try {
+    await metadataReady;
+    if (batch.length > manifest.files.length) throw Error('Choose only the Christmas Special demo files.');
+    const candidate = new Map(localFiles);
+    for (const file of batch) {
+      const entry = manifest.files.find(item => item.path.split('/').pop() === file.name);
+      if (!entry) throw Error(`Not a Christmas Special file: ${file.name}. Unzip the archive first and choose its files.`);
+      if (file.size !== entry.size) throw Error(`Content mismatch: ${entry.path}`);
+      const data = new Uint8Array(await file.arrayBuffer());
+      await checkFile(data, entry);
+      candidate.set(entry.path, data);
+    }
+    localFiles.clear();
+    for (const [path, data] of candidate) localFiles.set(path, data);
+    accepted = true;
+  } catch (error) {
+    log(error.message);
+    status(`Cannot use these demo files: ${error.message}`);
+  } finally {
+    const missing = manifest ? manifest.files.filter(item => !localFiles.has(item.path)) : [];
+    fileProgress.textContent = `${localFiles.size} of 20 demo files verified.${missing.length === 1 ? ` Still needed: ${missing[0].path}` : ''}`;
+    if (accepted && localFiles.size < 20) status(fileProgress.textContent);
+    if (localFiles.size === 20) {
+      pack = manifest.files.map(entry => [entry.path, localFiles.get(entry.path)]);
+      ready();
+    }
+    // Clear the picker, not the verified map: subsequent selections add files.
+    filesInput.value = '';
+    importing = false;
+    updateControls();
+  }
+});
+
+packInput.addEventListener('change', async () => {
+  if (failed || started || importing || !packInput.files.length) return;
+  pack = null;
+  startButton.disabled = true;
+  importing = true;
+  updateControls();
   try {
     await metadataReady;
     const file = packInput.files[0];
@@ -90,22 +193,26 @@ packInput.addEventListener('change', async () => {
       const encoded = candidate.files[entry.path];
       if (typeof encoded !== 'string') throw Error(`Missing ${entry.path}`);
       const data = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-      const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)), b => b.toString(16).padStart(2, '0')).join('');
-      if (data.length !== entry.size || hash !== entry.sha256) throw Error(`Content mismatch: ${entry.path}`);
+      await checkFile(data, entry);
       checked.push([entry.path, data]);
     }
     pack = checked;
+    localFiles.clear();
+    fileProgress.textContent = '20 of 20 demo files verified from the local pack.';
     ready();
   } catch (error) {
     // File validation is recoverable: keep the picker usable for another file.
     status(`Cannot use this demo pack: ${error.message}`);
     log(error.message);
+  } finally {
+    importing = false;
+    updateControls();
   }
 });
 startButton.addEventListener('click', () => {
-  if (!runtimeReady || !pack || started || failed) return;
+  if (!runtimeReady || !pack || started || failed || importing) return;
   started = true;
-  startButton.disabled = true;
+  updateControls();
   try {
     for (const [path, data] of pack) {
       Module.FS.mkdirTree('/' + path.slice(0, path.lastIndexOf('/')));
@@ -118,6 +225,7 @@ startButton.addEventListener('click', () => {
     canvas.focus();
     Module.callMain(args);
     pack = null;
+    localFiles.clear();
   } catch (error) {
     fail(`Startup failed: ${error.message}. Check the log and reload.`);
   }

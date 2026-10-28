@@ -4,7 +4,8 @@ This document describes how to build Open Fodder from source.
 
 For the pinned Emscripten browser build, run `./scripts/build-web.sh` on Linux/WSL
 and follow [the web build instructions](docs/mobile/BUILD.md). The standalone
-preview requires a player-supplied local demo pack; game assets are not hosted.
+preview loads the pinned demo directly from upstream, with local files as a
+fallback; game assets are not mirrored on the preview host.
 
 ## Windows (Visual Studio 2022 + CMake)
 

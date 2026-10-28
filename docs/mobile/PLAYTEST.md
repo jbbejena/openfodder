@@ -1,6 +1,6 @@
 # Mobile acceptance checklist
 
-Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). No actual iPhone Safari test has run. Later milestone rows remain untested.
+Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). MOB-005 emulated-touch results are in [touch-commands.md](test-runs/touch-commands.md). No actual iPhone Safari test has run. Later milestone rows remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -35,7 +35,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `d755c600e2f2`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `7809755786a7`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
@@ -45,16 +45,16 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 
 | ID | Check | Initial status |
 | --- | --- | --- |
-| I01 | Select every available squad; selection feedback matches engine state | Desktop bridge: populated squad selected, empty rejected; real touch interface pending |
-| I02 | Move each squad to an intended destination | Desktop bridge: real order/leader movement passed; phone pending |
-| I03 | Hold fire, aim at another location, release; no stuck fire | Desktop primary-fire bridge passed; real touch mode pending |
-| I04 | Use available secondary weapons deliberately; displayed ammo matches engine state | Selection/rejection tested with original zero ammo and separate local fixture; secondary firing pending |
-| I05 | A HUD tap cannot move/fire troops and one touch does not generate duplicate commands | Not run |
+| I01 | Select every available squad; selection feedback matches engine state | Emulated touch toolbar: populated squad selected, empty disabled; actual phone not run |
+| I02 | Move each squad to an intended destination | Emulated touch: actual order/leader movement passed for the one populated demo squad; phone not run |
+| I03 | Hold fire, aim at another location, release; no stuck fire | Emulated touch Fire mode: hold/slide/lift and actual engine aim passed; phone not run |
+| I04 | Use available secondary weapons deliberately; displayed ammo matches engine state | Emulated targeting/confirmation fired one grenade and rocket in a separate local ammo fixture; real demo remains zero ammo; phone not run |
+| I05 | A HUD tap cannot move/fire troops and one touch does not generate duplicate commands | Emulated touch/engine command counts passed; phone not run |
 | I06 | Pan the camera without a stray movement/fire action | Desktop camera intent passed; touch gestures pending |
-| I07 | Add/remove a second finger during a gesture without leaking an unintended command | Not run |
-| I08 | Aim/move coordinates stay correct after pan, resize and rotation | Desktop pan/resize/letterbox/DPR 1/2 bridge passed; real Safari rotation pending |
+| I07 | Add/remove a second finger during a gesture without leaking an unintended command | Emulated second-finger cancellation passed; two-finger pan pending; phone not run |
+| I08 | Aim/move coordinates stay correct after pan, resize and rotation | Desktop DPR 1/2 bridge and emulated touch after resize/letterboxing passed; real Safari rotation not run |
 | I09 | Open help/menu, pause/resume, cancel targeting and return to play using touch only | Desktop explicit pause/cancel and native P passed; complete touch menus pending |
-| I10 | Finger cancellation, leaving the canvas and switching modes release held inputs | Desktop API cancel, pause, synthetic blur and real harness pointer release passed; phone gestures pending |
+| I10 | Finger cancellation, leaving the canvas and switching modes release held inputs | Emulated canvas exit, touchCancel, HUD/mode change and resize released fire; desktop pause/blur/API/harness checks passed; phone not run |
 | U01 | Controls are readable and reachable around cutouts and the home indicator | Not run |
 | U02 | Center battlefield stays usable; menus collapse and do not obstruct live combat | Not run |
 | U03 | Portrait guidance is usable; rotating back restores a working landscape layout | Not run |

@@ -28,7 +28,7 @@ coordinates and the explicit browser bridge therefore use the same displayed
 image. The engine render resolution and simulation rate are unchanged. Geometry
 changes cancel an active touch gesture before accepting a fresh one.
 
-Portrait touch users see a paused rotation prompt with **Keep playing in
+On the battlefield, portrait touch users see a paused rotation prompt with **Keep playing in
 portrait** as an alternative. That choice puts controls below the field until
 returning to landscape. No orientation lock is required. Fine-pointer desktop
 windows retain native controls unless touch controls are explicitly enabled.
@@ -48,5 +48,5 @@ while Guide/portrait/error blocks input. A runtime failure releases held input
 where possible, presents the original error and offers **Reload preview**.
 
 Normal play starts with cheats off. Progress is not persistent; reloading starts
-a new game. Audio remains disabled. Full touch mission menus, retry/abort/results
-belong to MOB-008; storage/lifecycle/performance remain later tasks.
+a new game. Audio remains disabled. MOB-008 adds [mission menus and retry/abort/results](MISSION_FLOW.md)
+with internally scrollable cards usable in either orientation. Storage/lifecycle/performance remain later tasks.

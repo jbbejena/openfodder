@@ -105,7 +105,7 @@
     for (const type of ['pointerdown', 'pointermove', 'touchstart', 'touchmove', 'mousedown', 'mousemove', 'keydown', 'keyup']) {
       document.addEventListener(type, event => {
         if (!running || !blocked()) return;
-        if (event.target.closest?.('#field-dialog, #field-guide, #portrait-guide, #mission-screen, #status-region')) return;
+        if (event.target.closest?.('#field-dialog, #field-guide, #portrait-guide, #mission-screen, #status-region, #lifecycle-dialog')) return;
         if (event.cancelable) event.preventDefault();
         event.stopImmediatePropagation();
       }, { capture: true, passive: false });
@@ -120,10 +120,11 @@
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(requestFit) : null;
     observer?.observe(field); observer?.observe(dock); observer?.observe(app);
     const timer = root.setInterval(() => { if (running && !failed) syncPause(); }, 100);
-    root.addEventListener('pagehide', () => root.clearInterval(timer), { once: true });
+    root.addEventListener('pagehide', event => { if (!event.persisted) root.clearInterval(timer); });
     return Object.freeze({
       connect(input, physical) { bridge = input; controller = physical; },
       closeGuide,
+      refresh() { updatePresentation(); requestFit(); },
       start() {
         running = true; document.body.classList.add('game-running');
         document.getElementById('battle-ui').hidden = false; guideButton.hidden = false;

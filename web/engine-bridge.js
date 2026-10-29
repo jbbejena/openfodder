@@ -61,6 +61,12 @@
     }
     return Object.freeze({
       state,
+      setLifecycle(reasons) {
+        if (!Number.isInteger(reasons) || reasons < 0 || reasons > 22 || (reasons & ~22)) return rejected('invalid');
+        if (typeof Module._of_web_lifecycle !== 'function') return rejected('uninitialized');
+        const code=Module._of_web_lifecycle(reasons);
+        return code===0?{ok:true}:rejected(errors[code]||'unknown');
+      },
       selectMission: number => send(actions.selectMission, number),
       deployMission: () => send(actions.deployMission),
       retryMission: () => send(actions.retryMission),

@@ -163,6 +163,7 @@ dialog { border: 1px solid var(--line); border-radius: 8px; background: var(--pa
 }
 dialog[open] { display: flex; flex-direction: column; }
 dialog::backdrop { background: #030906cb; }
+#lifecycle-dialog { z-index: 40; }
 .dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
 .dialog-heading h2 { margin: 0; font-size: 1.05rem; }
 .dialog-scroll { padding: 0 16px 16px; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; line-height: 1.5; }

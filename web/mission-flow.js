@@ -90,7 +90,7 @@
     document.addEventListener('fodder-storage-change',refresh);
     for (const type of ['keydown', 'keyup']) screen.addEventListener(type, event => event.stopPropagation());
     const timer = root.setInterval(refresh, 100);
-    root.addEventListener('pagehide', () => root.clearInterval(timer), { once: true });
+    root.addEventListener('pagehide', event => { if (!event.persisted) root.clearInterval(timer); });
     refresh(); return Object.freeze({ refresh });
   }
   const api = Object.freeze({ presentation, mount });

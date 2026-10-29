@@ -330,7 +330,7 @@
     document.addEventListener('visibilitychange', () => { if (document.hidden) interrupt(); });
     controller.setEnabled(toggle.checked);
     const timer = setInterval(() => { if (document.body.dataset.runtimeError !== 'true') controller.tick(); }, 50);
-    window.addEventListener('pagehide', () => clearInterval(timer), { once: true });
+    window.addEventListener('pagehide', event => { if (!event.persisted) clearInterval(timer); });
     controller.tick();
     return controller;
   }

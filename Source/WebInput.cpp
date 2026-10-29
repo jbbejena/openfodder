@@ -14,13 +14,14 @@ std::vector<Command> pending;
 WebInput::Stage stage = WebInput::Stage::Uninitialized;
 int nextId = 0, lastId = 0, lastResult = Ok;
 int pauseReasons = 0;
+int lifecycleReasons = 0; // 2 hidden, 4 unfocused, 16 awaiting explicit return
 bool lastPaused = false, fireHeld = false, manualCamera = false, ownsInput = false;
 bool secondaryPending = false;
 int secondarySquad = -1, secondaryWeapon = eWeapon_None;
 sSprite* secondaryLeader = nullptr;
 int fireX = 0, fireY = 0;
 
-int CurrentPauseReasons(const cFodder& e) {
+int BasePauseReasons(const cFodder& e) {
     int reasons = pauseReasons;
     if (e.mPhase_Paused != lastPaused) {
         if (e.mPhase_Paused) reasons |= 1;
@@ -28,6 +29,7 @@ int CurrentPauseReasons(const cFodder& e) {
     }
     return reasons;
 }
+int CurrentPauseReasons(const cFodder& e) { return BasePauseReasons(e) | lifecycleReasons; }
 
 bool Battlefield(const cFodder& e) {
     return stage == WebInput::Stage::Battlefield && e.mPhase_In_Progress &&
@@ -59,6 +61,7 @@ void Release(cFodder& e) {
 }
 int Validate(const cFodder& e, int action, int a, int b) {
     if (action == Cancel || action == FireStop) return Ok;
+    if (lifecycleReasons && action != Pause) return Paused;
     if (action >= WebInput::SelectMission) return WebInput::ValidateMission(action, a, b);
     if (!Battlefield(e)) return NotBattlefield;
     if (action == Pause) return (a == 0 || a == 1) && (b == 1 || b == 2 || b == 4 || b == 8) ? Ok : Invalid;
@@ -133,9 +136,11 @@ void SetStage(Stage value) {
     if (g_Fodder) Release(*g_Fodder);
     stage = value;
     pauseReasons = 0;
-    fireHeld = manualCamera = ownsInput = lastPaused = false;
-    if (g_Fodder) g_Fodder->mPhase_Paused = false;
+    fireHeld = manualCamera = ownsInput = false;
+    lastPaused = lifecycleReasons != 0;
+    if (g_Fodder) g_Fodder->mPhase_Paused = lastPaused;
 }
+bool LifecyclePaused() { return lifecycleReasons != 0; }
 void ApplyPending(cFodder& e) {
     ownsInput = false;
     // Native projectile creation (including a rejected shot) consumes this
@@ -145,7 +150,7 @@ void ApplyPending(cFodder& e) {
         e.mSquad_CurrentWeapon[secondarySquad] != secondaryWeapon)) Release(e);
     // Preserve desktop P as the user pause reason. External reasons cannot be
     // cleared by a keyboard toggle or by releasing a different reason.
-    pauseReasons = CurrentPauseReasons(e);
+    pauseReasons = BasePauseReasons(e);
     if (pauseReasons && !lastPaused) { Release(e); manualCamera = false; }
     for (const auto& command : pending) {
         lastId = command.id;
@@ -192,10 +197,10 @@ void ApplyPending(cFodder& e) {
             else pauseReasons &= ~command.b;
             break;
         }
-        e.mPhase_Paused = pauseReasons != 0;
+        e.mPhase_Paused = (pauseReasons | lifecycleReasons) != 0;
     }
     pending.clear();
-    e.mPhase_Paused = pauseReasons != 0;
+    e.mPhase_Paused = (pauseReasons | lifecycleReasons) != 0;
     lastPaused = e.mPhase_Paused;
     if (!Battlefield(e) || !e.mInput_Enabled || e.mPhase_Paused || !Selected(e)) {
         if (fireHeld || secondaryPending) Release(e);
@@ -226,6 +231,31 @@ void Fire(cFodder& e) {
 }
 
 extern "C" {
+// Lifecycle events can be the last callback before the browser freezes. Apply
+// this small safety boundary synchronously instead of waiting for another frame.
+EMSCRIPTEN_KEEPALIVE int of_web_lifecycle(double rawReasons) {
+    if (!std::isfinite(rawReasons) || rawReasons != std::floor(rawReasons) || rawReasons < 0 || rawReasons > 22) return Invalid;
+    const int reasons = static_cast<int>(rawReasons);
+    if (reasons & ~22) return Invalid;
+    if (g_Fodder && stage != WebInput::Stage::Uninitialized) {
+        auto& e = *g_Fodder;
+        pauseReasons = BasePauseReasons(e);
+        pending.erase(std::remove_if(pending.begin(), pending.end(), [](const Command& c) {
+            return c.action != Pause && c.action < WebInput::SelectMission;
+        }), pending.end());
+        Release(e); manualCamera = false;
+        e.mKeyCode = 0; e.mKeyCodeAscii = 0;
+        e.mMouse_EventLastPositionRelative.Clear(); e.mMouse_EventLastWheel.Clear();
+        // Drop stale native input events, keeping window/focus/quit events.
+        for (Uint32 type : {SDL_EVENT_KEY_DOWN, SDL_EVENT_KEY_UP, SDL_EVENT_MOUSE_MOTION,
+            SDL_EVENT_MOUSE_BUTTON_DOWN, SDL_EVENT_MOUSE_BUTTON_UP, SDL_EVENT_MOUSE_WHEEL,
+            SDL_EVENT_FINGER_DOWN, SDL_EVENT_FINGER_UP, SDL_EVENT_FINGER_MOTION}) SDL_FlushEvent(type);
+        e.mPhase_Paused = (pauseReasons | reasons) != 0;
+        lastPaused = e.mPhase_Paused;
+    }
+    lifecycleReasons = reasons;
+    return Ok;
+}
 EMSCRIPTEN_KEEPALIVE int of_web_command(int action, double a, double b) {
     if (action < Cancel || action > WebInput::ResumeCheckpoint || !std::isfinite(a) || !std::isfinite(b) ||
         a != std::floor(a) || b != std::floor(b) || std::abs(a) > 32700 || std::abs(b) > 32700) return Invalid;
@@ -257,6 +287,7 @@ EMSCRIPTEN_KEEPALIVE const char* of_web_state() {
     state["stage"] = names[static_cast<int>(stage)];
     state["last"] = {{"id", lastId}, {"code", lastResult}};
     state["pending"] = pending.size();
+    state["lifecycleReasons"] = lifecycleReasons;
     state["ready"] = false;
     if (g_Fodder && stage != WebInput::Stage::Uninitialized)
         state["mission"] = Json::parse(WebInput::MissionState());

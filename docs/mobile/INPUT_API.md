@@ -11,6 +11,7 @@ fire to this foundation. MOB-006 adds touch camera gestures and Follow using the
 engine intents. MOB-007 adds the [viewport shell/HUD](PHONE_LAYOUT.md) and its independent
 presentation pause. MOB-008 adds [mission states and touch menus](MISSION_FLOW.md).
 MOB-009 adds [mission-start checkpoints](CHECKPOINTS.md) and validated restore.
+MOB-010 adds [synchronous lifecycle safety and explicit return](LIFECYCLE.md).
 Vehicles receive `unsupported` rather than an invented order.
 Native mouse/keyboard paths remain in use when the bridge does not own input.
 
@@ -21,6 +22,7 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | Method | Meaning |
 | --- | --- |
 | `state()` | Read the engine/adapter snapshot; never a writable engine object |
+| `setLifecycle(mask)` | Synchronous release/pause safety for hidden (2), unfocused (4), suspended/awaiting Return (16); separate from queued gameplay |
 | `selectMission(number)` | Select a loaded demo mission from the menu and show its briefing |
 | `deployMission()` | Deploy from that briefing through native phase preparation |
 | `retryMission()` | Restart the result's mission from its first phase with fresh native game data/recruits |
@@ -42,7 +44,8 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | `clientToWorld(x,y)` / `worldToClient(x,y)` | Read-only projection for the current canvas/view |
 | `clientDeltaToMap(dx,dy)` | Read-only CSS distance conversion using the contained image scale; returns fractional map pixels or null for missing geometry |
 
-Commands return `{ok:true,id}` when accepted or `{ok:false,reason}` when rejected.
+Queued commands return `{ok:true,id}` when accepted or `{ok:false,reason}` when rejected.
+`setLifecycle` is synchronous and returns `{ok:true}` without an ID.
 A positive ID means queued, not completed; inspect `state().last` after an input
 boundary. A newer ID or changed stage may supersede an older command. Cancel and
 stop before engine initialization are safe no-ops (`id:0`). Secondary fire is
@@ -119,8 +122,14 @@ portrait guidance jointly own `shell`; closing either leaves it set while the
 other is open. Native P remains the
 user pause input. The Emscripten loop keeps rendering/yielding/polling SDL while
 paused and skips mission updates; it never enters the native blocking pause loop.
-The harness cancels input on blur, hidden visibility and pagehide. Full automatic
-background pause/resume, timing and restoration policy remains MOB-010.
+The harness cancels input on blur, hidden visibility and pagehide. MOB-010's
+`of_web_lifecycle(mask)` synchronously releases native input and gates the whole
+web loop, including ending/queued transitions, before a possible freeze. It
+returns 0/-1 immediately rather than a queued ID. State reports `lifecycleReasons`
+at every stage; combined battlefield pause includes the new bit 16. Lifecycle
+bits survive stage changes and cannot be cleared by user/Guide operations.
+Focus/visibility restoration retains explicit Return; it does not automatically
+resume combat. [Lifecycle policy and audio limitation](LIFECYCLE.md).
 
 ## Coordinate boundary
 

@@ -20,6 +20,8 @@ canvas.running { display: block; }
 canvas { object-fit: contain; object-position: center; border: 0; padding: 0; }
 #playfield { position: relative; }
 canvas.touch-commands { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; max-height: max(160px, calc(100svh - 280px)); }
+canvas.touch-commands[data-input-mode=pan] { cursor: grab; }
+canvas.touch-commands[data-panning=true] { cursor: grabbing; }
 #touch-commands { border-bottom: 1px solid #526346; padding: 6px 0; }
 .touch-heading, .touch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
 .touch-heading { justify-content: space-between; font-size: .85rem; color: #bbccba; }

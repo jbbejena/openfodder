@@ -1,6 +1,6 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const {create, clientToWorld, worldToClient} = require('./engine-bridge.js');
+const {create, clientToWorld, worldToClient, clientDeltaToMap} = require('./engine-bridge.js');
 const view = {width:320, height:200, sidebar:48, cameraX:100, cameraY:50};
 function canvas(rect, width=960, height=600) {
   return {width, height, getBoundingClientRect: () => rect};
@@ -49,4 +49,18 @@ test('a pre-runtime bridge reports uninitialized and cannot submit orders', () =
   const bridge=create({},canvas({left:0,top:0,width:960,height:600}));
   assert.equal(bridge.state().stage,'uninitialized');
   assert.deepEqual(bridge.moveTo({x:5,y:5}),{ok:false,reason:'uninitialized'});
+});
+test('pan distances use the contained image scale without camera/sidebar translation or double DPR', () => {
+  for (const [c,v] of [
+    [canvas({left:137,top:83,width:960,height:600}),view],
+    [canvas({left:137,top:83,width:960,height:600},1920,1200),{...view,cameraX:220}],
+    [canvas({left:100,top:-70,width:960,height:800}),{...view,cameraY:123}]
+  ]) assert.deepEqual(clientDeltaToMap(c,v,30,-15),{x:10,y:-5});
+  const small=canvas({left:0,top:0,width:480,height:300});
+  assert.deepEqual(clientDeltaToMap(small,view,1.5,-.75),{x:1,y:-.5});
+});
+test('hidden/invalid pan geometry cannot generate a movement delta', () => {
+  assert.equal(clientDeltaToMap(canvas({left:0,top:0,width:0,height:0}),view,5,5),null);
+  assert.equal(clientDeltaToMap(canvas({left:0,top:0,width:960,height:600}),undefined,5,5),null);
+  assert.equal(clientDeltaToMap(canvas({left:0,top:0,width:960,height:600}),view,NaN,5),null);
 });

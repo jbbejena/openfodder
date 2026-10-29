@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Open Fodder · Phase 2 input preview</title>
+  <title>Open Fodder · Phase 2 camera preview</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <strong>OPEN FODDER</strong> <span>Phase 2 · touch commands</span>
+    <strong>OPEN FODDER</strong> <span>Phase 2 · touch camera</span>
     <span id="identity">Reading build identity…</span>
   </header>
   <main>
@@ -42,7 +42,8 @@
       <button id="start" disabled>Start game</button>
       <p>Start the game, then tap or click and briefly hold the Christmas Special campaign row.
         On the battlefield, touch commands provide squad selection and Move/Fire modes.
-        Camera gestures, the full phone layout and persistent saves are still pending.</p>
+        Use two fingers in Move mode, or one finger in Pan mode, to move the camera.
+        The full phone layout, mission menus and persistent saves are still pending.</p>
       <p><a href="source.zip">Source &amp; build instructions</a> · <a href="SOURCE.txt">Licenses &amp; provenance</a></p>
       <details id="launch-diagnostics">
         <summary>Diagnostics (optional)</summary>
@@ -66,11 +67,13 @@
           <div role="group" aria-label="Command mode">
             <button data-touch-mode="move" aria-pressed="true">Move</button>
             <button data-touch-mode="fire" aria-pressed="false">Fire</button>
+            <button data-touch-mode="pan" aria-pressed="false">Pan</button>
             <button data-touch-mode="grenade" aria-pressed="false">Grenade</button>
             <button data-touch-mode="rocket" aria-pressed="false">Rocket</button>
           </div>
           <button id="touch-confirm" hidden>Confirm target</button>
           <button id="touch-cancel">Cancel</button>
+          <button id="touch-follow">Follow squad</button>
         </div>
         <p id="touch-feedback" role="status" aria-live="polite">Tap ground to move.</p>
       </div>

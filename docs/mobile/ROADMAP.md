@@ -1,6 +1,6 @@
 # Mobile browser roadmap
 
-Status: Phase 1 desktop build/preview and Phase 2 command foundation and touch modes (MOB-004/005) implemented; actual iPhone gate not run. Updated: 2026-10-28. See [Phase 1 evidence](test-runs/phase-1.md) and [MOB-004 verification](test-runs/command-bridge.md); [MOB-005 touch verification](test-runs/touch-commands.md) records emulated input. Camera gestures, phone layout and mission flow remain planned.
+Status: Phase 1 desktop build/preview and Phase 2 command foundation, touch modes and camera (MOB-004–006) implemented; actual iPhone gate not run. Updated: 2026-10-29. See [Phase 1 evidence](test-runs/phase-1.md) and [MOB-004 verification](test-runs/command-bridge.md); [MOB-005 touch verification](test-runs/touch-commands.md) records emulated input. [MOB-006 camera evidence](test-runs/touch-camera.md) records local/public checks. Phone layout and mission flow remain planned.
 
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 
@@ -17,7 +17,7 @@ The later target is one H Hour story-to-combat-to-results cycle with stable sold
 - Retain the C++/SDL engine and compile the existing web path with Emscripten. Add a small HTML/CSS/JavaScript browser shell and explicit engine adapter. Do not rebuild the game in Phaser, Three.js or another engine.
 - Preserve the original combat model, timing and the inspected nine-soldier/three-squad scope.
 - Let the engine own combat state, selection, ammunition, deaths, objectives, mission outcome and simulation time. The browser owns physical input mapping, readable controls, loading feedback and browser persistence/lifecycle integration.
-- Use tap-to-move and an explicit Fire mode with held aiming input. Secondary weapons require deliberate targeting. Two-finger pan is the first camera prototype; a Pan mode is the fallback if gesture ownership proves unreliable.
+- Use tap-to-move and an explicit Fire mode with held aiming input. Secondary weapons require deliberate targeting. Two-finger pan begins in Move mode; explicit Pan mode provides a one-finger route. Fire/secondary second touches cancel without acquiring camera ownership. See the [gesture rules](TOUCH_CONTROLS.md).
 - Keep the battlefield center clear. Use a compact squad selector, contextual actions and pause/help surfaces.
 - Save only a verified checkpoint state. Begin with supported mission boundaries, not a promised live-battle snapshot.
 - Establish a standalone mobile baseline before changing H Hour. Define narrow interfaces so this sequence does not require discarding the mobile work.

@@ -32,6 +32,13 @@
     return { x: rect.left + (x - view.cameraX + view.sidebar) * rect.width / view.width,
       y: rect.top + (y - view.cameraY) * rect.height / view.height };
   }
+  function clientDeltaToMap(canvas, view, dx, dy) {
+    const rect = contentRect(canvas);
+    if (!rect || !view || !finite(dx, dy)) return null;
+    // Retain fractional motion for gesture accumulation. No camera/sidebar
+    // translation applies to a distance, and CSS already accounts for DPR.
+    return { x: dx * view.width / rect.width, y: dy * view.height / rect.height };
+  }
   function create(Module, canvas) {
     const state = () => typeof Module._of_web_state !== 'function' ? { api: 1, stage: 'uninitialized', ready: false } :
       JSON.parse(Module.UTF8ToString(Module._of_web_state()));
@@ -73,10 +80,11 @@
         return typeof paused === 'boolean' && bit ? send(actions.pause, Number(paused), bit) : rejected('invalid');
       },
       clientToWorld: (x, y) => clientToWorld(canvas, state().view, x, y),
+      clientDeltaToMap: (x, y) => clientDeltaToMap(canvas, state().view, x, y),
       worldToClient: (x, y) => worldToClient(canvas, state().view, x, y)
     });
   }
-  const api = Object.freeze({ create, clientToWorld, worldToClient });
+  const api = Object.freeze({ create, clientToWorld, worldToClient, clientDeltaToMap });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.OpenFodderInput = api;
 })(globalThis);

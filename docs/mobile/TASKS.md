@@ -1,6 +1,6 @@
 # Agent task ledger and specifications
 
-Updated: 2026-10-28. Phase 1 implemented by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. [Verification record](test-runs/phase-1.md) and [merged PR #1](https://github.com/jbbejena/openfodder/pull/1). The actual iPhone gate remains unpassed.
+Updated: 2026-10-29. Phase 1 implemented by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. [Verification record](test-runs/phase-1.md) and [merged PR #1](https://github.com/jbbejena/openfodder/pull/1). The actual iPhone gate remains unpassed.
 
 Read [ROADMAP.md](ROADMAP.md), [PLAYTEST.md](PLAYTEST.md), the root [AGENTS.md](../../AGENTS.md) and [handoff](../../AGENT_HANDOFF.md) before claiming work.
 
@@ -23,11 +23,11 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | --- | --- | --- | --- | --- | --- |
 | MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
 | MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
-| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `7809755`: current public preview with direct upstream demo loading, anonymous/emulated menu/map passed; [MOB-005 record](test-runs/touch-commands.md). B05 not run: no real iPhone |
+| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `1384e4f`: current public preview with direct upstream demo loading, anonymous/emulated menu/map passed; [MOB-006 record](test-runs/touch-camera.md). B05 not run: no real iPhone |
 | MOB-004 | M2 | done | MOB-002 | Codex / `mobile/command-bridge`, from `47e956d` | `d755c60`: [API contract](INPUT_API.md), [actual-engine DPR 1/2 + hosted checks](test-runs/command-bridge.md), [merged PR #3](https://github.com/jbbejena/openfodder/pull/3). B05/M1 still unpassed. |
-| MOB-005 | M2 | done | MOB-004 | Codex / `mobile/touch-command-modes`, from `6afde21` | `1dd9a2c` + `7809755`: [control map](TOUCH_CONTROLS.md), [actual-engine emulated touch + desktop evidence](test-runs/touch-commands.md), [draft PR #5](https://github.com/jbbejena/openfodder/pull/5). Actual iPhone and M2 remain unpassed. |
-| MOB-006 | M2 | ready | MOB-004, MOB-005 | Unclaimed | Next: two-finger camera intent using verified single-owner cancellation |
-| MOB-007 | M2 | ready | MOB-004 | Unclaimed | Engine state/coordinate contract and basic command toolbar exist; full landscape phone shell/HUD remains to implement |
+| MOB-005 | M2 | done | MOB-004 | Codex / `mobile/touch-command-modes`, from `6afde21` | `1dd9a2c` + `7809755`: [control map](TOUCH_CONTROLS.md), [actual-engine emulated touch + desktop evidence](test-runs/touch-commands.md), [merged PR #5](https://github.com/jbbejena/openfodder/pull/5). Actual iPhone and M2 remain unpassed. |
+| MOB-006 | M2 | done | MOB-004, MOB-005 | Codex / `mobile/touch-camera`, from `ec0497a` | `c0dc737` + `1384e4f`: [camera rules](TOUCH_CONTROLS.md), [local/hosted actual-engine emulation at DPR 1/2](test-runs/touch-camera.md), [branch PR](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Ftouch-camera). Actual iPhone remains not run. |
+| MOB-007 | M2 | ready | MOB-004 | Unclaimed | Next: landscape phone layout/HUD, safe areas and dynamic browser bounds; command/camera foundation verified |
 | MOB-008 | M2 | pending | MOB-005, MOB-006, MOB-007 | Unclaimed | — |
 | MOB-009 | M3 | pending | MOB-002, MOB-008 | Unclaimed | — |
 | MOB-010 | M3 | pending | MOB-004, MOB-008 | Unclaimed | — |

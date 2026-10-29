@@ -335,6 +335,16 @@ bool cWindow::CanChangeToMultiplier( const int pNewMultiplier ) {
 	return true;
 }
 
+#ifdef EMSCRIPTEN
+void cWindow::FrameBegin() {
+    // A complete image is about to be drawn. Web callbacks can present several
+    // images before the browser composites once; additive textures must never
+    // accumulate against the previous image. Keep overlay blending intact.
+    SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
+    SDL_RenderClear(mRenderer);
+}
+#endif
+
 void cWindow::FrameEnd() {
     #ifndef EMSCRIPTEN
 	SDL_RenderPresent( mRenderer );
@@ -345,8 +355,8 @@ void cWindow::FrameEnd() {
 	// SDL3 batches renderer commands. Present them before the browser composites
 	// the canvas; a running engine/updated DOM alone does not display a frame.
 	WebPerformance::Presented(SDL_RenderPresent(mRenderer));
-	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 0);
-	//SDL_RenderClear( mRenderer );
+    // Do not clear after presenting: the browser still has to composite this
+    // image. FrameBegin clears only when another complete redraw starts.
 #endif
 }
 

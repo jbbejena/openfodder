@@ -76,7 +76,7 @@
       pan: (x, y) => finite(x, y) ? send(actions.pan, Math.round(x), Math.round(y)) : rejected('invalid'),
       follow: () => send(actions.follow),
       setPaused(paused, reason = 'user') {
-        const bit = { user: 1, visibility: 2, focus: 4 }[reason];
+        const bit = { user: 1, visibility: 2, focus: 4, shell: 8 }[reason];
         return typeof paused === 'boolean' && bit ? send(actions.pause, Number(paused), bit) : rejected('invalid');
       },
       clientToWorld: (x, y) => clientToWorld(canvas, state().view, x, y),

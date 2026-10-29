@@ -42,7 +42,11 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
         ground:cameraCommands.filter(c=>[2,3,4,10].includes(c.args[0])).length
       }));
       const project = p=>page.evaluate(p=>fodderInput.worldToClient(p.x+.5,p.y+.5),p);
-      const mode = async name=>{await page.locator(`[data-touch-mode=${name}]`).tap();await page.waitForTimeout(100);};
+      const mode = async name=>{
+        const button=page.locator(`[data-touch-mode=${name}]`);
+        if(!await button.isVisible())await page.locator('#touch-weapons').tap();
+        await button.tap();await page.waitForTimeout(100);
+      };
       const panEnded = ()=>page.waitForFunction(()=>document.querySelector('#canvas').dataset.panning==='false');
       const response=await page.goto(url);assert.equal(response.status(),200);
       await page.waitForFunction(()=>window.fodderInput&&document.querySelector('#status').textContent.includes('Engine ready'));

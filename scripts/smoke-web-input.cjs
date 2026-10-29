@@ -184,6 +184,8 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       await command('setPaused',false);
       await ready();
       await page.locator('#input-harness > summary').click();
+      await page.waitForFunction(()=>document.body.dataset.layoutReady==='true');
+      await page.waitForTimeout(100);
       await page.locator('#input-x').fill(String(target.x));await page.locator('#input-y').fill(String(target.y));
       const fire=await page.locator('#input-fire').boundingBox();
       await page.mouse.move(fire.x+fire.width/2,fire.y+fire.height/2);await page.mouse.down();

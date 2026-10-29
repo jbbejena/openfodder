@@ -60,7 +60,7 @@ void Release(cFodder& e) {
 int Validate(const cFodder& e, int action, int a, int b) {
     if (action == Cancel || action == FireStop) return Ok;
     if (!Battlefield(e)) return NotBattlefield;
-    if (action == Pause) return (a == 0 || a == 1) && (b == 1 || b == 2 || b == 4) ? Ok : Invalid;
+    if (action == Pause) return (a == 0 || a == 1) && (b == 1 || b == 2 || b == 4 || b == 8) ? Ok : Invalid;
     if (CurrentPauseReasons(e)) return Paused;
     if (!e.mInput_Enabled || e.mCamera_Start_Adjust) return Busy;
     if (action == Pan) return std::abs(a) <= 128 && std::abs(b) <= 128 ? Ok : Invalid;

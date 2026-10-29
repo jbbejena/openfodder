@@ -55,7 +55,11 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
         const r=await page.evaluate(()=>fodderInput.pan(0,0));assert(r.ok);
         await page.waitForFunction(id=>fodderInput.state().last.id>=id,r.id);
       }
-      async function mode(name) {await page.locator(`[data-touch-mode=${name}]`).tap();await page.waitForTimeout(100);}
+      async function mode(name) {
+        const button=page.locator(`[data-touch-mode=${name}]`);
+        if(!await button.isVisible())await page.locator('#touch-weapons').tap();
+        await button.tap();await page.waitForTimeout(100);
+      }
       return {context,page,errors,state,touch,clear,count,project,lockView,mode};
     }
     const normal=await boot(false);

@@ -205,7 +205,16 @@
   function mount(bridge, canvas) {
     const panel = document.getElementById('touch-commands');
     const toggle = document.getElementById('touch-enabled');
-    const controls = document.getElementById('touch-actions');
+    const weaponsButton = document.getElementById('touch-weapons');
+    let weaponsOpen = false;
+    function showWeapons(value) {
+      weaponsOpen = value;
+      document.getElementById('squad-buttons').hidden = value;
+      document.getElementById('weapon-buttons').hidden = !value;
+      document.getElementById('rail-caption').textContent = value ? 'WEAPONS' : 'SQUADS';
+      weaponsButton.textContent = value ? 'Squads' : 'Weapons';
+      weaponsButton.setAttribute('aria-expanded', String(value));
+    }
     const output = document.getElementById('touch-feedback');
     const confirm = document.getElementById('touch-confirm');
     const marker = document.getElementById('touch-target');
@@ -214,7 +223,8 @@
     const modeButtons = [...panel.querySelectorAll('[data-touch-mode]')];
     const controller = create(bridge, (ui, state) => {
       panel.hidden = state.stage !== 'battlefield';
-      controls.hidden = !ui.enabled;
+      const visible = String(ui.enabled && state.stage === 'battlefield');
+      if (document.body.dataset.touchControls !== visible) document.body.dataset.touchControls = visible;
       canvas.classList.toggle('touch-commands', ui.enabled && !panel.hidden);
       if (output.textContent !== ui.message) output.textContent = ui.message;
       const canAct = ui.enabled && state.ready && !state.paused;
@@ -223,7 +233,8 @@
         const id = Number(button.dataset.touchSquad), info = state.squads?.[id];
         button.disabled = !canAct || !info?.count;
         button.setAttribute('aria-pressed', String(state.selectedSquad === id));
-        button.textContent = `Squad ${id + 1} · ${info?.count ?? 0}`;
+        button.textContent = `${id + 1} · ${info?.count ?? 0}`;
+        button.setAttribute('aria-label', `Squad ${id + 1}, ${info?.count ?? 0} soldiers`);
       });
       modeButtons.forEach(button => {
         const mode = button.dataset.touchMode, secondary = weapons[mode];
@@ -234,11 +245,15 @@
           { move: 'Move', fire: 'Fire', pan: 'Pan' }[mode];
       });
       document.getElementById('touch-follow').disabled = !canAct || !squad?.count;
+      document.getElementById('touch-follow').hidden = Boolean(ui.target);
+      weaponsButton.disabled = !canAct || !squad?.count;
       canvas.dataset.inputMode = ui.panning ? 'pan' : ui.mode;
       canvas.dataset.panning = String(ui.panning);
       confirm.hidden = !ui.target;
       confirm.disabled = !canAct || !ui.target;
-      confirm.textContent = ui.mode === 'grenade' ? 'Throw grenade' : 'Launch rocket';
+      confirm.textContent = ui.mode === 'grenade' ? 'Throw' : 'Launch';
+      confirm.setAttribute('aria-label', ui.mode === 'grenade' ? 'Throw grenade' : 'Launch rocket');
+      document.getElementById('touch-mode').textContent = ui.enabled ? (ui.panning ? 'CAMERA' : ui.mode.toUpperCase()) : 'MOUSE / KEYBOARD';
       document.getElementById('touch-selection').textContent = state.paused ? 'Paused' :
         squad?.count ? `Squad ${state.selectedSquad + 1} · ${squad.count} soldiers` : 'No squad selected';
       marker.hidden = !ui.target;
@@ -261,9 +276,11 @@
     for (const [type, handler] of [['pointerdown', 'down'], ['pointermove', 'move'], ['pointerup', 'up'],
       ['pointercancel', 'lost'], ['lostpointercapture', 'lost']]) {
       canvas.addEventListener(type, event => {
+        if (document.body.dataset.runtimeError === 'true') { stop(event); return; }
         if (!ownsCanvas() && !controller.snapshot().pointers) return;
         stop(event);
         if (type === 'pointerdown') {
+          canvas.focus({ preventScroll: true });
           try { canvas.setPointerCapture(event.pointerId); } catch (_) { /* Cancel/up still releases. */ }
         }
         controller[handler](event);
@@ -279,6 +296,7 @@
     canvas.addEventListener('pointerdown', event => {
       if (event.pointerType === 'touch' && bridge.state().stage === 'battlefield' && !toggle.checked) {
         toggle.checked = true; controller.setEnabled(true);
+        canvas.focus({ preventScroll: true });
         stop(event); canvas.setPointerCapture(event.pointerId); controller.down(event);
       }
     }, { capture: true, passive: false });
@@ -293,19 +311,25 @@
     toggle.checked = matchMedia('(pointer: coarse)').matches;
     toggle.addEventListener('change', () => controller.setEnabled(toggle.checked));
     squadButtons.forEach(button => button.addEventListener('click', () => controller.selectSquad(Number(button.dataset.touchSquad))));
-    modeButtons.forEach(button => button.addEventListener('click', () => controller.setMode(button.dataset.touchMode)));
+    modeButtons.forEach(button => button.addEventListener('click', () => {
+      if (controller.setMode(button.dataset.touchMode)) showWeapons(false);
+    }));
+    weaponsButton.addEventListener('click', () => {
+      controller.cancel('Choose a secondary weapon; ammo comes from the squad.');
+      showWeapons(!weaponsOpen);
+    });
     confirm.addEventListener('click', controller.confirm);
     document.getElementById('touch-cancel').addEventListener('click', () => controller.cancel());
     document.getElementById('touch-follow').addEventListener('click', controller.followSquad);
     function interrupt() {
-      if (controller.snapshot().enabled) controller.cancel('Input released. Choose a mode to continue.');
+      if (document.body.dataset.runtimeError !== 'true' && controller.snapshot().enabled) controller.cancel('Input released. Choose a mode to continue.');
     }
     window.addEventListener('blur', interrupt);
     window.addEventListener('pagehide', interrupt);
     window.addEventListener('resize', interrupt);
     document.addEventListener('visibilitychange', () => { if (document.hidden) interrupt(); });
     controller.setEnabled(toggle.checked);
-    const timer = setInterval(controller.tick, 50);
+    const timer = setInterval(() => { if (document.body.dataset.runtimeError !== 'true') controller.tick(); }, 50);
     window.addEventListener('pagehide', () => clearInterval(timer), { once: true });
     controller.tick();
     return controller;

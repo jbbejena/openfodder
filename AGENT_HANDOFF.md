@@ -4,6 +4,14 @@ Updated 2026-10-29. **MOB-006 touch camera is implemented and desktop/emulation
 checks passed locally and publicly. Actual iPhone Safari, physical touch and a
 full touch-only mission are NOT RUN. M1/B05 and M2 remain unpassed.**
 
+## Active task: MOB-007
+
+Codex claimed `mobile/phone-layout` from user-merged master
+`15b5ff1aa63a1556f74ff35475c9d12c4d938cf3` (PR #6). Scope: viewport-fitted phone
+shell, compact safe-area HUD, portrait guidance, scrollable guide and independent
+shell pause. Implementation/tests are in progress. The current public preview
+below is still MOB-006; actual iPhone layout acceptance remains not run.
+
 ## Branch and review
 
 - Codex / MOB-006, branch `mobile/touch-camera`, from user-merged master

@@ -1,6 +1,6 @@
 # Mobile acceptance checklist
 
-Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. No actual iPhone Safari test has run. Later milestone rows remain untested.
+Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. MOB-009 adds [checkpoint semantics](CHECKPOINTS.md) and [Chromium persistence evidence](test-runs/checkpoints.md). No actual iPhone Safari test has run; lifecycle/performance remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -35,7 +35,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `7ec50c315b0e`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `f4696c53ccfa`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
@@ -68,11 +68,11 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 
 | ID | Check | Initial status |
 | --- | --- | --- |
-| S01 | Save at a documented supported checkpoint and wait for persistence acknowledgement | Not run |
-| S02 | Close/reopen and restore the correct campaign/mission and surviving recruits | Not run |
-| S03 | Malformed/incompatible save does not silently destroy the last valid checkpoint | Not run |
-| S04 | Unavailable/denied storage gives clear feedback without a false saved indication | Not run |
-| S05 | The UI accurately labels checkpoint limits; no unverified mid-battle resume promise | Not run |
+| S01 | Save at a documented supported checkpoint and wait for persistence acknowledgement | Pass in local/public Chromium: briefing Save awaits real IDBFS sync; actual iPhone NOT RUN |
+| S02 | Close/reopen and restore the correct campaign/mission and surviving recruits | Pass in Chromium: real persistent profile reopened, mission restored; local goal fixture round-tripped four native returning recruits/reserves and deployed mapm2. Actual iPhone NOT RUN |
+| S03 | Malformed/incompatible save does not silently destroy the last valid checkpoint | Pass in local/public Chromium: rejected imports unchanged, failed write rolled back; real reopen retained valid save; corrupt primary recovered previous |
+| S04 | Unavailable/denied storage gives clear feedback without a false saved indication | Pass with Chromium denied IndexedDB and simulated sync failure; play remains available, Save disabled on denial; actual Safari storage modes NOT RUN |
+| S05 | The UI accurately labels checkpoint limits; no unverified mid-battle resume promise | Pass in Chromium/source: mission-start briefing only, current battlefield export rejected; backup export/import passed. Actual Safari Files behavior NOT RUN |
 | L01 | Background during combat; no unintended combat advance or catch-up burst on return | Not run |
 | L02 | Background while firing; held input is released | Not run |
 | L03 | A user-paused game remains paused through background/foreground transitions | Not run |

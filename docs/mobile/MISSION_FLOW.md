@@ -15,8 +15,8 @@ playing** cancels the confirmation without issuing an engine abort.
 
 | Engine stage | Player action / behavior |
 | --- | --- |
-| `menu` | Choose either loaded demo mission |
-| `briefing` | Read engine objectives; Deploy, or Return to menu |
+| `menu` | Choose either loaded demo mission, Continue a validated checkpoint or Import a backup |
+| `briefing` | Read engine objectives; Deploy, Return to menu, Save checkpoint or Export backup |
 | `battlefield` | Existing squad/combat/camera controls and paused Guide |
 | `ending` | Wait for the native end countdown and cleanup; new gameplay/mission commands are gated |
 | `result` | Read the outcome; Retry, Return to menu, or Next mission when a winning result has a successor |
@@ -55,11 +55,13 @@ browser's old canvas campaign menu. Portrait rotation guidance is limited to
 the battlefield, so selection/briefing/results can be read in either orientation.
 The [phone shell](PHONE_LAYOUT.md) continues to own fitting/safe areas and Guide.
 
-**Progress is not saved.** Returning to menu or reloading discards the run.
-Browser Back can leave the page; there is no supported checkpoint recovery or
-Back/Forward Cache resume promise. If browser history restores a stale screen,
-reload and start again. Persistent mission-boundary checkpoints are MOB-009;
-full browser lifecycle recovery is MOB-010. Audio stays disabled.
+**MOB-009 adds explicit [mission-start checkpoints](CHECKPOINTS.md).** Save at a
+briefing and wait for confirmation. After reopening, load the demo and Start
+game, then Continue to that mission's briefing with saved recruit progress.
+Returning to menu/reloading discards the current unsaved run while preserving
+confirmed checkpoints. There is no live-battle or Back/Forward Cache resume
+promise. If browser history restores a stale screen, reload and Continue the
+confirmed checkpoint. Full browser lifecycle recovery is MOB-010; audio stays off.
 
 [Verification and exact phone steps](test-runs/mission-flow.md) separate actual
 Wasm touch emulation from real iPhone Safari, which remains **NOT RUN**. The

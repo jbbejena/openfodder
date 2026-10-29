@@ -1,158 +1,149 @@
 # Current handoff
 
-Updated 2026-10-29. **MOB-008 mission flow is implemented and local/public actual
-Wasm touch emulation passed. The unmodified first mission reached defeat and
-retried without a keyboard/reload. Actual iPhone Safari/physical touch and an
-unmodified combat victory are NOT RUN. MOB-007/008 device acceptance remains
-blocked; M1/B05 and M2 remain unpassed.**
+Updated 2026-10-29. **MOB-009 browser mission-start checkpoints are implemented.
+Actual Wasm + Chromium IndexedDB save/close/reopen, validated restore, recovery
+and error checks passed locally and publicly. Returning recruits round-tripped
+using a local native-progression fixture. Actual iPhone Safari/physical touch/
+storage durability and an unmodified combat victory remain NOT RUN. B05,
+MOB-007/008 phone gates and M1/M2/M3 remain unpassed.**
 
 ## Branch and review
 
-- Codex / MOB-008, `mobile/mission-flow`, from user-merged master
-  `7e6b537bbcb9a587f30ec27b7fdca1a71e3aef76` (PR #7). User work preserved.
-- `7ec8a5d09036751f1e9d7145009366b541805b42`: engine-backed mission states,
-  touch menus/results, transition commands, tests and semantics.
-- **Tested/published code:** `7ec50c315b0e98d3ca6b8247b604e47f8bfb645c`:
-  explicit header stacking above mission overlays, found during hosted visual QA.
-  Later Markdown handoff changes do not change that artifact.
-- [Draft PR for this branch](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fmission-flow),
-  target master, left unmerged. Its body/checks supply the exact final handoff
-  commit and CI/artifact links. Roadmap, Phase 1 and MOB-004–007 are already in
-  master through the user's merges of PRs #1–7.
+- Codex / **MOB-009**, `mobile/browser-saves`, from user-merged master
+  `86c70318768ce59fcc85b606caeb655ccddf62b1` (PR #8). User work preserved;
+  independent implementation authorized while inherited phone gates remain open.
+- **Application/tested/published:** `f4696c53ccfab5faea024ff221c5052b7f2a8496`:
+  native validation/temporary restore, briefing/menu UI, IDBFS, backups, packaging,
+  storage cases/browser smoke and native audit. `aaa99dd` adds previous-selection/
+  replacement-import assertions; no runtime change. Final Markdown records this
+  handoff without changing the published artifact.
+- [Draft branch PR to master](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fbrowser-saves)
+  supplies exact final head and observed CI/artifact links. Leave unmerged.
+  Roadmap/Phase 1/MOB-004–008 already reached master through user merges.
 - No merge, force push, dependency repin, workflow change or game-data upload.
 
-## Delivered behavior and source boundary
+## Behavior and source boundary
 
-Load demo → Start game → choose either demo mission → engine briefing/objectives
-→ Deploy. Guide pauses combat, shows objectives/help and supports confirmed
-Abort. Back restores the previous pause; Resume combat clears a native user pause.
-Native end cleanup leads to a stable result: won, lost or aborted remain distinct.
-Retry starts the same mission afresh with new recruits. Next mission uses native
-Phase_Next when available. Return to menu discards the run but keeps content
-loaded. Progress is not saved; Back/reload has no checkpoint/resume promise.
+Load demo → Start → choose mission → briefing → **Save checkpoint** → wait for
+Saved. Reopen same origin/browser/profile → load demo again → Start → **Continue**
+→ saved briefing → Deploy. Save after Next mission to retain returning recruits.
+Continue starts the mission from its beginning. **No live-battle/phase-exact resume.**
 
-Emscripten-only changes: `Source/Start_Emscripten.cpp`, `Source/WebInput.cpp/.hpp`.
-Transition commands use the existing validated queue; scene allocation/stage
-changes occur afterward, outside its iteration/redraw lock. Cancel cannot erase
-an accepted mission selection. Native phase/goal/defeat/abort routines own results;
-JS cannot declare an outcome. Existing loop pacing and battlefield controls remain.
-Native desktop startup, combat rules, CMake, pins and workflows are unchanged.
+Native JSON contains campaign/mission/recruit IDs/ranks/kills/reserves/heroes/
+scores, but omits phase number, sprites/positions/orders, ammo, RNG, camera/input
+and within-mission phase counts. Only the pinned Christmas Special's two
+single-phase missions are supported. Validate the complete candidate, load a
+temporary native object, replace active data only on success, detach all nine
+troop pointers and rebuild sprites on Deploy. Shared native save/load unchanged.
 
-Browser changes: `web/mission-flow.js` + focused tests, bridge/actions, shell/CSS,
-bootstrap and phone-shell gating. Packaging/guard includes the new JS. Existing
-smokes use DOM mission selection/deploy; new `scripts/smoke-web-mission.cjs`
-exercises real Wasm. Mission screens scroll internally in either orientation;
-portrait rotation guidance remains on the battlefield. No force/tactical changes.
+IDBFS mounts `/Saves` and loads before main/save discovery. Schema 1 compatibility
+pins ABI, Run/Scripts and the full content manifest; producing commit is
+informational to support compatible builds. SHA-256 detects corruption.
+`current.json`/`previous.json` retain a validated recovery copy. Save/Import waits
+for successful `syncfs(false)` before acknowledgement. Failures roll memory back;
+denied storage gives nonfatal feedback and still permits play/briefing Export.
+Invalid imports preserve stored bytes/scene. Use previous does not replace current.
+Backups contain progress JSON, not game assets. No unload-only saving.
 
-[Mission semantics](docs/mobile/MISSION_FLOW.md), [API](docs/mobile/INPUT_API.md),
-[exact verification](docs/mobile/test-runs/mission-flow.md),
-[build/data provenance](docs/mobile/BUILD.md).
+Files: Emscripten-only `Source/Start_Emscripten.cpp`, `WebInput.cpp/.hpp`, CMake
+IDBFS flags within `if(EMSCRIPTEN)`; new `web/checkpoints.js`/tests, bridge action
+17, bootstrap ordering, mission gating, shell/CSS, packaging/guard and real-browser
+smoke. Native startup/combat/timing/forces unchanged. [Audit/policy](docs/mobile/CHECKPOINTS.md),
+[API](docs/mobile/INPUT_API.md), [exact results/commands](docs/mobile/test-runs/checkpoints.md),
+[build/phone steps](docs/mobile/BUILD.md).
 
-## Commands and evidence
+## Checks and commands
 
 ```sh
 node --test web/*.test.cjs
 ./scripts/build-web.sh
+build-web/tools/venv/bin/cmake --build build-web/cmake --target clean
+./scripts/build-web.sh
 python3 scripts/check-web-artifact.py
+./scripts/build-web.sh
 python3 scripts/ci/windows_scope.py \
-  --base 7e6b537bbcb9a587f30ec27b7fdca1a71e3aef76 --head HEAD
-python3 -m http.server 8093 --bind 127.0.0.1 --directory build-web/cmake/dist
+  --base 86c70318768ce59fcc85b606caeb655ccddf62b1 --head HEAD
+python3 -m http.server 8094 --bind 127.0.0.1 --directory build-web/cmake/dist
 PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
-  node scripts/smoke-web-mission.cjs http://127.0.0.1:8093/ \
-  build-web/local-only/christmas.ofdata build-web/local-only/mission-header-final-evidence \
-  7ec50c315b0e98d3ca6b8247b604e47f8bfb645c --fixtures
+  node scripts/smoke-web-saves.cjs http://127.0.0.1:8094/ \
+  build-web/local-only/christmas.ofdata build-web/local-only/saves-final-evidence \
+  f4696c53ccfab5faea024ff221c5052b7f2a8496 --fixtures
 PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
-  node scripts/smoke-web-mission.cjs https://openfodder-phase-one.zanysky263.chatgpt.site/ \
-  upstream build-web/local-only/mission-header-hosted-evidence \
-  7ec50c315b0e98d3ca6b8247b604e47f8bfb645c
+  node scripts/smoke-web-saves.cjs https://openfodder-phase-one.zanysky263.chatgpt.site/ \
+  upstream build-web/local-only/saves-hosted-final-evidence \
+  f4696c53ccfab5faea024ff221c5052b7f2a8496
 ```
 
-- **32 Node cases passed** (9 coordinate/API, 17 ownership, 3 geometry, 3 result
-  presentation). Pinned build/incremental relink and clean artifact/source guard
-  passed: 47 GPL/config files, no game assets. See PR for fresh CI build evidence.
-- Local/public actual-engine checks passed: state/argument validation, duplicate
-  transition rejection, Select surviving Cancel, two mission briefings, unmodified
-  mapm1 touch movement → actual defeat, stable result/no auto restart, fresh-troop
-  same-mission Retry, Guide pause/resume, abort confirmation cancellation, distinct
-  abort, menu and mission-2 selection/replay. No keyboard/cheats in normal play.
-- **Local-only empty-goal campaign fixtures** exercised native goal completion,
-  win/Continue/Phase_Next/mission-2 and final-demo branches. They are not an
-  unmodified combat victory. Only one browser's ephemeral campaign JSON changes;
-  no fixture asset is written to disk, committed or uploaded. Hosted QA has no fixtures.
-- Committed layout checks passed at DPR 1/2/3: 568×320 through 915×412, simulated
-  safe areas/browser bars, ≥44px controls outside canvas, Guide focus/scroll and
-  composed pause, portrait round trip/aim, held-fire release and narrow native P.
-- Combat, native-field input/harness, camera and launcher regressions passed during
-  implementation. Exact scope in test record: movement/aim/release, local ammo
-  fixture, queue/pause, native right-fire/P, pan/Follow/cancel/resize/clamp,
-  corrupt/partial/missing data, upstream retry, cheats opt-in/off and Wasm failure.
-- Linux Chromium 154.0.8037.57 / Playwright Core 1.57.0, SwiftShader/WebGL1,
-  mouse/keyboard and emulated touch. **No Safari/physical touch/performance claim.**
-- Public QA: fresh anonymous context, HTTP 200/full clean fork ID, 20 pinned
-  hash-verified upstream files, no auth headers, unexpected methods or page errors.
-  TLS stayed verified with temporary browser proxy CA, removed afterward.
-- Visual QA caught header painting disappearing above mission screens in hosted
-  Chromium; explicit header stacking fixed it. Other QA corrections: full rebuild
-  after HTML changes (a JS-only shortcut left stale HTML), and campaign-goal
-  fixtures replacing an ineffective post-load sprite-file mutation. No engine
-  outcome was overridden. Screenshots were inspected and remain local.
-- Logs `/workspace/mission-{committed-build,header-build,header-final,header-layout,header-hosted}.log`,
-  `mission-{touch,input,camera,launcher}.log`, `mission-node.log`;
-  JSON/screenshots under `build-web/local-only/mission-*-evidence/`.
+- Passed **38 individual Node cases** across five files (also run directly),
+  pinned committed/clean build (69 tasks/cached SDK), incremental no-op and
+  source/publication guard (47 GPL/config files). Existing JSON warnings only.
+- Local/public actual IndexedDB: real context close/reopen/native mission-2
+  restore; explicit previous-1 selection while current-2 retained; downloaded
+  backup replacing a different save; rejected malformed/incompatible/invalid
+  native fields; forced sync/quota failure then real reopen; synchronized corrupt
+  primary/previous recovery; denied IndexedDB, disabled Save, available briefing
+  Export and playable battlefield; live export rejected.
+- Local empty-goal campaign fixture: native win/Next, original bytes restored,
+  save four returning recruits at mission-2 briefing, real reopen, exact native
+  serialization round trip, deploy four troops on mapm2. **Not an unmodified
+  victory.** No fixture assets uploaded/committed.
+- Same artifact passed mission/layout smokes: unmodified emulated-touch mapm1
+  defeat/Retry, Guide pause/resume, cancel/confirm Abort, menu/mapm2; local native
+  goal fixtures; DPR 1/2/3, 568×320–915×412, simulated safe areas/browser bars,
+  focus/scroll, composed pause, portrait/aim/release and narrow native P.
+- Linux Chromium 154.0.8037.57, Playwright Core 1.57.0, SwiftShader/WebGL1,
+  emulated touch. **No Safari/physical touch/phone-performance claim.**
+- Public: HTTP 200/clean fork ID, 20 pinned/hash-verified upstream files per
+  startup, no page errors/non-GET/auth headers; TLS verified with temporary browser
+  proxy CA removed afterward. Local/public screenshots inspected. Profiles,
+  exports and artwork remain ignored/local.
+- Logs `/workspace/saves-{clean-build,incremental-build,committed-build,node,final,hosted-final,mission,layout}.log`;
+  evidence `build-web/local-only/saves-*-evidence/`.
 
-## Preview, source and CI
+## Preview, CI and provenance
 
-- [Public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in:
-  **Sites version 9**, visible ID **`7ec50c315b0e`**, supersedes v8 / `7ec8a5d`.
-- Saved version `appgprj_6ae24fbe89788191a38778521e56e855~appgver_fbc778e09e9c8191ac66b7bc422c0115`;
-  deployment `appgdep_6ae2d001998481918d53c28d342e61c6`: succeeded. Source
-  `2b20c46d397b43187f4c5dca4d201dd6fa52cb4c`, checkout/manifest
-  `/workspace/sites/openfodder-phase-one`, project
-  `appgprj_6ae24fbe89788191a38778521e56e855`. Source pushed before saving;
-  built output packaged separately; public audience revision 2 preserved.
-- Actual Windows classifier returns `native: false`; its scope job should pass
-  and compiler matrix skip. Linux's existing Source-path native check still runs.
-  No workflow/protection was weakened. Final docs were prepared before opening
-  the PR to avoid duplicate PR builds; feature pushes are outside the web master
-  push trigger. PR body/checks record observed CI outcomes and artifact links.
+- [Public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no login:
+  **Sites version 10**, **`f4696c53ccfa`**, supersedes v9/MOB-008.
+- Version `appgprj_6ae24fbe89788191a38778521e56e855~appgver_1c0385c31d2c8191968182bba85972e9`;
+  deployment `appgdep_6ae3a8ebd3e8819193e6ab91bf128ba1`: succeeded. Hosting
+  source `6c80a25750a6b2156d0da235c939f894d9de6a3d`, pushed before saving;
+  exact clean output packaged separately. Project
+  `appgprj_6ae24fbe89788191a38778521e56e855`, checkout
+  `/workspace/sites/openfodder-phase-one`, public audience revision 2 preserved.
+- Local Windows comparison returns `native:false`: Ubuntu scope job should pass,
+  compiler matrix skip. Linux's existing Source-path check runs. PR body/checks
+  record observed final CI/artifact links. No workflow/protection changed. Final
+  docs prepared before opening PR; feature pushes do not duplicate web PR builds.
+- Run `070a6086c62164e859fc3274b75b5f536fa9d902`, Scripts
+  `dad04730860bcdd1189aa8562860e379b0f5d783`, emsdk
+  `c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`, emcc 4.0.23
+  `7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`, SDL 3.2.22,
+  CMake 3.31.6/Ninja 1.11.1 unchanged; recursive pins clean.
+- Runtime/support 3,021,095 + upstream content 223,382 = **3,244,477 bytes**
+  before compression. Optional source 1,913,121; hosted total/notices/source
+  5,047,510. No game assets/player pack/profiles/progress exports hosted. GPL
+  source/notices included. Own demo-mirroring permission remains unresolved,
+  separate from engine/Scripts rights; browser fetches existing pinned upstream.
 
-## Pins and data boundary
+## Remaining checks and next task
 
-Run `070a6086c62164e859fc3274b75b5f536fa9d902`, Scripts
-`dad04730860bcdd1189aa8562860e379b0f5d783`, emsdk
-`c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`, Emscripten 4.0.23
-(`7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`), web SDL 3.2.22,
-CMake 3.31.6/Ninja 1.11.1: unchanged, recursive pins clean.
+MOB-001/002 and desktop MOB-004–006/009 deliverables done. MOB-003/B05 and
+MOB-007/008 actual iPhone gates remain open; actual storage/Files durability is
+NOT RUN. M1/M2/M3 remain unpassed. **Next bounded implementation: MOB-010**, explicit
+visibility/focus/input/audio lifecycle, within active user authorization.
 
-Top-level runtime/support 2,983,624 bytes plus upstream demo 223,382 bytes: about
-3.21 MB before compression. Optional source 1,889,823 bytes; all hosted files
-including notices/source 4,986,741 bytes. Engine/GPL Scripts source and notices
-are included. No game assets/player pack are hosted here; loading uses pinned
-existing upstream or local files and verifies hashes. Our own data-mirroring
-permission remains unresolved and is separate from engine/Scripts licensing.
+Phone: Safari → public URL → verify `f4696c53ccfa` → Load demo (20 verified) →
+Start → choose mission → Save at briefing → wait for Saved. Close/reopen same
+Safari URL/profile → Load demo again → Start → Continue → verify briefing →
+Deploy. Check previous-save selection and Export/Import through Safari/Files.
+Record model/iOS, errors, mission/troops. [Exact steps](docs/mobile/BUILD.md#try-mission-checkpoints--actual-iphone-not-run).
+No ChatGPT login, computer or initial Files import is needed.
 
-## Remaining tasks and phone steps
-
-| Task | Status / next action |
-| --- | --- |
-| MOB-001/002 | Done; historical baseline/Phase 1 evidence |
-| MOB-003 | Blocked on actual iPhone Safari B05 menu/map |
-| MOB-004–006 | Implemented with desktop/emulation evidence; actual phone not run |
-| MOB-007 | Implemented; blocked on actual iPhone landscape/cutout/browser-bar acceptance |
-| MOB-008 | Implemented; emulated defeat/retry/abort/menu and fixture wins passed; inherited/actual phone gates unpassed |
-| **MOB-009** | **Next implementation candidate:** audit native checkpoint fidelity, round-trip supported mission-boundary saves, then browser persistence; active user scope still controls next work |
-
-Phone: refresh the public URL in Safari and verify `7ec50c315b0e`; record model/iOS.
-Load demo → 20 verified files → Start game → LAND OF HOPE AND GLORY → read objectives
-→ Deploy. Record B05 menu/map and MOB-007 landscape/rotation/bar clearance.
-Guide → Abort mission → Keep playing should leave play active; confirm abort on
-another try, check the aborted result, Retry, then Return to menu. Play to an
-actual win/loss and verify results. No ChatGPT login, PC or Files import is needed.
-
-**Those actual device steps have not run.** Missing real-device access is the
-precise remaining acceptance blocker. Unmodified combat victory, persistent
-checkpoints, interruption recovery, audio (disabled), sustained phone performance,
-larger forces, tactical changes and H Hour remain unverified/unimplemented/outside scope.
+**Actual device steps have not run.** Use one game tab per origin; browser
+clearing/eviction/private mode can remove saves, so retain an exported backup.
+No cloud/cross-tab sync or live-battle resume. Lifecycle/audio (currently disabled),
+sustained phone performance, larger forces, tactical changes and H Hour remain
+unverified/unfinished/outside scope.
 
 ## Future handoff template
 

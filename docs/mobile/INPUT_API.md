@@ -10,6 +10,7 @@ MOB-005 adds [touch command modes](TOUCH_CONTROLS.md) and deliberate secondary
 fire to this foundation. MOB-006 adds touch camera gestures and Follow using the same existing
 engine intents. MOB-007 adds the [viewport shell/HUD](PHONE_LAYOUT.md) and its independent
 presentation pause. MOB-008 adds [mission states and touch menus](MISSION_FLOW.md).
+MOB-009 adds [mission-start checkpoints](CHECKPOINTS.md) and validated restore.
 Vehicles receive `unsupported` rather than an invented order.
 Native mouse/keyboard paths remain in use when the bridge does not own input.
 
@@ -26,6 +27,7 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | `abortMission()` | End an active attempt through native abort handling; available while paused |
 | `returnToMenu()` | Leave briefing/results and discard the current run |
 | `continueMission()` | Advance a winning result through native `Phase_Next`, if another phase/mission exists |
+| `resumeCheckpoint()` | Restore the staged, validated native checkpoint from the menu to its mission-start briefing; storage is owned by `fodderSaves` |
 | `selectSquad(0..2)` | Select a populated engine squad; clears held input |
 | `moveTo({x,y})` / `moveAt(clientX,clientY)` | Issue an on-foot engine movement order; preserves native path/waypoint rules |
 | `fireStart({x,y})` / `fireStartAt(clientX,clientY)` | Hold primary fire at a map target; repeated starts update aim without resetting the fire cooldown |
@@ -76,7 +78,7 @@ selected squad, actual squad counts/ammo/secondary weapon, and leader
 position/destination/aim. The viewport and map bounds also come from the engine.
 The numeric applied result codes are 0 success, -1 invalid, -2 uninitialized,
 -3 not-battlefield, -4 paused, -5 no-squad, -6 unavailable, -7 busy, -8 unsupported.
-Mission commands are additive actions **11–16** in the table's order; they accept
+Mission commands are additive actions **11–17** in the table's order; they accept
 only a mission number for Select and zero arguments otherwise. Wrong-stage
 mission actions return `unavailable`, invalid IDs/arguments return `invalid`,
 and a second pending transition returns `busy`. They are revalidated at the
@@ -85,6 +87,15 @@ input boundary; scene preparation runs afterward, outside the queue/redraw lock.
 engine-read campaign/mission/map/objectives, available missions, attempt counter,
 transition pending state, `canContinue` and a frozen `result` (or null).
 See [mission semantics](MISSION_FLOW.md) for result fields and supported scope.
+
+The separate `of_web_checkpoint(operation)` returns copied JSON: `0` exports
+native checkpoint/summary only at a phase-1 briefing with no pending transition;
+`1` validates `/tmp/openfodder-checkpoint.json` without modifying active state.
+Invalid/wrong-screen candidates return `ok:false` with a reason. Resume command
+17 revalidates that file before loading into a temporary native object and
+transitioning to briefing. This does not expose live battlefield snapshot/restore.
+Wrapper checksums, compatibility, IDBFS synchronization and recovery belong to
+the [checkpoint service](CHECKPOINTS.md), not to arbitrary command arguments.
 
 A primary-fire hold owns aiming until stopped/cancelled. Engine targeting and
 cooldowns remain authoritative; holding fire does not generate a new mouse-down

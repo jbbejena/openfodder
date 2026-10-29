@@ -64,14 +64,16 @@
       }
       hidden(el('briefing-objectives'), !['briefing', 'result'].includes(state.stage));
       for (const [name, button] of Object.entries(buttons)) hidden(button, !view.actions.includes(name));
-      const busy = Boolean(pending || mission.pending);
+      const busy = Boolean(pending || mission.pending || root.fodderSaves?.state().busy);
       for (const button of screen.querySelectorAll('button')) button.disabled = busy;
       hidden(el('mission-guide'), state.stage !== 'battlefield');
       hidden(el('mission-resume'), !(state.pauseReasons & 1));
       el('confirm-abort').disabled = busy || !state.ready;
       el('mission-abort').disabled = busy || !state.ready;
+      root.fodderCheckpointUI?.refresh(state);
       if (state.stage !== previousStage) {
         previousStage = state.stage; resetConfirmation(); text('mission-message', '');
+        screen.querySelector('.mission-card').scrollTop=0;
         if (visible) root.requestAnimationFrame(() => { if (!screen.hidden && !dialog.open) el('mission-title').focus({ preventScroll: true }); });
       }
     }
@@ -85,6 +87,7 @@
       if (reply.ok) shell.closeGuide(); else text('mission-guide-message', `Could not resume (${reply.reason}).`);
     });
     dialog.addEventListener('close', resetConfirmation);
+    document.addEventListener('fodder-storage-change',refresh);
     for (const type of ['keydown', 'keyup']) screen.addEventListener(type, event => event.stopPropagation());
     const timer = root.setInterval(refresh, 100);
     root.addEventListener('pagehide', () => root.clearInterval(timer), { once: true });

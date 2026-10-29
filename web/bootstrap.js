@@ -10,6 +10,7 @@ const localFiles = new Map();
 const canvas = document.getElementById('canvas');
 let phoneShell = null;
 let missionUI = null;
+let checkpointUI = null;
 let runtimeReady = false;
 let pack = null;
 let manifest;
@@ -54,15 +55,24 @@ var Module = {
   setStatus(message) { if (message) status(message); },
   onAbort(reason) { fail(`Engine stopped: ${reason}. Check the build log and reload to retry.`); },
   onExit(code) { fail(`Engine exited (${code}). Check the log and reload to retry.`); },
-  onRuntimeInitialized() {
-    runtimeReady = true;
-    window.fodderInput = OpenFodderInput.create(Module, canvas);
-    const physical = OpenFodderTouch.mount(window.fodderInput, canvas);
-    phoneShell?.connect(window.fodderInput, physical);
-    missionUI = OpenFodderMission.mount(window.fodderInput, phoneShell);
-    setupInputHarness(window.fodderInput);
-    log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
-    ready();
+  async onRuntimeInitialized() {
+    try {
+      const {info,content}=await metadataReady;
+      window.fodderSaves=OpenFodderSaves.create(Module,info,content);
+      // Populate the real /Saves mount before main/ResourceMan discovers saves.
+      // A storage failure is recoverable; the engine can still play in memory.
+      await window.fodderSaves.initialize();
+      window.fodderInput = OpenFodderInput.create(Module, canvas);
+      checkpointUI=OpenFodderSaves.bind(window.fodderSaves,window.fodderInput);
+      window.fodderCheckpointUI=checkpointUI;
+      const physical = OpenFodderTouch.mount(window.fodderInput, canvas);
+      phoneShell?.connect(window.fodderInput, physical);
+      missionUI = OpenFodderMission.mount(window.fodderInput, phoneShell);
+      setupInputHarness(window.fodderInput);
+      runtimeReady = true;
+      log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
+      ready();
+    } catch(error) { fail(`Could not prepare the preview: ${error.message}. Reload to retry.`); }
   },
   onGameStatus(state, cheats) {
     document.body.dataset.gameState = state;
@@ -97,6 +107,7 @@ const metadataReady = Promise.all([
   document.getElementById('identity').textContent = `Build ${info.commit.slice(0, 12)}${info.dirty ? ' *' : ''}`;
   document.getElementById('identity').title = `jbbejena/openfodder · ${info.commit}${info.dirty ? ' (local changes)' : ''}`;
   document.getElementById('build-details').textContent = JSON.stringify(info, null, 2);
+  return {info,content};
 }).catch(error => { fail(error.message); throw error; });
 
 async function checkFile(data, entry) {

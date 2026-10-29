@@ -4,7 +4,8 @@ The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004)
 and [touch commands/camera](TOUCH_CONTROLS.md) (MOB-005/006). The [command API](INPUT_API.md)
 and squad/Move/Fire/secondary/Pan/Follow controls plus the [phone shell/HUD](PHONE_LAYOUT.md)
 (MOB-007) and [mission flow](MISSION_FLOW.md) (MOB-008) are implemented. An unmodified
-mission reached defeat through emulated touch; actual iPhone acceptance remains pending.
+mission reached defeat through emulated touch. MOB-009 adds [mission-start
+checkpoint persistence](CHECKPOINTS.md); actual iPhone acceptance remains pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
 
@@ -33,7 +34,8 @@ python3 -m http.server 8080 --directory build-web/cmake/dist
 Open `http://localhost:8080/`. `file://` is unsupported. Use HTTPS for a hosted
 preview; localhost is a secure context for the pack's SHA-256 verification.
 The output entry point is `index.html`, with `index.js`, `index.wasm`, `index.data`,
-`bootstrap.js`, `engine-bridge.js`, `touch-controls.js`, `input-harness.js`,
+`bootstrap.js`, `engine-bridge.js`, `touch-controls.js`, `phone-shell.js`,
+`mission-flow.js`, `checkpoints.js`, `input-harness.js`,
 `style.css`, `content-manifest.json`, `build-info.json`,
 `source.zip`, `SOURCE.txt`, and `notices/`. Serve Wasm as `application/wasm`.
 No pthreads, cross-origin isolation headers or external asset services are needed.
@@ -78,8 +80,9 @@ allowing startup; there are no Site credentials/cookies on those public requests
 A failed or timed-out download can be retried; partial data cannot start the game.
 No ZIP, Files-app selection, Git, terminal or compiler is needed on the phone.
 
-Cold runtime files are about **2.9 MB**, plus **223 KB** of demo content: roughly
-**3.1 MB before compression**. The roughly 1.8 MB source archive is an optional
+Cold top-level runtime/support files are **3,021,095 bytes**, plus **223,382 bytes**
+of demo content: roughly **3.24 MB before compression** at `f4696c53ccfa`.
+The **1,913,121-byte** source archive is an optional
 separate download, not required to start. These sizes describe the selected two-
 mission demo; the full retail campaign is not bundled or measured.
 
@@ -109,8 +112,9 @@ Select that file in the preview, choose **Start game**, select a mission, read
 its objectives, then **Deploy mission**. The importer
 checks every path/size/SHA-256 before writing anything into the in-memory filesystem.
 It accepts only the selected pack, not arbitrary scripts or retail content.
-No pack data leaves the browser, and reload clears the imported data and saves.
-This is not the later browser checkpoint/persistence implementation.
+No pack data leaves the browser. Reload clears imported game content and the
+current battlefield; explicit [confirmed checkpoints](CHECKPOINTS.md) persist
+separately in this browser's storage. Load the verified demo again before Continue.
 
 Normal play uses `cheats=false`. The optional Diagnostics checkbox explicitly
 passes `--cheats` for that launch; the engine reports the resulting value in the
@@ -178,19 +182,22 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 9, fork build `7ec50c315b0e98d3ca6b8247b604e47f8bfb645c`.
-The mission build passed local and anonymous hosted actual-engine touch emulation:
-menu/briefing, unmodified defeat, retry, pause/resume, abort and return to menu.
-Local-only goal fixtures checked victory/continuation, not an unmodified combat
-victory. [The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fmission-flow)
-provide the focused web CI and downloadable artifact for its final handoff.
-Source/notices remain included; no game assets are hosted. Emscripten-only
-C++ changes add the mission state machine and validated transition commands. The Windows
-scope classifier returns `native: false`; its compiler matrix skips. Linux's
-existing Source-path check still runs. CMake, pins and workflows are unchanged.
-[The mission record](test-runs/mission-flow.md) contains exact hosting identity,
-sizes, commands and remaining checks. Prior Phase 1/bridge/touch records remain
-historical evidence for those builds.
+Sites version 10, fork build `f4696c53ccfab5faea024ff221c5052b7f2a8496`.
+MOB-009 adds explicit briefing Save/Continue, validated native restore, two-slot
+IDBFS persistence and backup export/import. Local/public actual-engine Chromium
+checks passed real browser close/reopen, invalid imports, failed writes, denied
+storage and previous-save recovery. A local goal fixture additionally preserved
+returning recruits across reopening and deployment. Mission/layout regressions
+passed, including unmodified defeat/retry/abort and local-only goal fixtures for
+victory/continuation; fixtures are not unmodified victories.
+[The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fbrowser-saves)
+provide focused CI/artifact links. Source/notices remain included; no game assets,
+profiles or player saves are hosted. C++ changes and new IDBFS linker flags are
+Emscripten-only; the Windows classifier returns `native: false`. Linux's existing
+Source-path check still runs. Pins and workflows are unchanged.
+[The checkpoint record](test-runs/checkpoints.md) contains exact public QA,
+hosting identity, sizes and remaining checks. Prior records remain historical
+evidence for their builds. Actual iPhone Safari remains NOT RUN.
 
 ## Actual iPhone Safari checkpoint — NOT RUN
 
@@ -229,5 +236,25 @@ Record actual cutout/home-indicator clearance, browser-bar changes and aim after
 rotating back. These real-device checks have **not run**. In Guide, try
 **Abort mission → Confirm abort**, check the distinct aborted result, then Retry
 and Return to menu. [Mission semantics](MISSION_FLOW.md) explain fresh-recruit
-replay and the lack of persistent checkpoints. Persistence is the next task,
-MOB-009; it is not implemented by these menu controls.
+replay and [checkpoint limits](CHECKPOINTS.md). Checkpoints are available at a
+briefing; the current battlefield cannot be saved.
+
+## Try mission checkpoints — actual iPhone NOT RUN
+
+1. In Safari open the public URL and verify **`f4696c53ccfa`**. Record model/iOS.
+   Load demo → wait for 20 verified files → Start game → choose mission 1.
+2. At its briefing tap **Save checkpoint**. Wait for **Saved checkpoint** before
+   closing the tab. Reopen the same URL in the same Safari browser/profile.
+3. Load demo again → Start game → **Continue**. Confirm the saved mission briefing,
+   then Deploy and check the battlefield. This restarts the mission, not the battle
+   position. No account sign-in or computer is needed.
+4. Save a different mission briefing, return to menu and try **Use previous
+   checkpoint**. Check that it restores the earlier mission without overwriting
+   the latest save. Try Export backup and Import backup through Safari/Files;
+   confirm a malformed file reports failure while Continue still works.
+
+**These physical-device steps have not run.** Chromium close/reopen evidence does
+not establish Safari storage durability, Files behavior, private-mode behavior
+or browser eviction recovery. Keep an exported backup; use one game tab per
+origin. Backgrounding/audio recovery remains MOB-010 and sustained phone
+performance remains MOB-011.

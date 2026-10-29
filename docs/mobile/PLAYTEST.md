@@ -35,7 +35,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `1de52e57c4c1`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `d3edef36fc52`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — current Chromium/SwiftShader screenshot + composited-pixel checks; see MOB-010 correction |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
@@ -77,10 +77,10 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | L02 | Background while firing; held input is released | Local/public Chrome real focus loss released fire synchronously; return required tap. Actual Safari/physical touch NOT RUN |
 | L03 | A user-paused game remains paused through background/foreground transitions | Local/public Chrome composed user/Guide/lifecycle pause passed; synthetic portrait interruption retained its own pause. Actual Safari NOT RUN |
 | L04 | Interrupt/resume supported audio through normal user interaction without duplicate loops | Not run / unsupported: web build forces null audio backend despite included sound data; audible recovery not implemented or claimed |
-| P01 | Record cold/warm load time, artifact/data size and renderer identity | Not run |
-| P02 | Record sustained frame pacing during at least ten minutes or the full mission if longer | Not run |
-| P03 | Simulation/weapon timing remains correct across render rates | Not run |
-| P04 | Repeated retry/menu/mission transitions show no unbounded memory/handler growth | Not run |
+| P01 | Record cold/warm load time, artifact/data size and renderer identity | [Desktop first/reload observations, sizes and renderer](test-runs/performance.md); QA disables HTTP cache, so verified cold/warm and actual Safari NOT RUN |
+| P02 | Record sustained frame pacing during at least ten minutes or the full mission if longer | Optional recorder/export implemented; short desktop submission/RAF observations only. Ten-minute on-device session and rendered-FPS target NOT RUN |
+| P03 | Simulation/weapon timing remains correct across render rates | Clock/pacing unchanged; desktop callbacks advanced zero/one tick each. Cross-refresh weapon/phone check NOT RUN |
+| P04 | Repeated retry/menu/mission transitions show no unbounded memory/handler growth | Five short desktop recording/restart cycles: one start/stop each, bounded rows, stable Wasm capacity. Used memory/long-term leaks and actual Safari NOT RUN |
 | R01 | Accepted candidate has reproducible source/content revisions and linked evidence | Not run |
 | R02 | Source/notices and data terms match what is actually distributed | Not run |
 

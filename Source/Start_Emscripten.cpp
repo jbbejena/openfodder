@@ -23,6 +23,7 @@
 #ifdef EMSCRIPTEN
 #include "stdafx.hpp"
 #include "WebInput.hpp"
+#include "WebPerformance.hpp"
 #include "Utils/json.hpp"
 #include <set>
 
@@ -167,6 +168,7 @@ void finish(int phaseResult) {
 
 void web_loop() {
     auto& e = *g_Fodder;
+    WebPerformance::Observe();
     // Keep the normal clock/pacing unchanged. A suspended page does no engine
     // work; resuming schedules one ordinary callback, never elapsed-time debt.
     if (WebInput::LifecyclePaused()) return;

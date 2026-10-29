@@ -58,9 +58,13 @@ def main():
         'sdl': '3.2.22', 'cmake': '3.31.6', 'ninja': '1.11.1',
         'content': 'Christmas Special from pinned upstream or local files; no game assets hosted',
     }
-    write(DIST / 'build-info.json', (json.dumps(metadata, indent=2) + '\n').encode())
-    for name in ['content-manifest.json', 'bootstrap.js', 'style.css', 'engine-bridge.js', 'lifecycle.js', 'touch-controls.js', 'phone-shell.js', 'mission-flow.js', 'checkpoints.js', 'input-harness.js']:
+    for name in ['content-manifest.json', 'bootstrap.js', 'style.css', 'engine-bridge.js', 'lifecycle.js', 'touch-controls.js', 'phone-shell.js', 'mission-flow.js', 'checkpoints.js', 'performance.js', 'input-harness.js']:
         write(DIST / name, (ROOT / 'web' / name).read_bytes())
+    # Logical uncompressed runtime bytes; no transfer/cache or RAM claim. The
+    # self-describing metadata, matching source and notices are separate.
+    metadata['runtime_files_bytes'] = {p.name: p.stat().st_size for p in sorted(DIST.iterdir())
+        if p.is_file() and p.suffix in {'.html', '.js', '.wasm', '.data', '.css'}}
+    write(DIST / 'build-info.json', (json.dumps(metadata, indent=2) + '\n').encode())
     # Always distribute the complete engine/scripts source used, including dirty
     # working files during local development. Exact committed builds say dirty=false.
     with zipfile.ZipFile(DIST / 'source.zip', 'w', zipfile.ZIP_DEFLATED) as archive:

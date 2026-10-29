@@ -23,15 +23,15 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | --- | --- | --- | --- | --- | --- |
 | MOB-001 | M1 | done | None | Codex / `build/mobile-phase-1` | [Baseline](BUILD_BASELINE.md) |
 | MOB-002 | M1 | done | MOB-001 | Codex / `build/mobile-phase-1` | `570be27`, tested at `291de61`; [build](BUILD.md), [clean/incremental + desktop results](test-runs/phase-1.md) |
-| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `1de52e5`: current public preview with direct upstream loading and verified rendered battlefield; [MOB-010 record/correction](test-runs/lifecycle.md). B05 not run: no real iPhone |
+| MOB-003 | M1 | blocked | MOB-002 | Codex / `web/iphone-file-import` follow-up | `d3edef3`: current public preview with direct upstream loading, verified battlefield and [optional recorder](PERFORMANCE.md); [desktop evidence](test-runs/performance.md). B05 not run: no real iPhone |
 | MOB-004 | M2 | done | MOB-002 | Codex / `mobile/command-bridge`, from `47e956d` | `d755c60`: [API contract](INPUT_API.md), [actual-engine DPR 1/2 + hosted checks](test-runs/command-bridge.md), [merged PR #3](https://github.com/jbbejena/openfodder/pull/3). B05/M1 still unpassed. |
 | MOB-005 | M2 | done | MOB-004 | Codex / `mobile/touch-command-modes`, from `6afde21` | `1dd9a2c` + `7809755`: [control map](TOUCH_CONTROLS.md), [actual-engine emulated touch + desktop evidence](test-runs/touch-commands.md), [merged PR #5](https://github.com/jbbejena/openfodder/pull/5). Actual iPhone and M2 remain unpassed. |
 | MOB-006 | M2 | done | MOB-004, MOB-005 | Codex / `mobile/touch-camera`, from `ec0497a` | `c0dc737` + `1384e4f`: [camera rules](TOUCH_CONTROLS.md), [local/hosted actual-engine emulation at DPR 1/2](test-runs/touch-camera.md), [merged PR #6](https://github.com/jbbejena/openfodder/pull/6). Actual iPhone remains not run. |
 | MOB-007 | M2 | blocked | MOB-004 | Codex / `mobile/phone-layout`, from `15b5ff1` | `ecdf558`: [shell/control map](PHONE_LAYOUT.md), [local/public layout and regression evidence](test-runs/phone-layout.md), [merged PR #7](https://github.com/jbbejena/openfodder/pull/7). Implementation complete; actual iPhone landscape/cutout/browser-bar acceptance NOT RUN |
 | MOB-008 | M2 | blocked | MOB-005, MOB-006, MOB-007 | Codex / `mobile/mission-flow`, from `7e6b537` | `7ec50c3`: [flow/API semantics](MISSION_FLOW.md), [local/public actual-engine checks](test-runs/mission-flow.md), [merged PR #8](https://github.com/jbbejena/openfodder/pull/8). Implementation and emulated touch defeat/retry/abort/menu passed; actual iPhone mission flow and inherited MOB-007 device acceptance NOT RUN |
 | MOB-009 | M3 | done | MOB-002, MOB-008 | Codex / `mobile/browser-saves`, from `86c7031` | `f4696c5`: [native audit/semantics](CHECKPOINTS.md), [actual Chromium IDBFS close/reopen, recruit round-trip and error/recovery checks](test-runs/checkpoints.md), [merged PR #9](https://github.com/jbbejena/openfodder/pull/9). Desktop deliverables complete; actual iPhone storage durability NOT RUN. Inherited phone gates/M3 remain unpassed |
-| MOB-010 | M3 | blocked | MOB-004, MOB-008 | Codex / `mobile/browser-lifecycle`, from `965b90f` | `1de52e5`: [policy/audio audit](LIFECYCLE.md), [local/public focus/cache/pixel evidence](test-runs/lifecycle.md), [draft branch PR](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fbrowser-lifecycle). Lifecycle implementation complete on desktop; actual Safari/OS interruption and audible-audio acceptance remain open (null backend retained). M3 remains unpassed |
-| MOB-011 | M3 | pending | MOB-008, MOB-010 | Unclaimed | — |
+| MOB-010 | M3 | blocked | MOB-004, MOB-008 | Codex / `mobile/browser-lifecycle`, from `965b90f` | `1de52e5`: [policy/audio audit](LIFECYCLE.md), [local/public focus/cache/pixel evidence](test-runs/lifecycle.md), [merged PR #10](https://github.com/jbbejena/openfodder/pull/10). Lifecycle implementation complete on desktop; actual Safari/OS interruption and audible-audio acceptance remain open (null backend retained). M3 remains unpassed |
+| MOB-011 | M3 | blocked | MOB-008, MOB-010 | Codex / `mobile/performance`, from `9daff60` | `d3edef3`: [recorder/phone steps](PERFORMANCE.md), [local/public desktop measurements and restart/export checks](test-runs/performance.md). Implementation delivered independently with user authorization; ten-minute actual Safari, displayed-FPS target, cold/warm/heat/response NOT RUN. M3 unpassed |
 | MOB-012 | M4 | pending | MOB-003, MOB-008, MOB-009, MOB-010, MOB-011 | Unclaimed | — |
 | MOB-013 | M4 | pending | MOB-012 | Unclaimed | — |
 | MOB-014 | M5 | deferred | MOB-013 | Unclaimed | — |
@@ -280,6 +280,16 @@ Measure cold/warm load, frame pacing, memory and responsiveness using the select
 - Simulation speed and weapon behavior do not depend on display refresh rate or a frame cap.
 - The target is measured or explicitly reported unmet; a cloud renderer failure is not an iPhone performance result.
 - No repeated mission restarts cause unbounded growth or duplicate event/audio handlers in the observed session.
+
+MOB-011 implementation record (2026-10-29): `d641978` native observer, `8503b17`
+Guide/JSON/loading/size metadata, `60d56c5` frozen reports, `d3edef3` anonymous-host
+QA correction. Pinned builds, 52 Node cases, clean source/asset guard and actual-
+Wasm local/public recorder checks passed. Five restart cycles and short desktop
+observations are [recorded separately](test-runs/performance.md). Sites v13
+identifies `d3edef36fc52`; no game assets uploaded. Local Windows scope is
+`native:false`; observed final CI/artifact links belong in the draft branch PR.
+Actual ten-minute/cold-warm phone performance and inherited device gates remain
+blocked; no timing, scale, touch, weapon, force, audio or H Hour change.
 
 ## MOB-012: Run the complete mobile acceptance pass
 

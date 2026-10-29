@@ -81,9 +81,9 @@ allowing startup; there are no Site credentials/cookies on those public requests
 A failed or timed-out download can be retried; partial data cannot start the game.
 No ZIP, Files-app selection, Git, terminal or compiler is needed on the phone.
 
-Cold top-level runtime/support files are **3,027,663 bytes**, plus **223,382 bytes**
-of demo content: roughly **3.25 MB before compression** at `1de52e57c4c1`.
-The **1,932,326-byte** source archive is an optional
+Core runtime/support files are **3,048,057 bytes**, plus **223,382 bytes**
+of demo content: roughly **3.27 MB before compression**, plus small JSON metadata,
+at `d3edef36fc52`. The **1,959,286-byte** matching source archive is an optional
 separate download, not required to start. These sizes describe the selected two-
 mission demo; the full retail campaign is not bundled or measured.
 
@@ -183,7 +183,10 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 11, fork build `1de52e57c4c185dde254f679209d253af6009c82`.
+Sites version 13, fork build `d3edef36fc529ab051060524516168dc976a53ee`.
+MOB-011 adds **Guide → Performance test** for opt-in submission pacing, Wasm
+capacity and load measurements with a local JSON report. [Desktop observations
+and phone procedure](PERFORMANCE.md); ten-minute Safari performance NOT RUN.
 MOB-010 immediately releases input and pauses on interruptions; returning requires
 an explicit tap and preserves manual/Guide pause. Local/public actual-engine
 Chromium checks passed focus loss, real Back/Forward Cache return, native callback
@@ -200,7 +203,7 @@ snow, troops and sidebar before/after return. See [the correction/evidence](test
 Checkpoint/layout/launcher regressions passed. The checkpoint wrapper ABI/content
 pins are unchanged; this keeps compatible saves. Audio remains explicitly silent:
 `OPENFODDER_NO_MIXER` selects `cSound_Null` even though the pack includes sound files.
-[The draft branch PR/checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fbrowser-lifecycle)
+[The draft branch PR/checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fperformance)
 provide final CI/artifact links. No game assets, profiles or progress exports are
 hosted. C++ changes are Emscripten-only; the Windows scope check returns
 `native:false`; Linux retains its existing native build. Pins/workflows unchanged.
@@ -247,7 +250,7 @@ briefing; the current battlefield cannot be saved.
 
 ## Try mission checkpoints — actual iPhone NOT RUN
 
-1. In Safari open the public URL and verify **`1de52e57c4c1`**. Record model/iOS.
+1. In Safari open the public URL and verify **`d3edef36fc52`**. Record model/iOS.
    Load demo → wait for 20 verified files → Start game → choose mission 1.
 2. At its briefing tap **Save checkpoint**. Wait for **Saved checkpoint** before
    closing the tab. Reopen the same URL in the same Safari browser/profile.
@@ -267,7 +270,7 @@ performance remains MOB-011.
 
 ## Try interruptions — actual iPhone NOT RUN
 
-1. In Safari verify **`1de52e57c4c1`**, load demo, Start → choose mission → Deploy.
+1. In Safari verify **`d3edef36fc52`**, load demo, Start → choose mission → Deploy.
    Confirm a visible snow battlefield, troops and sidebar.
 2. In Fire mode hold aim, then switch apps/tabs or lock/unlock the phone. On return,
    check **Game paused while away**. Firing must have released and combat must
@@ -281,3 +284,13 @@ performance remains MOB-011.
 Record model/iOS, exact build, observed focus/visibility/lock behavior and errors.
 These device checks and audible audio recovery are **NOT RUN**. The preview is
 silent, and sustained phone performance remains MOB-011.
+
+## Record performance — actual iPhone NOT RUN
+
+Open **Guide → Performance test → Record performance**. Play for at least ten
+active minutes, reopen Guide, add observations, then **Stop recording → Export
+report** to save the local JSON. No sign-in or computer is needed. Paused/menu
+time is excluded; export before reload. [Full phone procedure and metric
+limits](PERFORMANCE.md), [separate desktop results](test-runs/performance.md).
+Submitted FPS and WebAssembly capacity do not establish displayed FPS or used
+Safari memory. The engine clock and rendering settings are unchanged.

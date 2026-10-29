@@ -2,6 +2,7 @@
 #ifdef EMSCRIPTEN
 #include "stdafx.hpp"
 #include "WebInput.hpp"
+#include "WebPerformance.hpp"
 #include "Utils/json.hpp"
 
 namespace {
@@ -132,6 +133,7 @@ void PanBy(cFodder& e, int dx, int dy) {
 namespace WebInput {
 Stage GetStage() { return stage; }
 void SetStage(Stage value) {
+    WebPerformance::Break();
     pending.clear();
     if (g_Fodder) Release(*g_Fodder);
     stage = value;
@@ -237,6 +239,7 @@ EMSCRIPTEN_KEEPALIVE int of_web_lifecycle(double rawReasons) {
     if (!std::isfinite(rawReasons) || rawReasons != std::floor(rawReasons) || rawReasons < 0 || rawReasons > 22) return Invalid;
     const int reasons = static_cast<int>(rawReasons);
     if (reasons & ~22) return Invalid;
+    WebPerformance::Break();
     if (g_Fodder && stage != WebInput::Stage::Uninitialized) {
         auto& e = *g_Fodder;
         pauseReasons = BasePauseReasons(e);

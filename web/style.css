@@ -41,6 +41,11 @@ input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--accent); }
 #identity { margin-left: auto; font-family: ui-monospace, SFMono-Regular, monospace; white-space: nowrap; }
 #field-info { display: none; }
 #cheat-tag { color: var(--warning); font-size: .75rem; }
+#performance-badge { color: var(--warning); font: 600 .65rem ui-monospace, monospace; white-space: nowrap; }
+.performance-setting { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0; }
+.performance-setting input, .performance-setting select, .performance-setting textarea { min-height: 44px; max-width: 100%; padding: 8px; font: inherit; font-size: 16px; }
+.performance-setting textarea { width: 100%; }
+.performance-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 #status-region { margin: 12px 0; border-left: 3px solid var(--accent); background: var(--panel); padding: 10px; }
 #status { margin: 0; line-height: 1.4; }
 #status-region.has-error { border-color: var(--error); color: var(--error); }

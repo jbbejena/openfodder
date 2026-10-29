@@ -18,6 +18,21 @@ let started = false;
 let failed = false;
 let importing = false;
 const bootStarted = performance.now();
+// Small bounded startup record, independent of the opt-in combat sampler.
+const loading = { navigationType: performance.getEntriesByType('navigation')[0]?.type || 'unknown',
+  cacheState: 'unknown', runtimeReadyMs: null, startToMenuMs: null, deployments: [], contentAttempts: [] };
+let startAt = null, deployAt = null;
+function contentMeasurement(source) {
+  const at = performance.now();
+  return success => {
+    if (loading.contentAttempts.length === 20) loading.contentAttempts.shift();
+    loading.contentAttempts.push({ source, success, durationMs: performance.now() - at,
+      verifiedLogicalBytes: success && pack ? pack.reduce((sum, f) => sum + f[1].length, 0) : null });
+  };
+}
+document.addEventListener('click', event => {
+  if (event.target.closest?.('#mission-deploy, #mission-retry')) deployAt = performance.now();
+}, true);
 
 function status(message) {
   if (!failed) statusLine.textContent = message;
@@ -64,6 +79,7 @@ var Module = {
       // A storage failure is recoverable; the engine can still play in memory.
       await window.fodderSaves.initialize();
       window.fodderInput = OpenFodderInput.create(Module, canvas);
+      window.fodderPerformance = OpenFodderPerformance.mount(Module, window.fodderInput, phoneShell, info, content, loading);
       checkpointUI=OpenFodderSaves.bind(window.fodderSaves,window.fodderInput);
       window.fodderCheckpointUI=checkpointUI;
       const physical = OpenFodderTouch.mount(window.fodderInput, canvas);
@@ -72,11 +88,18 @@ var Module = {
       missionUI = OpenFodderMission.mount(window.fodderInput, phoneShell);
       setupInputHarness(window.fodderInput);
       runtimeReady = true;
+      loading.runtimeReadyMs = performance.now(); // Navigation start, including storage initialization.
       log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
       ready();
     } catch(error) { fail(`Could not prepare the preview: ${error.message}. Reload to retry.`); }
   },
   onGameStatus(state, cheats) {
+    if (state === 'menu' && startAt !== null && loading.startToMenuMs === null) loading.startToMenuMs = performance.now() - startAt;
+    if (state === 'battlefield' && deployAt !== null) {
+      if (loading.deployments.length === 20) loading.deployments.shift();
+      loading.deployments.push({ durationMs: performance.now() - deployAt, boundary: 'deploy-click-to-battlefield-stage' });
+      deployAt = null;
+    }
     document.body.dataset.gameState = state;
     document.body.dataset.cheats = cheats ? 'on' : 'off';
     document.getElementById('cheat-tag').hidden = !cheats;
@@ -120,6 +143,7 @@ async function checkFile(data, entry) {
 
 loadButton.addEventListener('click', async () => {
   if (failed || started || importing || !runtimeReady) return;
+  const measured = contentMeasurement('upstream-fetch-and-sha256');
   importing = true;
   pack = null;
   updateControls();
@@ -154,6 +178,7 @@ loadButton.addEventListener('click', async () => {
     status(`Could not load the demo: ${reason} Tap Load demo to retry, or choose local files.`);
     log(reason);
   } finally {
+    measured(Boolean(pack));
     clearTimeout(timeout);
     importing = false;
     updateControls();
@@ -164,6 +189,7 @@ filesInput.addEventListener('change', async () => {
   if (failed || started || importing) return;
   const batch = Array.from(filesInput.files);
   if (!batch.length) return;
+  const measured = contentMeasurement('local-file-batch-read-and-sha256');
   pack = null;
   startButton.disabled = true;
   // Snapshot before asynchronous reads so another picker selection cannot change
@@ -197,6 +223,7 @@ filesInput.addEventListener('change', async () => {
       pack = manifest.files.map(entry => [entry.path, localFiles.get(entry.path)]);
       ready();
     }
+    measured(accepted);
     // Clear the picker, not the verified map: subsequent selections add files.
     filesInput.value = '';
     importing = false;
@@ -206,6 +233,7 @@ filesInput.addEventListener('change', async () => {
 
 packInput.addEventListener('change', async () => {
   if (failed || started || importing || !packInput.files.length) return;
+  const measured = contentMeasurement('local-pack-read-and-sha256');
   pack = null;
   startButton.disabled = true;
   importing = true;
@@ -237,12 +265,14 @@ packInput.addEventListener('change', async () => {
     status(`Cannot use this demo pack: ${error.message}`);
     log(error.message);
   } finally {
+    measured(Boolean(pack));
     importing = false;
     updateControls();
   }
 });
 startButton.addEventListener('click', () => {
   if (!runtimeReady || !pack || started || failed || importing) return;
+  startAt = performance.now();
   started = true;
   updateControls();
   try {

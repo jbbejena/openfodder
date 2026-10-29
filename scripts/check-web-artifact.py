@@ -16,10 +16,12 @@ head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root).decode().
 assert info['commit'] == head, 'Stale build identity'
 assert args.allow_dirty or not info['dirty'], 'Publish a committed build, not a dirty tree'
 required = {'index.html', 'index.js', 'index.wasm', 'index.data', 'bootstrap.js',
-            'style.css', 'engine-bridge.js', 'lifecycle.js', 'touch-controls.js', 'phone-shell.js', 'mission-flow.js', 'checkpoints.js', 'input-harness.js', 'build-info.json', 'content-manifest.json', 'source.zip', 'SOURCE.txt'}
+            'style.css', 'engine-bridge.js', 'lifecycle.js', 'touch-controls.js', 'phone-shell.js', 'mission-flow.js', 'checkpoints.js', 'performance.js', 'input-harness.js', 'build-info.json', 'content-manifest.json', 'source.zip', 'SOURCE.txt'}
 assert required == {p.name for p in dist.iterdir() if p.is_file()}, 'Unexpected or missing artifact file'
 assert {p.name for p in dist.iterdir() if p.is_dir()} == {'notices'}
 assert (dist / 'index.wasm').read_bytes()[:4] == b'\0asm'
+assert info['runtime_files_bytes'] == {p.name: p.stat().st_size for p in dist.iterdir()
+    if p.is_file() and p.suffix in {'.html', '.js', '.wasm', '.data', '.css'}}, 'Stale runtime size metadata'
 runtime = root / 'build-web/runtime'
 support = [p for p in runtime.rglob('*') if p.is_file()]
 scripts = subprocess.check_output(['git', 'ls-files'], cwd=root / 'Run/Scripts').decode().splitlines()

@@ -8,7 +8,8 @@ squad/path/weapon/camera routines. The browser remains single-threaded.
 
 MOB-005 adds [touch command modes](TOUCH_CONTROLS.md) and deliberate secondary
 fire to this foundation. MOB-006 adds touch camera gestures and Follow using the same existing
-engine intents. The full phone HUD and mission menus remain MOB-007–008. Vehicles receive `unsupported` rather than an invented order.
+engine intents. MOB-007 adds the [viewport shell/HUD](PHONE_LAYOUT.md) and its independent
+presentation pause. Mission menus remain MOB-008. Vehicles receive `unsupported` rather than an invented order.
 Native mouse/keyboard paths remain in use when the bridge does not own input.
 
 ## JavaScript surface
@@ -27,7 +28,7 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | `secondaryTo({x,y})` / `secondaryAt(clientX,clientY)` | Request one shot with the selected available grenade/rocket; native weapon/projectile rules decide whether it fires |
 | `pan(dx,dy)` | Apply a bounded camera intent in map pixels, at most 128 per axis; clamps to map bounds; cancels held input |
 | `follow()` | Resume the engine's squad-follow camera |
-| `setPaused(boolean, reason='user')` | Set/clear one explicit pause reason: `user`, `visibility`, or `focus` |
+| `setPaused(boolean, reason='user')` | Set/clear one explicit pause reason: `user` (1), `visibility` (2), `focus` (4), or reserved `shell` (8) |
 | `cancel()` | Clear pending physical commands, held fire and native button/control latches; return camera ownership to the engine; preserve pause reasons and already-issued movement/projectiles |
 | `clientToWorld(x,y)` / `worldToClient(x,y)` | Read-only projection for the current canvas/view |
 | `clientDeltaToMap(dx,dy)` | Read-only CSS distance conversion using the contained image scale; returns fractional map pixels or null for missing geometry |
@@ -86,7 +87,9 @@ from a primary-fire hold. Changing squad/leader/weapon, stop/cancel or pause
 releases the request; a committed projectile is never undone.
 
 Pause reasons compose with OR. Setting user pause twice cannot resume the game;
-clearing user pause cannot clear a visibility/focus pause. Native P remains the
+clearing user pause cannot clear a visibility/focus/shell pause. Guide and
+portrait guidance jointly own `shell`; closing either leaves it set while the
+other is open. Native P remains the
 user pause input. The Emscripten loop keeps rendering/yielding/polling SDL while
 paused and skips mission updates; it never enters the native blocking pause loop.
 The harness cancels input on blur, hidden visibility and pagehide. Full automatic
@@ -130,8 +133,8 @@ After selecting the campaign, expand **Control bridge test panel** below the
 canvas. Use the engine map coordinates, squad/weapon buttons, Move, held primary
 fire, camera arrows/follow, Pause/Resume and Cancel. The JSON readout reflects the
 actual engine. Empty squads and unavailable weapons are disabled. The panel is
-not the production touch combat layout. Leave **Touch commands** unchecked for
-the original desktop canvas controls; the checkbox defaults off for a fine
+not the production touch combat layout. Leave **Guide → Touch controls** unchecked
+for the original desktop canvas controls; the checkbox defaults off for a fine
 pointer. Touch devices enable the production controller by default.
 
 ```sh

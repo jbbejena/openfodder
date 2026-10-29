@@ -2,7 +2,8 @@
 
 The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004)
 and [touch commands/camera](TOUCH_CONTROLS.md) (MOB-005/006). The [command API](INPUT_API.md)
-and squad/Move/Fire/secondary/Pan/Follow controls are implemented; a complete phone mission
+and squad/Move/Fire/secondary/Pan/Follow controls plus the [phone shell/HUD](PHONE_LAYOUT.md)
+(MOB-007) are implemented; a complete phone mission
 and actual iPhone acceptance remain pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
@@ -178,13 +179,15 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 6, fork build `1384e4f1809edc1a6d7f24967da46768152033d1`.
-The camera build passed local and anonymous hosted actual-engine emulation at
-DPR 1/2. [The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Ftouch-camera)
+Sites version 7, fork build `ecdf5587ce784a12f22354ec2e5757c3225ddb66`.
+The layout build passed local and anonymous hosted actual-engine emulation at
+DPR 1/2/3. [The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fphone-layout)
 provide the focused web CI and downloadable artifact for its final handoff.
-Source/notices remain included; no game assets are hosted. Native C++/CMake,
-submodules and native workflows are unchanged by this browser-only task.
-[The camera record](test-runs/touch-camera.md) contains exact hosting identity,
+Source/notices remain included; no game assets are hosted. A single Emscripten-only
+C++ validation change admits the independent shell pause reason. The Windows
+scope classifier returns `native: false`; its compiler matrix skips. Linux's
+existing Source-path check still runs. CMake, pins and workflows are unchanged.
+[The layout record](test-runs/phone-layout.md) contains exact hosting identity,
 sizes, commands and remaining checks. Prior Phase 1/bridge/touch records remain
 historical evidence for those builds.
 
@@ -210,10 +213,16 @@ No real iPhone is attached to this environment. To perform B05:
 After the battlefield loads, select the populated squad and tap ground in Move
 mode. Choose Fire, hold/slide on ground, then lift. Add a second finger or move
 outside the battlefield to confirm fire releases. HUD taps must never order troops.
-Touch commands enable automatically for touch devices; desktop can use the checkbox.
-The first demo mission has zero secondary ammo, so Grenade/Rocket stay disabled.
+Touch controls enable automatically for touch devices; desktop can use the
+**Guide → Touch controls** checkbox. The first demo mission has zero secondary
+ammo, so **Weapons → Grenade/Rocket** stay disabled.
 The separate local ammo fixture is not published. [Control map and cancellation
 rules](TOUCH_CONTROLS.md). In Move, put both fingers down before dragging to pan;
 or select Pan and drag one finger. Lift all fingers before a fresh command.
 Follow squad returns the camera. Combat continues while inspecting the map.
-The full landscape phone layout remains the next task.
+The fitted landscape shell keeps controls beside the battlefield. Open **Guide**
+to pause and read controls, then **Back to game** to return; a prior user pause
+stays paused. Rotate to portrait for guidance or choose **Keep playing in portrait**.
+Record actual cutout/home-indicator clearance, browser-bar changes and aim after
+rotating back. These real-device checks have **not run**. Complete touch mission
+menus/retry/abort/results remain MOB-008.

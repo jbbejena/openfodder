@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Open Fodder · Phase 2 camera preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Open Fodder · Mobile field preview</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <strong>OPEN FODDER</strong> <span>Phase 2 · touch camera</span>
+<div id="app">
+  <header id="topbar">
+    <strong>OPEN FODDER</strong><span id="preview-label">Mobile field preview</span>
+    <div id="field-info"><span id="touch-selection"></span><span id="touch-mode"></span></div>
     <span id="identity">Reading build identity…</span>
+    <span id="cheat-tag" hidden>Cheats on</span>
+    <button id="field-guide" aria-haspopup="dialog" hidden>Guide</button>
   </header>
-  <main>
-    <p id="status" role="status" aria-live="polite">Loading browser engine…</p>
+  <main id="main">
+    <section id="status-region" aria-label="Preview status">
+      <p id="status" role="status" aria-live="polite">Loading browser engine…</p>
+      <button id="reload" hidden>Reload game</button>
+    </section>
     <section id="launch" aria-label="Start preview">
       <h1>Play the Christmas demo</h1>
       <p>Load the two-mission demo from its existing upstream GitHub host.
@@ -43,7 +50,7 @@
       <p>Start the game, then tap or click and briefly hold the Christmas Special campaign row.
         On the battlefield, touch commands provide squad selection and Move/Fire modes.
         Use two fingers in Move mode, or one finger in Pan mode, to move the camera.
-        The full phone layout, mission menus and persistent saves are still pending.</p>
+        The field guide explains the controls. Progress is not saved; reloading starts a new game.</p>
       <p><a href="source.zip">Source &amp; build instructions</a> · <a href="SOURCE.txt">Licenses &amp; provenance</a></p>
       <details id="launch-diagnostics">
         <summary>Diagnostics (optional)</summary>
@@ -52,40 +59,54 @@
         <p>Normal play leaves cheat keys off. Audio is disabled in this web baseline.</p>
       </details>
     </section>
-    <section id="touch-commands" aria-label="Touch commands" hidden>
-      <div class="touch-heading">
-        <label><input id="touch-enabled" type="checkbox"> Touch commands</label>
-        <span id="touch-selection">No squad selected</span>
-      </div>
-      <div id="touch-actions" hidden>
-        <div class="touch-row">
-          <div role="group" aria-label="Squad selection">
+    <div id="battle-ui" hidden>
+      <section id="touch-commands" aria-label="Touch commands" hidden>
+        <nav id="squad-rail" class="rail" aria-label="Squads and weapons">
+          <span class="rail-label" id="rail-caption">SQUADS</span>
+          <div id="squad-buttons" class="rail-group" role="group" aria-label="Squad selection">
             <button data-touch-squad="0" aria-pressed="false">Squad 1</button>
             <button data-touch-squad="1" aria-pressed="false">Squad 2</button>
             <button data-touch-squad="2" aria-pressed="false">Squad 3</button>
           </div>
-          <div role="group" aria-label="Command mode">
-            <button data-touch-mode="move" aria-pressed="true">Move</button>
-            <button data-touch-mode="fire" aria-pressed="false">Fire</button>
-            <button data-touch-mode="pan" aria-pressed="false">Pan</button>
+          <div id="weapon-buttons" class="rail-group" role="group" aria-label="Secondary weapons" hidden>
             <button data-touch-mode="grenade" aria-pressed="false">Grenade</button>
             <button data-touch-mode="rocket" aria-pressed="false">Rocket</button>
           </div>
-          <button id="touch-confirm" hidden>Confirm target</button>
-          <button id="touch-cancel">Cancel</button>
-          <button id="touch-follow">Follow squad</button>
-        </div>
+          <button id="touch-weapons" aria-controls="weapon-buttons" aria-expanded="false">Weapons</button>
+        </nav>
+        <nav id="action-rail" class="rail" aria-label="Battlefield actions">
+          <div class="rail-group" role="group" aria-label="Command mode">
+            <button data-touch-mode="move" aria-pressed="true">Move</button>
+            <button data-touch-mode="fire" aria-pressed="false">Fire</button>
+            <button data-touch-mode="pan" aria-pressed="false">Pan</button>
+          </div>
+          <div class="rail-group contextual-actions">
+            <button id="touch-cancel">Cancel</button>
+            <button id="touch-follow" aria-label="Follow squad">Follow</button>
+            <button id="touch-confirm" hidden>Confirm target</button>
+          </div>
+        </nav>
         <p id="touch-feedback" role="status" aria-live="polite">Tap ground to move.</p>
+      </section>
+      <div id="playfield">
+        <canvas id="canvas" width="960" height="600" tabindex="0" aria-label="Open Fodder game"></canvas>
+        <span id="touch-target" aria-hidden="true" hidden></span>
       </div>
-    </section>
-    <div id="playfield">
-      <canvas id="canvas" width="960" height="600" tabindex="0" aria-label="Open Fodder game"></canvas>
-      <span id="touch-target" aria-hidden="true" hidden></span>
+      <p id="scene-feedback">Choose the Christmas Special campaign.</p>
+      <section id="portrait-guide" aria-labelledby="portrait-title" hidden>
+        <div class="orientation-mark" aria-hidden="true">↻</div>
+        <h1 id="portrait-title">Turn for a wider battlefield</h1>
+        <p>Landscape leaves more room for the map and your controls.</p>
+        <p>The game is paused while this screen is shown.</p>
+        <button id="keep-portrait">Keep playing in portrait</button>
+      </section>
     </div>
+  </main>
+  <aside id="debug-dock" aria-label="Optional input diagnostics">
     <details id="input-harness" hidden>
       <summary>Control bridge test panel</summary>
       <p>Development controls for MOB-004. Map coordinates come from the engine.
-        Touch commands above the battlefield provide the normal combat interface. Fire here uses the primary weapon;
+        Touch controls around the battlefield provide the normal combat interface. Fire here uses the primary weapon;
         grenade/rocket buttons select the secondary weapon only.</p>
       <div class="input-row" aria-label="Select squad">
         <button data-squad="0">Squad 1</button><button data-squad="1">Squad 2</button><button data-squad="2">Squad 3</button>
@@ -109,15 +130,35 @@
       <p id="input-result" role="status" aria-live="polite">No bridge command sent.</p>
       <pre id="input-state" aria-label="Engine control state"></pre>
     </details>
+  </aside>
+  <dialog id="field-dialog" aria-labelledby="guide-title">
+    <header class="dialog-heading">
+      <h2 id="guide-title">Field guide</h2>
+      <button id="close-guide" autofocus>Back to game</button>
+    </header>
+    <div class="dialog-scroll">
+      <p>Reading the guide pauses combat. Closing it returns to your previous pause state.</p>
+      <div class="guide-controls">
+        <p><strong>Move</strong> — tap ground. <strong>Fire</strong> — hold, slide to aim, lift to stop.</p>
+        <p><strong>Camera</strong> — use two fingers in Move, or choose Pan and drag one. Lift all fingers before a new command. Follow squad brings the camera back.</p>
+        <p><strong>Weapons</strong> — choose a grenade or rocket, mark ground, then confirm. Cancel clears the target. Buttons show engine ammo and disable at zero.</p>
+      </div>
+      <label class="setting"><input id="touch-enabled" type="checkbox"> Touch controls</label>
+      <p>Turn touch controls off for the original mouse and keyboard controls.</p>
+      <p class="save-note">Progress is not saved. Reloading starts a new game. Audio is off in this preview.</p>
+      <p><a href="source.zip">Source &amp; build instructions</a> · <a href="SOURCE.txt">Licenses &amp; provenance</a></p>
     <details id="diagnostics">
       <summary>Build details &amp; log</summary>
       <pre id="build-details"></pre>
       <pre id="log" aria-label="Runtime log"></pre>
     </details>
-  </main>
+    </div>
+  </dialog>
+</div>
   <script src="engine-bridge.js"></script>
   <script src="touch-controls.js"></script>
   <script src="input-harness.js"></script>
+  <script src="phone-shell.js"></script>
   <script src="bootstrap.js"></script>
   {{{ SCRIPT }}}
 </body>

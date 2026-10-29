@@ -3,16 +3,16 @@
 The existing C++/SDL engine owns soldiers, movement, targeting, weapons and ammo.
 The browser provides one pointer controller in `web/touch-controls.js`, using
 the [engine command boundary](INPUT_API.md). MOB-006 adds camera gestures and
-Follow squad. The full landscape phone layout and complete touch menus remain
-MOB-007–008. Real iPhone Safari acceptance and a complete touch-only mission
+Follow squad. MOB-007 adds the [landscape shell and control rails](PHONE_LAYOUT.md).
+Complete touch menus remain MOB-008. Real iPhone Safari acceptance and a complete touch-only mission
 have **not run**.
 
 ## Play this build
 
 Load demo → Start game → briefly hold the Christmas Special campaign row.
-The touch toolbar appears on the battlefield. Touch commands default on with a
+The touch rails appear on the battlefield. Touch commands default on with a
 coarse pointer; the first battlefield touch also enables them on a hybrid device.
-On desktop, check **Touch commands** to try the same loop with a mouse. Uncheck
+On desktop, open **Guide** and check **Touch controls** to try the same loop with a mouse. Uncheck
 it to use the original SDL mouse/keyboard controls.
 
 - Select a populated squad. The highlighted button and soldier count come from
@@ -23,8 +23,8 @@ it to use the original SDL mouse/keyboard controls.
   down before dragging to pan instead.
 - **Fire:** hold ground to use primary fire, slide to aim, and lift to stop.
   Choosing Fire does not consume secondary ammo or change combat timing.
-- **Grenade / Rocket:** choose an available weapon, tap a target, then tap
-  **Throw grenade / Launch rocket**. The marker shows the world target.
+- **Grenade / Rocket:** open **Weapons**, choose an available weapon, tap a target,
+  then tap **Throw / Launch**. The marker shows the world target.
   Marking alone spends nothing. Confirmation requests one native shot and
   returns to Move. Choose the weapon again for another shot.
 - **Pan:** drag one finger to inspect the map without a combat command.

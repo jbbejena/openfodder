@@ -8,6 +8,7 @@ const filesInput = document.getElementById('demo-files');
 const fileProgress = document.getElementById('file-progress');
 const localFiles = new Map();
 const canvas = document.getElementById('canvas');
+let phoneShell = null;
 let runtimeReady = false;
 let pack = null;
 let manifest;
@@ -23,6 +24,9 @@ function fail(message) {
   failed = true;
   statusLine.classList.add('error');
   statusLine.textContent = message;
+  document.getElementById('status-region').classList.add('has-error');
+  document.getElementById('reload').hidden = false;
+  phoneShell?.setError();
   updateControls();
 }
 function log(message) {
@@ -52,7 +56,8 @@ var Module = {
   onRuntimeInitialized() {
     runtimeReady = true;
     window.fodderInput = OpenFodderInput.create(Module, canvas);
-    OpenFodderTouch.mount(window.fodderInput, canvas);
+    const physical = OpenFodderTouch.mount(window.fodderInput, canvas);
+    phoneShell?.connect(window.fodderInput, physical);
     setupInputHarness(window.fodderInput);
     log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
     ready();
@@ -60,6 +65,8 @@ var Module = {
   onGameStatus(state, cheats) {
     document.body.dataset.gameState = state;
     document.body.dataset.cheats = cheats ? 'on' : 'off';
+    document.getElementById('cheat-tag').hidden = !cheats;
+    phoneShell?.setGameState(state);
     status(`${state === 'menu' ? 'Campaign menu' : state === 'battlefield' ? 'Battlefield loaded' : 'Starting game'} · cheats ${cheats ? 'ON (diagnostic)' : 'off'} · audio disabled`);
     log(`Engine state: ${state}; cheats=${Boolean(cheats)}`);
   }
@@ -71,16 +78,20 @@ canvas.addEventListener('webglcontextlost', event => {
   fail('The graphics context was lost. Reload to restart; this preview does not save a battlefield.');
 });
 canvas.addEventListener('contextmenu', event => event.preventDefault());
+document.getElementById('reload').addEventListener('click', () => window.location.reload());
 setTimeout(() => {
   if (!runtimeReady && !failed) fail('Engine loading timed out after 90 seconds. Check your connection, allow WebAssembly/WebGL, and reload.');
 }, 90000);
+try { phoneShell = OpenFodderShell.mount(canvas); }
+catch (error) { fail(`Could not prepare the game screen: ${error.message}. Reload to retry.`); }
 
 const metadataReady = Promise.all([
   fetch('build-info.json').then(r => { if (!r.ok) throw Error('Missing build identity'); return r.json(); }),
   fetch('content-manifest.json').then(r => { if (!r.ok) throw Error('Missing content manifest'); return r.json(); })
 ]).then(([info, content]) => {
   manifest = content;
-  document.getElementById('identity').textContent = `jbbejena/openfodder · ${info.commit.slice(0, 12)}${info.dirty ? ' (local changes)' : ''}`;
+  document.getElementById('identity').textContent = `Build ${info.commit.slice(0, 12)}${info.dirty ? ' *' : ''}`;
+  document.getElementById('identity').title = `jbbejena/openfodder · ${info.commit}${info.dirty ? ' (local changes)' : ''}`;
   document.getElementById('build-details').textContent = JSON.stringify(info, null, 2);
 }).catch(error => { fail(error.message); throw error; });
 
@@ -225,7 +236,8 @@ startButton.addEventListener('click', () => {
     const args = document.getElementById('cheats').checked ? ['--cheats'] : [];
     document.getElementById('launch').hidden = true;
     canvas.classList.add('running');
-    canvas.focus();
+    phoneShell.start();
+    canvas.focus({ preventScroll: true });
     Module.callMain(args);
     pack = null;
     localFiles.clear();

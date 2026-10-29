@@ -42,13 +42,14 @@ function setupInputHarness(bridge) {
   fire.addEventListener('keyup', event => {
     if (event.code === 'Space' || event.code === 'Enter') { event.preventDefault(); report(bridge.fireStop()); }
   });
-  function cancel() { heldPointer = null; bridge.cancel(); }
+  function cancel() { heldPointer = null; if (document.body.dataset.runtimeError !== 'true') bridge.cancel(); }
   enabled.addEventListener('change', () => { if (!enabled.checked) cancel(); refresh(); });
   panel.addEventListener('toggle', () => { if (!panel.open) cancel(); });
   window.addEventListener('blur', cancel);
   window.addEventListener('pagehide', cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });
   function refresh() {
+    if (document.body.dataset.runtimeError === 'true') return;
     const state = bridge.state();
     panel.hidden = !enabled.checked || state.stage !== 'battlefield';
     if (panel.hidden) return;

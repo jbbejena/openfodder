@@ -13,7 +13,12 @@ const assertWebFrame=require('./assert-web-frame.cjs');
   const page=await context.newPage(),errors=[],boundary=[],requests=[];page.setDefaultTimeout(30000);
   page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>requests.push({method:r.method(),host:new URL(r.url()).hostname}));
-  await page.route('**/*',route=>{const r=route.request();if(r.method()!=='GET'||Object.keys(r.headers()).some(k=>/^(authorization|oai-sites-authorization)$/i.test(k)))boundary.push(r.url());return route.continue();});
+  await page.route('**/*',async route=>{
+    const r=route.request(),headers=await r.allHeaders(),upstream=new URL(r.url()).hostname==='raw.githubusercontent.com';
+    if(r.method()!=='GET'||Object.keys(headers).some(k=>/^(authorization|oai-sites-authorization)$/i.test(k))||
+      (upstream&&Object.keys(headers).some(k=>/^cookie$/i.test(k))))boundary.push(r.url());
+    return route.continue();
+  });
   const results={url,browser:browser.version(),input:'desktop Chromium emulated touch, SwiftShader',
     iphoneSafari:'NOT RUN',tenMinutePhoneSession:'NOT RUN',checks:{},cycles:[]};
   const tap=id=>page.locator(id).tap(),state=()=>page.evaluate(()=>fodderInput.state());
@@ -30,6 +35,7 @@ const assertWebFrame=require('./assert-web-frame.cjs');
   async function deploy(){await tap('[data-mission="1"]');await tap('#mission-deploy');await ready();}
   async function abort(){await guide();await tap('#mission-abort');await tap('#confirm-abort');await page.waitForFunction(()=>fodderInput.state().stage==='result');assert.equal((await state()).mission.result.outcome,'aborted');}
   try{
+    assert.equal((await context.cookies()).length,0,'Fresh anonymous browser context before navigation');
     assert.equal((await page.goto(url)).status(),200);await load();
     const info=await page.evaluate(()=>fetch('build-info.json').then(r=>r.json()));results.commit=info.commit;results.dirty=info.dirty;
     if(expected){assert.equal(info.commit,expected);assert.equal(info.dirty,false);}
@@ -104,7 +110,10 @@ const assertWebFrame=require('./assert-web-frame.cjs');
     await page.reload();await load();await deploy();await record();await page.waitForTimeout(1600);await guide();await tap('#performance-stop');
     results.repeat=await page.evaluate(()=>fodderPerformance.report());
     assert.equal(results.repeat.loading.navigationType,'reload');assert.equal(results.repeat.loading.cacheState,'unknown');
-    assert.deepEqual(errors,[]);assert.deepEqual(boundary,[]);assert.deepEqual(await context.cookies(),[]);
+    assert.deepEqual(errors,[]);assert.deepEqual(boundary,[]);
+    // A public host can issue anonymous visitor/bot-management cookies. Their
+    // presence does not imply login. Never print or export their values.
+    assert.equal((await context.cookies('https://raw.githubusercontent.com')).length,0,'No upstream cookies');
     results.upstreamRequests=requests.filter(r=>r.host==='raw.githubusercontent.com').length;
     if(pack==='upstream')assert.equal(results.upstreamRequests,40);
     fs.writeFileSync(path.join(evidence,'performance.json'),JSON.stringify(results,null,2)+'\n');

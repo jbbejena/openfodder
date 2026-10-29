@@ -2,7 +2,7 @@ const {test}=require('node:test'), assert=require('node:assert/strict');
 const {intervals,create}=require('./performance.js');
 
 function fixture() {
-  let time=0,id=0,isActive=true,recording=false,count=0,activeMs=0,capacity=16777216,tick=0,broken=false;
+  let time=0,id=0,isActive=true,recording=false,count=0,activeMs=0,capacity=16777216,tick=0,broken=false,loadMs=100;
   const timers=new Map(),frames=new Map(),calls=[];
   const session=create({
     native(op) {
@@ -17,11 +17,11 @@ function fixture() {
     now:()=>time,isoNow:()=>new Date(time).toISOString(),
     schedule:fn=>{timers.set(++id,fn);return id;},cancel:key=>timers.delete(key),
     requestFrame:fn=>{frames.set(++id,fn);return id;},cancelFrame:key=>frames.delete(key),
-    metadata:()=>({build:{commit:'abc'}}),loading:()=>({runtimeReadyMs:100,cacheState:'unknown'})
+    metadata:()=>({build:{commit:'abc'}}),loading:()=>({runtimeReadyMs:loadMs,cacheState:'unknown'})
   });
   function advance(ms){time+=ms;if(recording&&isActive){activeMs+=ms;count++;tick++;}}
   return {session,timers,frames,calls,advance,
-    active(value){isActive=value;},grow(){capacity*=2;},crash(){broken=true;},
+    active(value){isActive=value;},grow(){capacity*=2;},crash(){broken=true;},changeLoading(){loadMs=200;},
     timer(){const [key,fn]=timers.entries().next().value;timers.delete(key);fn();},
     frame(){const [key,fn]=frames.entries().next().value;frames.delete(key);fn(time);}
   };
@@ -40,7 +40,7 @@ test('recording is opt-in; duplicate starts do not duplicate samplers and stoppi
   assert(f.session.start());assert.equal(f.session.start(),false);assert.equal(f.timers.size,1);assert.equal(f.frames.size,1);
   f.advance(1000);f.timer();assert(f.session.stop());assert.equal(f.session.stop(),false);
   assert.equal(f.timers.size,0);assert.equal(f.frames.size,0);assert.equal(f.session.status().recording,false);
-  const report=f.session.report();f.advance(10000);assert.deepEqual(f.session.report(),report);
+  const report=f.session.report();f.advance(10000);f.changeLoading();assert.deepEqual(f.session.report(),report);
   assert.equal(report.phoneAcceptance.tenMinutesActive,false);assert.match(report.phoneAcceptance.status,/NOT ESTABLISHED/);
 });
 test('animation opportunities exclude pauses and explicit interruption gaps, separately from native submissions',()=>{

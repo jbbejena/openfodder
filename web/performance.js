@@ -73,6 +73,8 @@
       } catch (_) { session.nativeStopUnconfirmed = true; /* Preserve the last good snapshot on runtime failure. */ }
       session.memory.endCapacityBytes = session.native.wasmCapacityBytes;
       session.memory.peakCapacityBytes = Math.max(session.memory.peakCapacityBytes, session.native.wasmCapacityBytes);
+      session.metadata = JSON.parse(JSON.stringify(options.metadata()));
+      session.loading = JSON.parse(JSON.stringify(options.loading()));
       session.recording = false; session.endedAt = isoNow(); session.stopReason = reason;
       session.wallMs = now() - session.origin; clear(); changed(); return true;
     }
@@ -117,7 +119,7 @@
         // Detached copy; no mutable engine state or progress/checkpoint payload.
         const { origin, ...data } = session;
         return JSON.parse(JSON.stringify({ format: 'openfodder-performance', version: 1,
-          metadata: options.metadata(), loading: options.loading(), ...data, animationCallbacks: rafIntervals.snapshot(),
+          metadata: data.metadata || options.metadata(), loading: data.loading || options.loading(), ...data, animationCallbacks: rafIntervals.snapshot(),
           droppedEvents, limits: { samples: MAX_SAMPLES, events: MAX_EVENTS, wallMs: MAX_WALL_MS },
           phoneAcceptance: { status: 'NOT ESTABLISHED BY THIS REPORT', targetRenderedFps: 30,
             requiredActiveMs: TARGET_ACTIVE_MS, recordedActiveMs: data.native.activeMs,
@@ -175,7 +177,11 @@
     });
     start.disabled = false;
     start.addEventListener('click', () => {
-      try { if (session.start(byId('performance-device').value, byId('performance-load').value)) shell.closeGuide(); }
+      try {
+        if (session.start(byId('performance-device').value, byId('performance-load').value)) {
+          byId('performance-notes').value = ''; shell.closeGuide();
+        }
+      }
       catch (error) { session.stop('measurement-error'); status.textContent = `Could not record: ${error.message}`; }
     });
     stop.addEventListener('click', () => { session.notes(byId('performance-notes').value); session.stop(); });

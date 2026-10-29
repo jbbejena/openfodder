@@ -88,7 +88,9 @@ another recording resets the session. Startup retains only the last 20 content
 attempts and 20 deployment timings, independently of recording. Repeated
 pageshow does not install handlers or create another recorder.
 
-Reports use `format: openfodder-performance`, `version: 1`. Export stops the
+Reports use `format: openfodder-performance`, `version: 1`. Stop freezes the
+measurements, identity and loading snapshot; later attempts do not change an
+earlier report. New recording clears the observation field. Export stops the
 session and downloads locally; reload is intentionally not a persistence path.
 Runtime failure stops sampling best-effort and marks `nativeStopUnconfirmed` if
 the native boundary no longer answers. No telemetry service or new dependency.

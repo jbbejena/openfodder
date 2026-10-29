@@ -88,7 +88,7 @@ body.game-running { overflow: hidden; overscroll-behavior: none; }
   max-width: none; margin: 0; display: flex; flex-direction: column; gap: 4px;
   padding: calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px);
 }
-.game-running #topbar { min-height: 44px; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; border: 0; }
+.game-running #topbar { position: relative; z-index: 12; min-height: 44px; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; border: 0; }
 .game-running #topbar strong { font-size: .8rem; letter-spacing: .09em; }
 .game-running #preview-label { display: none; }
 .game-running #field-info { display: flex; flex-direction: column; min-width: 0; font-size: .75rem; line-height: 1.25; }

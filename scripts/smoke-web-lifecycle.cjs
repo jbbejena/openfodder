@@ -77,9 +77,16 @@ const assertWebFrame=require('./assert-web-frame.cjs');
   await page.bringToFront();await page.waitForFunction(()=>fodderLifecycle.state().waiting&&fodderLifecycle.state().canReturn);assert.equal((await state()).fireHeld,false);
   const freezeSignals=await page.evaluate(()=>window.freezeSignals);assert.equal((await state()).engineTick,beforeFreeze);await freezer.close();
   const frozen=(await state()).engineTick;await page.waitForTimeout(300);assert.equal((await state()).engineTick,frozen);await lift();await resume();
-  const ticks=await page.evaluate(async()=>{const ticks=[fodderInput.state().engineTick];for(let i=0;i<12;i++){await new Promise(requestAnimationFrame);ticks.push(fodderInput.state().engineTick);}return ticks;});
-  assert(ticks.every((t,i)=>i===0||t-ticks[i-1]>=0&&t-ticks[i-1]<=1));assert(ticks.at(-1)>ticks[0]);
-  results.checks.freezeAttempt={observed:freezeSignals>0,wasHidden,signals:freezeSignals,result:freezeSignals>0?'Actual Chromium freeze event observed':'CDP request did not establish a real freeze in this automation environment; real freeze NOT RUN',ticks};
+  // The pinned SDL/Emscripten scheduler can run multiple callbacks per display
+  // frame. Observe its actual callback boundary, without changing its cadence.
+  const nativeCallbacks=await page.evaluate(()=>new Promise(resolve=>{
+   const samples=[];let before;
+   const pre=()=>{before=fodderInput.state().engineTick;};
+   const post=()=>{samples.push({before,after:fodderInput.state().engineTick});if(samples.length===15){MainLoop.preMainLoop.splice(MainLoop.preMainLoop.indexOf(pre),1);MainLoop.postMainLoop.splice(MainLoop.postMainLoop.indexOf(post),1);resolve(samples);}};
+   MainLoop.preMainLoop.push(pre);MainLoop.postMainLoop.push(post);
+  }));
+  assert(nativeCallbacks.every(s=>s.after-s.before>=0&&s.after-s.before<=1));assert(nativeCallbacks.some(s=>s.after>s.before));
+  results.checks.freezeAttempt={observed:freezeSignals>0,wasHidden,signals:freezeSignals,result:freezeSignals>0?'Actual Chromium freeze event observed':'CDP request did not establish a real freeze in this automation environment; real freeze NOT RUN',nativeCallbacks};
   // Exercise the lifecycle handlers/native boundary even when automation keeps
   // document.visibilityState visible and prevents a genuine Chromium freeze.
   await fire();const synthetic=await page.evaluate(()=>{document.dispatchEvent(new Event('freeze'));return fodderInput.state();});

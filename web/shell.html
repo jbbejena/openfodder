@@ -13,6 +13,7 @@
     <div id="field-info"><span id="touch-selection"></span><span id="touch-mode"></span></div>
     <span id="identity">Reading build identity…</span>
     <span id="cheat-tag" hidden>Cheats on</span>
+    <span id="performance-badge" hidden aria-label="Performance recording">REC</span>
     <button id="field-guide" aria-haspopup="dialog" hidden>Guide</button>
   </header>
   <main id="main">
@@ -189,6 +190,35 @@
       <p>Turn touch controls off for the original mouse and keyboard controls.</p>
       <p class="save-note">Save a checkpoint at a mission briefing. Reload/Continue starts that mission from its beginning; the current battlefield is not saved. Audio is off.</p>
       <p><a href="source.zip">Source &amp; build instructions</a> · <a href="SOURCE.txt">Licenses &amp; provenance</a></p>
+      <details id="performance-panel">
+        <summary>Performance test (optional)</summary>
+        <p>Record at least ten minutes of active combat. Menu, pause and away time are excluded.
+          This does not change game speed. Frame submissions are measured separately from browser animation callbacks;
+          neither proves displayed FPS. Audio is off.</p>
+        <label class="performance-setting" for="performance-device">Device and OS (optional)
+          <input id="performance-device" type="text" maxlength="120" placeholder="e.g. iPhone 15, iOS version" autocomplete="off">
+        </label>
+        <label class="performance-setting" for="performance-load">This page load
+          <select id="performance-load">
+            <option value="unspecified">Not specified</option>
+            <option value="tester-requested-cold">First visit / cleared cache</option>
+            <option value="tester-requested-repeat">Repeat visit / reload</option>
+          </select>
+        </label>
+        <div class="performance-actions">
+          <button id="performance-start" disabled>Record performance</button>
+          <button id="performance-stop" disabled>Stop recording</button>
+          <button id="performance-export" disabled>Export report</button>
+        </div>
+        <p id="performance-status" role="status">Recording is off. Record closes Guide so you can play.</p>
+        <pre id="performance-summary" aria-label="Performance measurements"></pre>
+        <label class="performance-setting" for="performance-notes">Observations (optional)
+          <textarea id="performance-notes" maxlength="600" rows="3" placeholder="Movement/fire response, visible stutter, heat, interruptions…"></textarea>
+        </label>
+        <p>Export stops recording and saves a JSON file to your device. Reports stay local and are lost on reload unless exported.
+          A new recording replaces the previous one. Recording stops after 30 minutes of wall time.
+          Reports contain the device label, browser, viewport, build and timing measurements; no game files or checkpoint.</p>
+      </details>
     <details id="diagnostics">
       <summary>Build details &amp; log</summary>
       <pre id="build-details"></pre>
@@ -212,6 +242,7 @@
   <script src="phone-shell.js"></script>
   <script src="mission-flow.js"></script>
   <script src="checkpoints.js"></script>
+  <script src="performance.js"></script>
   <script src="bootstrap.js"></script>
   {{{ SCRIPT }}}
 </body>

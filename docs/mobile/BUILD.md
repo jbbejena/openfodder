@@ -281,3 +281,13 @@ performance remains MOB-011.
 Record model/iOS, exact build, observed focus/visibility/lock behavior and errors.
 These device checks and audible audio recovery are **NOT RUN**. The preview is
 silent, and sustained phone performance remains MOB-011.
+
+## Record performance — actual iPhone NOT RUN
+
+Open **Guide → Performance test → Record performance**. Play for at least ten
+active minutes, reopen Guide, add observations, then **Stop recording → Export
+report** to save the local JSON. No sign-in or computer is needed. Paused/menu
+time is excluded; export before reload. [Full phone procedure and metric
+limits](PERFORMANCE.md), [separate desktop results](test-runs/performance.md).
+Submitted FPS and WebAssembly capacity do not establish displayed FPS or used
+Safari memory. The engine clock and rendering settings are unchanged.

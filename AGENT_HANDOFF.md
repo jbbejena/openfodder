@@ -1,5 +1,11 @@
 # Current handoff
 
+MOB-011 claimed 2026-10-29 by Codex on `mobile/performance`, from user-merged
+master `9daff60dfa41f393214174217df05ec65df6171a` (PR #10). Scope: opt-in,
+bounded performance recording, loading measurements and a local JSON report;
+preserve the engine clock and pinned dependencies. Actual ten-minute iPhone
+Safari measurement is unavailable here and remains an acceptance blocker.
+
 Updated 2026-10-29. **MOB-010 interruption-safe return is implemented with local/
 public actual-Wasm Chromium evidence. Real focus loss and persisted Back/Forward
 Cache return passed; synthetic hidden/freeze/rotation checks are separate. A black

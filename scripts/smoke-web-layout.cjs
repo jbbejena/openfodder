@@ -87,9 +87,9 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright-core');
     assert.equal((await state()).pauseReasons,9);await page.waitForTimeout(250);assert.equal((await state()).engineTick,frozen);
     await page.keyboard.press('p');assert.equal((await state()).pauseReasons,9,'Guide keyboard events must not reach SDL');
     for(let i=0;i<8;i++){await page.keyboard.press('Tab');assert(await page.evaluate(()=>Boolean(document.activeElement.closest('#field-dialog'))));}
-    const scroll=await page.locator('.dialog-scroll').boundingBox();const start={x:scroll.x+scroll.width*.5,y:scroll.y+scroll.height-20};
+    const scroll=await page.locator('#field-dialog .dialog-scroll').boundingBox();const start={x:scroll.x+scroll.width*.5,y:scroll.y+scroll.height-20};
     await touch('touchStart',3,start);await touch('touchMove',3,{x:start.x,y:start.y-130});await touch('touchEnd',3);await page.waitForTimeout(150);
-    assert(await page.locator('.dialog-scroll').evaluate(e=>e.scrollTop)>0,'Guide must scroll while the page stays fixed');assert.equal(await groundCount(),0);
+    assert(await page.locator('#field-dialog .dialog-scroll').evaluate(e=>e.scrollTop)>0,'Guide must scroll while the page stays fixed');assert.equal(await groundCount(),0);
     await page.screenshot({path:path.join(evidence,'guide.png')});
     await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#field-dialog').open&&fodderInput.state().pauseReasons===1);
     assert.equal((await state()).engineTick,frozen);assert((await state()).ready,'Escape must not abort the native mission');

@@ -14,6 +14,7 @@ namespace WebInput {
     void RequestMission(int action, int a);
     std::string MissionState();
     void ApplyPending(cFodder& engine);
+    bool LifecyclePaused();
     bool OwnsCamera();
     bool OwnsInput();
     void Fire(cFodder& engine);

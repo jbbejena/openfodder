@@ -29,6 +29,7 @@ function fail(message) {
   document.getElementById('status-region').classList.add('has-error');
   document.getElementById('reload').hidden = false;
   phoneShell?.setError();
+  document.dispatchEvent(new Event('fodder-runtime-error'));
   updateControls();
 }
 function log(message) {
@@ -67,6 +68,7 @@ var Module = {
       window.fodderCheckpointUI=checkpointUI;
       const physical = OpenFodderTouch.mount(window.fodderInput, canvas);
       phoneShell?.connect(window.fodderInput, physical);
+      window.fodderLifecycle=OpenFodderLifecycle.mount(window.fodderInput,physical,phoneShell);
       missionUI = OpenFodderMission.mount(window.fodderInput, phoneShell);
       setupInputHarness(window.fodderInput);
       runtimeReady = true;
@@ -80,6 +82,7 @@ var Module = {
     document.getElementById('cheat-tag').hidden = !cheats;
     missionUI?.refresh();
     phoneShell?.setGameState(state);
+    document.dispatchEvent(new Event('fodder-game-stage'));
     const label = { menu: 'Mission menu', briefing: 'Mission briefing', battlefield: 'Battlefield loaded', ending: 'Mission ending', result: 'Mission result' }[state] || 'Starting game';
     status(`${label} · cheats ${cheats ? 'ON (diagnostic)' : 'off'} · audio disabled`);
     log(`Engine state: ${state}; cheats=${Boolean(cheats)}`);

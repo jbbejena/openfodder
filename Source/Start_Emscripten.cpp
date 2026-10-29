@@ -167,6 +167,9 @@ void finish(int phaseResult) {
 
 void web_loop() {
     auto& e = *g_Fodder;
+    // Keep the normal clock/pacing unchanged. A suspended page does no engine
+    // work; resuming schedules one ordinary callback, never elapsed-time debt.
+    if (WebInput::LifecyclePaused()) return;
     // The command adapter only queues intent. Transitions/scene preparation run
     // after its iteration and the redraw mutex, never from inside that queue.
     e.Interrupt_Sim_Tick();

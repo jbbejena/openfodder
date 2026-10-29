@@ -47,6 +47,7 @@ function setupInputHarness(bridge) {
   panel.addEventListener('toggle', () => { if (!panel.open) cancel(); });
   window.addEventListener('blur', cancel);
   window.addEventListener('pagehide', cancel);
+  document.addEventListener('fodder-interrupt', cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });
   function refresh() {
     if (document.body.dataset.runtimeError === 'true') return;
@@ -71,6 +72,6 @@ function setupInputHarness(bridge) {
     panel.querySelectorAll('[data-pan]').forEach(button => { button.disabled = !canAct; });
   }
   const timer = setInterval(refresh, 150);
-  window.addEventListener('pagehide', () => clearInterval(timer), { once: true });
+  window.addEventListener('pagehide', event => { if (!event.persisted) clearInterval(timer); });
   refresh();
 }

@@ -196,8 +196,17 @@
     </details>
     </div>
   </dialog>
+  <dialog id="lifecycle-dialog" aria-labelledby="lifecycle-title" aria-describedby="lifecycle-message">
+    <div class="dialog-heading"><h2 id="lifecycle-title">Game paused while away</h2></div>
+    <div class="dialog-scroll">
+      <p id="lifecycle-message"></p>
+      <button id="lifecycle-return" autofocus>Return to game</button>
+      <p class="save-note">Audio is off. This keeps the current page paused; it does not save a battlefield. If the page was reloaded, Continue your confirmed mission checkpoint.</p>
+    </div>
+  </dialog>
 </div>
   <script src="engine-bridge.js"></script>
+  <script src="lifecycle.js"></script>
   <script src="touch-controls.js"></script>
   <script src="input-harness.js"></script>
   <script src="phone-shell.js"></script>

@@ -59,7 +59,7 @@ def main():
         'content': 'Christmas Special from pinned upstream or local files; no game assets hosted',
     }
     write(DIST / 'build-info.json', (json.dumps(metadata, indent=2) + '\n').encode())
-    for name in ['content-manifest.json', 'bootstrap.js', 'style.css', 'engine-bridge.js', 'touch-controls.js', 'phone-shell.js', 'mission-flow.js', 'checkpoints.js', 'input-harness.js']:
+    for name in ['content-manifest.json', 'bootstrap.js', 'style.css', 'engine-bridge.js', 'lifecycle.js', 'touch-controls.js', 'phone-shell.js', 'mission-flow.js', 'checkpoints.js', 'input-harness.js']:
         write(DIST / name, (ROOT / 'web' / name).read_bytes())
     # Always distribute the complete engine/scripts source used, including dirty
     # working files during local development. Exact committed builds say dirty=false.

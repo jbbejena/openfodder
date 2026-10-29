@@ -9,6 +9,12 @@ MOB-007/008 phone gates and M1/M2/M3 remain unpassed.**
 
 ## Branch and review
 
+Active claim: Codex / **MOB-010**, `mobile/browser-lifecycle` from user-merged
+master `965b90f3105e5861057e27b36937e66268f4f09d` (PR #9). Scope: explicit
+visibility/focus/page interruption policy, released input, safe resume, audio
+audit and real-browser checks. Existing preview/evidence below describe MOB-009
+until publication. Inherited phone gates remain unpassed.
+
 - Codex / **MOB-009**, `mobile/browser-saves`, from user-merged master
   `86c70318768ce59fcc85b606caeb655ccddf62b1` (PR #8). User work preserved;
   independent implementation authorized while inherited phone gates remain open.

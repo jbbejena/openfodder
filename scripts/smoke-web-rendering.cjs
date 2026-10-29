@@ -46,7 +46,7 @@ function analyze(frames) {
   const results={url,browser:browser.version(),viewport:{width:844,height:390},dpr:2,
     input:'desktop Chromium emulated touch / SwiftShader',iphoneSafari:'NOT RUN',patches,
     tolerance:'4/6 patch medians change in the same direction by >12/255 luminance and >20%',
-    requestedGapMs:90,entryFadeExcludedMs:3000,segments:{},excludedTransitions:[],errors:[]};
+    requestedGapMs:90,entryFadeExcludedMs:3000,segments:{},excludedTransitions:[],restarts:[],errors:[]};
   const context=await browser.newContext({viewport:results.viewport,deviceScaleFactor:2,hasTouch:true,isMobile:true});
   const page=await context.newPage(); page.setDefaultTimeout(30000);
   page.on('pageerror',e=>results.errors.push(e.message));
@@ -66,6 +66,13 @@ function analyze(frames) {
       if((await state()).view.cameraY===208)break;
     }
     await page.waitForTimeout(300);
+  }
+  async function fresh(reason) {
+    let current=await state();
+    if(current.stage==='battlefield')await command('abortMission');
+    await page.waitForFunction(()=>fodderInput.state().stage==='result');
+    current=await state();results.restarts.push({reason,result:current.mission.result});
+    await tap('#mission-retry');await ready();await page.waitForTimeout(3000);await pitch();
   }
   async function capture(name,count,step) {
     const frames=[],start=Date.now();
@@ -152,21 +159,27 @@ function analyze(frames) {
     } finally { await page.evaluate(()=>{delete window.qaRender;MainLoop.resume();}); }
     await command('setPaused',false);await pitch();
     if(!options.includes('--diagnostic-only')) {
+      await fresh('Movement/fire block; native demo remains unmodified');
       // Real touch movement and held fire; fixed camera keeps the grass patches
       // away from the troops/cursor at the top edge of this starting-area view.
       await tap('[data-touch-mode="move"]');const canvas=await page.locator('#canvas').boundingBox();
       const p={x:canvas.x+canvas.width*.6,y:canvas.y+canvas.height*.4};
-      await page.touchscreen.tap(p.x,p.y);await capture('move',5);
-      await tap('[data-touch-mode="fire"]');const cdp=await context.newCDPSession(page);
+      const beforeMove=(await state()).squads[0].leader;
+      await page.touchscreen.tap(p.x,p.y);await page.waitForTimeout(100);await pitch();await capture('move',5);
+      const afterMove=(await state()).squads[0].leader;
+      assert(beforeMove.x!==afterMove.x||beforeMove.y!==afterMove.y,'Real movement order moves the squad');
+      await tap('[data-touch-mode="fire"]');await pitch();const cdp=await context.newCDPSession(page);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,x:p.x,y:p.y,radiusX:2,radiusY:2,force:.5}]});
       await page.waitForFunction(()=>fodderInput.state().fireHeld);await capture('held-fire',5);
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
       await page.waitForFunction(()=>!fodderInput.state().fireHeld);
-      await tap('[data-touch-mode="pan"]');await capture('pan',5,()=>command('pan',2,0));
+      await fresh('Pan/Follow block before ordinary enemies can end the attempt');
+      await tap('[data-touch-mode="pan"]');await pitch();await capture('pan',5,()=>command('pan',2,0));
       await tap('#touch-follow');await ready();await page.waitForTimeout(400);
       // Camera movement is an intentional image transition. Reposition over the
       // pitch before resuming fixed-background comparisons.
       await pitch();await capture('after-follow',5);
+      await fresh('Guide/interruption block');
       await tap('#field-guide');await page.waitForFunction(()=>fodderInput.state().pauseReasons===8);
       await page.screenshot({path:path.join(evidence,'guide.png')});
       await tap('#close-guide');await pitch();await capture('after-guide',5);

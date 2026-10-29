@@ -24,9 +24,10 @@
       <h1>Play the Christmas demo</h1>
       <p>Load the two-mission demo from its existing upstream GitHub host.
         The demo is 223 KB; the browser engine is about 2.9 MB.
-        Reloading clears this preview's game state.</p>
+        Reloading clears the current battle; a confirmed checkpoint can be continued after loading the demo again.</p>
       <button id="load-demo" disabled>Load demo from GitHub</button>
       <p id="file-progress" role="status" aria-live="polite">Demo not loaded.</p>
+      <p id="storage-status" role="status" aria-live="polite">Checking browser storage…</p>
       <details id="local-import">
         <summary>Use local files instead</summary>
         <p>Selected files stay in browser memory and are never uploaded.</p>
@@ -50,7 +51,7 @@
       <p>Start the game, choose a mission, read its objectives, then deploy.
         On the battlefield, touch commands provide squad selection and Move/Fire modes.
         Use two fingers in Move mode, or one finger in Pan mode, to move the camera.
-        The field guide explains the controls. Progress is not saved; reloading starts a new game.</p>
+        The field guide explains the controls. Save at a mission briefing to keep a checkpoint. The current battle is not saved.</p>
       <p><a href="source.zip">Source &amp; build instructions</a> · <a href="SOURCE.txt">Licenses &amp; provenance</a></p>
       <details id="launch-diagnostics">
         <summary>Diagnostics (optional)</summary>
@@ -99,6 +100,7 @@
           <h1 id="mission-title" tabindex="-1"></h1>
           <p id="mission-selected-name"></p>
           <p id="mission-description"></p>
+          <button id="checkpoint-continue" hidden>Continue checkpoint</button>
           <div id="mission-list" aria-label="Demo missions"></div>
           <ul id="briefing-objectives" aria-label="Mission objectives"></ul>
           <div class="mission-actions">
@@ -106,8 +108,18 @@
             <button id="mission-retry" hidden>Retry mission</button>
             <button id="mission-next" hidden>Next mission</button>
             <button id="mission-menu" hidden>Return to menu</button>
+            <button id="checkpoint-save" hidden>Save checkpoint</button>
           </div>
-          <p class="save-note">Progress is not saved. Returning to menu or reloading discards this run. Audio is off.</p>
+          <section id="checkpoint-panel" aria-label="Mission checkpoint" hidden>
+            <p id="checkpoint-status" role="status" aria-live="polite"></p>
+            <div class="mission-actions">
+              <button id="checkpoint-previous" hidden>Use previous checkpoint</button>
+              <button id="checkpoint-export">Export backup</button>
+            </div>
+            <label id="checkpoint-import-label" class="file">Import backup <input id="checkpoint-import" type="file" accept=".json,application/json"></label>
+            <p>Import replaces the saved checkpoint and retains its previous copy. Browser storage can be cleared; export a backup to keep a separate copy. Backups contain progress, not game files.</p>
+          </section>
+          <p class="save-note">Only a confirmed mission-start checkpoint survives reload. The current battle is not saved. Audio is off.</p>
           <p id="mission-message" role="status" aria-live="polite"></p>
         </div>
       </section>
@@ -175,7 +187,7 @@
       </div>
       <label class="setting"><input id="touch-enabled" type="checkbox"> Touch controls</label>
       <p>Turn touch controls off for the original mouse and keyboard controls.</p>
-      <p class="save-note">Progress is not saved. Reloading starts a new game. Audio is off in this preview.</p>
+      <p class="save-note">Save a checkpoint at a mission briefing. Reload/Continue starts that mission from its beginning; the current battlefield is not saved. Audio is off.</p>
       <p><a href="source.zip">Source &amp; build instructions</a> · <a href="SOURCE.txt">Licenses &amp; provenance</a></p>
     <details id="diagnostics">
       <summary>Build details &amp; log</summary>
@@ -190,6 +202,7 @@
   <script src="input-harness.js"></script>
   <script src="phone-shell.js"></script>
   <script src="mission-flow.js"></script>
+  <script src="checkpoints.js"></script>
   <script src="bootstrap.js"></script>
   {{{ SCRIPT }}}
 </body>

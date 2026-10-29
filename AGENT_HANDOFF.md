@@ -8,6 +8,12 @@ blocked; M1/B05 and M2 remain unpassed.**
 
 ## Branch and review
 
+Active claim: Codex / **MOB-009**, `mobile/browser-saves` from user-merged master
+`86c70318768ce59fcc85b606caeb655ccddf62b1` (PR #8). Scope: native checkpoint
+fidelity audit, browser persistence, validated restore and clear storage feedback.
+Independent work is user-authorized while phone gates remain unpassed. The
+preview/evidence below still describe MOB-008 until this task is published.
+
 - Codex / MOB-008, `mobile/mission-flow`, from user-merged master
   `7e6b537bbcb9a587f30ec27b7fdca1a71e3aef76` (PR #7). User work preserved.
 - `7ec8a5d09036751f1e9d7145009366b541805b42`: engine-backed mission states,

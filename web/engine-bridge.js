@@ -3,7 +3,7 @@
   'use strict';
   const actions = { cancel: 0, selectSquad: 1, move: 2, fireStart: 3, fireAim: 4,
     fireStop: 5, selectWeapon: 6, pan: 7, follow: 8, pause: 9, secondary: 10,
-    selectMission: 11, deployMission: 12, retryMission: 13, abortMission: 14, returnToMenu: 15, continueMission: 16 };
+    selectMission: 11, deployMission: 12, retryMission: 13, abortMission: 14, returnToMenu: 15, continueMission: 16, resumeCheckpoint: 17 };
   const errors = { '-1': 'invalid', '-2': 'uninitialized', '-3': 'not-battlefield',
     '-4': 'paused', '-5': 'no-squad', '-6': 'unavailable', '-7': 'busy', '-8': 'unsupported' };
   const rejected = reason => ({ ok: false, reason });
@@ -67,6 +67,7 @@
       abortMission: () => send(actions.abortMission),
       returnToMenu: () => send(actions.returnToMenu),
       continueMission: () => send(actions.continueMission),
+      resumeCheckpoint: () => send(actions.resumeCheckpoint),
       cancel: () => send(actions.cancel),
       selectSquad: id => send(actions.selectSquad, id),
       moveTo: point => world(actions.move, point),

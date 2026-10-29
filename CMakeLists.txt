@@ -168,7 +168,8 @@ if(EMSCRIPTEN)
         "-sUSE_SDL=3"
         "-sALLOW_MEMORY_GROWTH=1"
         "-sASSERTIONS=1"
-        "-sEXPORTED_RUNTIME_METHODS=FS,callMain,UTF8ToString"
+        "-sEXPORTED_RUNTIME_METHODS=FS,IDBFS,callMain,UTF8ToString"
+        "-lidbfs.js"
         "SHELL:--shell-file ${CMAKE_SOURCE_DIR}/web/shell.html"
         "SHELL:--preload-file ${OPENFODDER_WEB_CONTENT}@/")
 else()

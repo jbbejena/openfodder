@@ -48,9 +48,9 @@ test('invalid JS inputs are rejected before crossing the Wasm boundary', () => {
 test('mission actions retain stable numeric commands and carry no outcome from JavaScript',()=>{
   const calls=[];
   const bridge=create({_of_web_command:(...args)=>{calls.push(args);return calls.length;}},canvas({left:0,top:0,width:960,height:600}));
-  for(const [method,args] of [['selectMission',[2]],['deployMission',[]],['retryMission',[]],['abortMission',[]],['returnToMenu',[]],['continueMission',[]]])
+  for(const [method,args] of [['selectMission',[2]],['deployMission',[]],['retryMission',[]],['abortMission',[]],['returnToMenu',[]],['continueMission',[]],['resumeCheckpoint',[]]])
     assert(bridge[method](...args).ok);
-  assert.deepEqual(calls,[[11,2,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0]]);
+  assert.deepEqual(calls,[[11,2,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0]]);
 });
 test('a pre-runtime bridge reports uninitialized and cannot submit orders', () => {
   const bridge=create({},canvas({left:0,top:0,width:960,height:600}));

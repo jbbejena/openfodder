@@ -227,7 +227,7 @@ void Fire(cFodder& e) {
 
 extern "C" {
 EMSCRIPTEN_KEEPALIVE int of_web_command(int action, double a, double b) {
-    if (action < Cancel || action > WebInput::ContinueMission || !std::isfinite(a) || !std::isfinite(b) ||
+    if (action < Cancel || action > WebInput::ResumeCheckpoint || !std::isfinite(a) || !std::isfinite(b) ||
         a != std::floor(a) || b != std::floor(b) || std::abs(a) > 32700 || std::abs(b) > 32700) return Invalid;
     if (!g_Fodder || stage == WebInput::Stage::Uninitialized)
         return action == Cancel || action == FireStop ? Ok : Uninitialized;

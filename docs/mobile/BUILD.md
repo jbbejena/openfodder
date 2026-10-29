@@ -1,8 +1,8 @@
 # Reproducible browser build (MOB-002/003)
 
 The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004)
-and [touch command modes](TOUCH_CONTROLS.md) (MOB-005). The [command API](INPUT_API.md)
-and squad/Move/Fire/secondary controls are implemented; a complete phone mission
+and [touch commands/camera](TOUCH_CONTROLS.md) (MOB-005/006). The [command API](INPUT_API.md)
+and squad/Move/Fire/secondary/Pan/Follow controls are implemented; a complete phone mission
 and actual iPhone acceptance remain pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
@@ -178,13 +178,15 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 5, fork build `7809755786a7999b835c814b63c945beb5c12f66`.
-[Web CI passed](https://github.com/jbbejena/openfodder/actions/runs/40783411106);
-the [matching engine artifact](https://github.com/jbbejena/openfodder/actions/runs/40783411106/artifacts/12856464683)
-contains source/notices and no game assets. The default upstream-download route
-passed hosted desktop menu/map verification. See [the follow-up record](test-runs/phone-file-import.md)
-for the earlier phone-loading change; [MOB-005's record](test-runs/touch-commands.md)
-contains current hosting identity/sizes and command checks. Original Phase 1 measurements are historical.
+Sites version 6, fork build `1384e4f1809edc1a6d7f24967da46768152033d1`.
+The camera build passed local and anonymous hosted actual-engine emulation at
+DPR 1/2. [The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Ftouch-camera)
+provide the focused web CI and downloadable artifact for its final handoff.
+Source/notices remain included; no game assets are hosted. Native C++/CMake,
+submodules and native workflows are unchanged by this browser-only task.
+[The camera record](test-runs/touch-camera.md) contains exact hosting identity,
+sizes, commands and remaining checks. Prior Phase 1/bridge/touch records remain
+historical evidence for those builds.
 
 ## Actual iPhone Safari checkpoint — NOT RUN
 
@@ -211,4 +213,7 @@ outside the battlefield to confirm fire releases. HUD taps must never order troo
 Touch commands enable automatically for touch devices; desktop can use the checkbox.
 The first demo mission has zero secondary ammo, so Grenade/Rocket stay disabled.
 The separate local ammo fixture is not published. [Control map and cancellation
-rules](TOUCH_CONTROLS.md). Camera gestures and full phone layout follow next.
+rules](TOUCH_CONTROLS.md). In Move, put both fingers down before dragging to pan;
+or select Pan and drag one finger. Lift all fingers before a fresh command.
+Follow squad returns the camera. Combat continues while inspecting the map.
+The full landscape phone layout remains the next task.

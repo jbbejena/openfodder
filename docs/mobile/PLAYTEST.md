@@ -1,6 +1,6 @@
 # Mobile acceptance checklist
 
-Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). MOB-005 emulated-touch results are in [touch-commands.md](test-runs/touch-commands.md). No actual iPhone Safari test has run. Later milestone rows remain untested.
+Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). MOB-005 emulated-touch results are in [touch-commands.md](test-runs/touch-commands.md). MOB-006 [camera results](test-runs/touch-camera.md) add desktop emulation at DPR 1/2. No actual iPhone Safari test has run. Later milestone rows remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -35,7 +35,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `7809755786a7`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `1384e4f1809e`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
@@ -50,9 +50,9 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | I03 | Hold fire, aim at another location, release; no stuck fire | Emulated touch Fire mode: hold/slide/lift and actual engine aim passed; phone not run |
 | I04 | Use available secondary weapons deliberately; displayed ammo matches engine state | Emulated targeting/confirmation fired one grenade and rocket in a separate local ammo fixture; real demo remains zero ammo; phone not run |
 | I05 | A HUD tap cannot move/fire troops and one touch does not generate duplicate commands | Emulated touch/engine command counts passed; phone not run |
-| I06 | Pan the camera without a stray movement/fire action | Desktop camera intent passed; touch gestures pending |
-| I07 | Add/remove a second finger during a gesture without leaking an unintended command | Emulated second-finger cancellation passed; two-finger pan pending; phone not run |
-| I08 | Aim/move coordinates stay correct after pan, resize and rotation | Desktop DPR 1/2 bridge and emulated touch after resize/letterboxing passed; real Safari rotation not run |
+| I06 | Pan the camera without a stray movement/fire action | Emulated Move two-finger pan and explicit Pan passed with no player ground command; phone not run |
+| I07 | Add/remove a second finger during a gesture without leaking an unintended command | Emulated both pan lift orders, third finger, HUD-first ownership and Fire cancellation passed; phone not run |
+| I08 | Aim/move coordinates stay correct after pan, resize and rotation | Emulated actual aim after pan/Follow and pan distances after resize/letterboxing passed at DPR 1/2; real Safari rotation not run |
 | I09 | Open help/menu, pause/resume, cancel targeting and return to play using touch only | Desktop explicit pause/cancel and native P passed; complete touch menus pending |
 | I10 | Finger cancellation, leaving the canvas and switching modes release held inputs | Emulated canvas exit, touchCancel, HUD/mode change and resize released fire; desktop pause/blur/API/harness checks passed; phone not run |
 | U01 | Controls are readable and reachable around cutouts and the home indicator | Not run |

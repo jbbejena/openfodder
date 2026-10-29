@@ -4,8 +4,8 @@ The existing C++/SDL engine owns soldiers, movement, targeting, weapons and ammo
 The browser provides one pointer controller in `web/touch-controls.js`, using
 the [engine command boundary](INPUT_API.md). MOB-006 adds camera gestures and
 Follow squad. The full landscape phone layout and complete touch menus remain
-MOB-007–008. Real iPhone Safari
-acceptance and a complete touch-only mission have **not run**.
+MOB-007–008. Real iPhone Safari acceptance and a complete touch-only mission
+have **not run**.
 
 ## Play this build
 
@@ -74,7 +74,8 @@ Follow squad releases all held input, requests the existing engine follow action
 and returns the browser to Move mode. Switching modes while inspecting the map
 uses cancel plus a zero-distance pan to retain the view; the raw API's cancel
 semantics are unchanged. A new engine movement/squad command may itself restore
-following. No C++ camera, combat or timing code changed in MOB-006.
+following. Combat continues while inspecting the map. No C++ camera, combat
+or timing code changed in MOB-006.
 
 Pointer Events are the sole command source during enabled battlefield control.
 Capture-phase listeners block SDL3's legacy Touch Events and compatibility mouse

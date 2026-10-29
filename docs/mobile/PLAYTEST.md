@@ -1,6 +1,6 @@
 # Mobile acceptance checklist
 
-Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. MOB-009 adds [checkpoint semantics](CHECKPOINTS.md) and [Chromium persistence evidence](test-runs/checkpoints.md). No actual iPhone Safari test has run; lifecycle/performance remain untested.
+Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. MOB-009 adds [checkpoint semantics](CHECKPOINTS.md) and [Chromium persistence evidence](test-runs/checkpoints.md). MOB-010 adds [interruption policy](LIFECYCLE.md) and [Chrome focus/cache/pixel evidence](test-runs/lifecycle.md), correcting the earlier black battlefield. Actual iPhone Safari, audible audio and phone performance remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -35,8 +35,8 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `f4696c53ccfa`, direct pinned upstream loading; local-file fallback |
-| B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `1de52e57c4c1`, direct pinned upstream loading; local-file fallback |
+| B04 | A desktop browser reaches the menu and loads a map | Pass — current Chromium/SwiftShader screenshot + composited-pixel checks; see MOB-010 correction |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
 | B07 | Normal-play cheats are off; diagnostics are explicit | Pass — normal off / explicit checkbox opt-in |
@@ -73,10 +73,10 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | S03 | Malformed/incompatible save does not silently destroy the last valid checkpoint | Pass in local/public Chromium: rejected imports unchanged, failed write rolled back; real reopen retained valid save; corrupt primary recovered previous |
 | S04 | Unavailable/denied storage gives clear feedback without a false saved indication | Pass with Chromium denied IndexedDB and simulated sync failure; play remains available, Save disabled on denial; actual Safari storage modes NOT RUN |
 | S05 | The UI accurately labels checkpoint limits; no unverified mid-battle resume promise | Pass in Chromium/source: mission-start briefing only, current battlefield export rejected; backup export/import passed. Actual Safari Files behavior NOT RUN |
-| L01 | Background during combat; no unintended combat advance or catch-up burst on return | Not run |
-| L02 | Background while firing; held input is released | Not run |
-| L03 | A user-paused game remains paused through background/foreground transitions | Not run |
-| L04 | Interrupt/resume supported audio through normal user interaction without duplicate loops | Not run |
+| L01 | Background during combat; no unintended combat advance or catch-up burst on return | Chrome real focus/cache pass; ≤1 update per native callback. Synthetic visibility/freeze pass; real CDP freeze event not observed; actual Safari NOT RUN |
+| L02 | Background while firing; held input is released | Local/public Chrome real focus loss released fire synchronously; return required tap. Actual Safari/physical touch NOT RUN |
+| L03 | A user-paused game remains paused through background/foreground transitions | Local/public Chrome composed user/Guide/lifecycle pause passed; synthetic portrait interruption retained its own pause. Actual Safari NOT RUN |
+| L04 | Interrupt/resume supported audio through normal user interaction without duplicate loops | Not run / unsupported: web build forces null audio backend despite included sound data; audible recovery not implemented or claimed |
 | P01 | Record cold/warm load time, artifact/data size and renderer identity | Not run |
 | P02 | Record sustained frame pacing during at least ten minutes or the full mission if longer | Not run |
 | P03 | Simulation/weapon timing remains correct across render rates | Not run |

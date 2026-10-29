@@ -5,7 +5,8 @@ and [touch commands/camera](TOUCH_CONTROLS.md) (MOB-005/006). The [command API](
 and squad/Move/Fire/secondary/Pan/Follow controls plus the [phone shell/HUD](PHONE_LAYOUT.md)
 (MOB-007) and [mission flow](MISSION_FLOW.md) (MOB-008) are implemented. An unmodified
 mission reached defeat through emulated touch. MOB-009 adds [mission-start
-checkpoint persistence](CHECKPOINTS.md); actual iPhone acceptance remains pending.
+checkpoint persistence](CHECKPOINTS.md). MOB-010 adds [interruption-safe return](LIFECYCLE.md)
+and corrects the black battlefield found by pixel/screenshot QA. Actual iPhone acceptance remains pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
 
@@ -35,7 +36,7 @@ Open `http://localhost:8080/`. `file://` is unsupported. Use HTTPS for a hosted
 preview; localhost is a secure context for the pack's SHA-256 verification.
 The output entry point is `index.html`, with `index.js`, `index.wasm`, `index.data`,
 `bootstrap.js`, `engine-bridge.js`, `touch-controls.js`, `phone-shell.js`,
-`mission-flow.js`, `checkpoints.js`, `input-harness.js`,
+`mission-flow.js`, `checkpoints.js`, `lifecycle.js`, `input-harness.js`,
 `style.css`, `content-manifest.json`, `build-info.json`,
 `source.zip`, `SOURCE.txt`, and `notices/`. Serve Wasm as `application/wasm`.
 No pthreads, cross-origin isolation headers or external asset services are needed.
@@ -80,9 +81,9 @@ allowing startup; there are no Site credentials/cookies on those public requests
 A failed or timed-out download can be retried; partial data cannot start the game.
 No ZIP, Files-app selection, Git, terminal or compiler is needed on the phone.
 
-Cold top-level runtime/support files are **3,021,095 bytes**, plus **223,382 bytes**
-of demo content: roughly **3.24 MB before compression** at `f4696c53ccfa`.
-The **1,913,121-byte** source archive is an optional
+Cold top-level runtime/support files are **3,027,663 bytes**, plus **223,382 bytes**
+of demo content: roughly **3.25 MB before compression** at `1de52e57c4c1`.
+The **1,932,326-byte** source archive is an optional
 separate download, not required to start. These sizes describe the selected two-
 mission demo; the full retail campaign is not bundled or measured.
 
@@ -182,22 +183,27 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 10, fork build `f4696c53ccfab5faea024ff221c5052b7f2a8496`.
-MOB-009 adds explicit briefing Save/Continue, validated native restore, two-slot
-IDBFS persistence and backup export/import. Local/public actual-engine Chromium
-checks passed real browser close/reopen, invalid imports, failed writes, denied
-storage and previous-save recovery. A local goal fixture additionally preserved
-returning recruits across reopening and deployment. Mission/layout regressions
-passed, including unmodified defeat/retry/abort and local-only goal fixtures for
-victory/continuation; fixtures are not unmodified victories.
-[The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fbrowser-saves)
-provide focused CI/artifact links. Source/notices remain included; no game assets,
-profiles or player saves are hosted. C++ changes and new IDBFS linker flags are
-Emscripten-only; the Windows classifier returns `native: false`. Linux's existing
-Source-path check still runs. Pins and workflows are unchanged.
-[The checkpoint record](test-runs/checkpoints.md) contains exact public QA,
-hosting identity, sizes and remaining checks. Prior records remain historical
-evidence for their builds. Actual iPhone Safari remains NOT RUN.
+Sites version 11, fork build `1de52e57c4c185dde254f679209d253af6009c82`.
+MOB-010 immediately releases input and pauses on interruptions; returning requires
+an explicit tap and preserves manual/Guide pause. Local/public actual-engine
+Chromium checks passed focus loss, real Back/Forward Cache return, native callback
+clock bounds and rendered battlefield pixels. Synthetic visibility/freeze/rotation
+and context-loss checks passed separately. A real CDP freeze event was not observed
+in this automation environment; actual Safari/OS interruptions remain NOT RUN.
+
+**Visual correction:** the DOM mission path left the palette black, and the web
+SDL3 renderer did not explicitly present its batches. Native state/DOM checks in
+older records did not establish visible gameplay. This build advances the pending
+palette and presents the frame; screenshots and composited-pixel checks verify
+snow, troops and sidebar before/after return. See [the correction/evidence](test-runs/lifecycle.md).
+
+Checkpoint/layout/launcher regressions passed. The checkpoint wrapper ABI/content
+pins are unchanged; this keeps compatible saves. Audio remains explicitly silent:
+`OPENFODDER_NO_MIXER` selects `cSound_Null` even though the pack includes sound files.
+[The draft branch PR/checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fbrowser-lifecycle)
+provide final CI/artifact links. No game assets, profiles or progress exports are
+hosted. C++ changes are Emscripten-only; the Windows scope check returns
+`native:false`; Linux retains its existing native build. Pins/workflows unchanged.
 
 ## Actual iPhone Safari checkpoint — NOT RUN
 
@@ -241,7 +247,7 @@ briefing; the current battlefield cannot be saved.
 
 ## Try mission checkpoints — actual iPhone NOT RUN
 
-1. In Safari open the public URL and verify **`f4696c53ccfa`**. Record model/iOS.
+1. In Safari open the public URL and verify **`1de52e57c4c1`**. Record model/iOS.
    Load demo → wait for 20 verified files → Start game → choose mission 1.
 2. At its briefing tap **Save checkpoint**. Wait for **Saved checkpoint** before
    closing the tab. Reopen the same URL in the same Safari browser/profile.
@@ -258,3 +264,20 @@ not establish Safari storage durability, Files behavior, private-mode behavior
 or browser eviction recovery. Keep an exported backup; use one game tab per
 origin. Backgrounding/audio recovery remains MOB-010 and sustained phone
 performance remains MOB-011.
+
+## Try interruptions — actual iPhone NOT RUN
+
+1. In Safari verify **`1de52e57c4c1`**, load demo, Start → choose mission → Deploy.
+   Confirm a visible snow battlefield, troops and sidebar.
+2. In Fire mode hold aim, then switch apps/tabs or lock/unlock the phone. On return,
+   check **Game paused while away**. Firing must have released and combat must
+   stay paused until **Return to game**; there should be no catch-up burst.
+3. Repeat with Guide already open and with a manual pause. Return must preserve
+   those pauses. Rotate while away/paused and check reachable controls and aim.
+4. Try browser Back then Forward. If Safari reloads instead of retaining the page,
+   load demo again and Continue a confirmed checkpoint; there is no live-battle
+   reload promise. Record Safari versus Home Screen results separately.
+
+Record model/iOS, exact build, observed focus/visibility/lock behavior and errors.
+These device checks and audible audio recovery are **NOT RUN**. The preview is
+silent, and sustained phone performance remains MOB-011.

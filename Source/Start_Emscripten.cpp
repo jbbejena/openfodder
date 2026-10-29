@@ -228,6 +228,10 @@ void web_loop() {
             if (phaseResult != 1) finish(phaseResult);
         }
     }
+    // DOM mission menus bypass the old canvas menu's palette fade. The web
+    // Phase_Cycle also excludes the native fade, so drive presentation here.
+    if ((current == WebInput::Stage::Battlefield || current == WebInput::Stage::Ending) && e.mSurface->isPaletteAdjusting())
+        e.mSurface->palette_FadeTowardNew();
     e.Video_Sleep();
     Sleep(10); // Preserve the existing browser loop's pacing.
 }

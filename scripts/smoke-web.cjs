@@ -6,6 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
+const assertWebFrame = require('./assert-web-frame.cjs');
 
 (async () => {
   const [url, packFile, evidenceDir] = process.argv.slice(2);
@@ -68,6 +69,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     await page.locator('[data-mission="1"]').click();await page.locator('#mission-deploy').click();
     await page.waitForFunction(() => document.body.dataset.gameState === 'battlefield', null, { timeout: 30000 });
     await page.waitForTimeout(1500);
+    result.battlefieldColors = await assertWebFrame(page);
     await page.screenshot({ path: path.join(evidenceDir, 'battlefield.png') });
     result.checks.battlefield = 'pass (screenshot review also required)';
     result.renderer = await page.evaluate(() => {
@@ -108,6 +110,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     await page.locator('[data-mission="1"]').click();await page.locator('#mission-deploy').click();
     await page.waitForFunction(() => document.body.dataset.gameState === 'battlefield');
     await page.waitForTimeout(1500);
+    result.upstreamBattlefieldColors = await assertWebFrame(page);
     await page.screenshot({ path: path.join(evidenceDir, 'upstream-battlefield.png') });
     assert.equal(await page.getAttribute('body', 'data-cheats'), 'off');
     result.checks.upstreamMenuAndBattlefield = 'pass (screenshots require review)';

@@ -339,6 +339,9 @@ void cWindow::FrameEnd() {
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 0);
 	SDL_RenderClear( mRenderer );
 	#else
+	// SDL3 batches renderer commands. Present them before the browser composites
+	// the canvas; a running engine/updated DOM alone does not display a frame.
+	SDL_RenderPresent(mRenderer);
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 0);
 	//SDL_RenderClear( mRenderer );
 #endif

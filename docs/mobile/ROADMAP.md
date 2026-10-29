@@ -1,6 +1,6 @@
 # Mobile browser roadmap
 
-Status: Phase 1 desktop build/preview and Phase 2 command foundation, touch modes and camera (MOB-004–006) implemented; actual iPhone gate not run. Updated: 2026-10-29. See [Phase 1 evidence](test-runs/phase-1.md) and [MOB-004 verification](test-runs/command-bridge.md); [MOB-005 touch verification](test-runs/touch-commands.md) records emulated input. [MOB-006 camera evidence](test-runs/touch-camera.md) records local/public checks. Phone layout and mission flow remain planned.
+Status: Phase 1 desktop build/preview and Phase 2 command foundation, touch modes, camera and phone shell (MOB-004–007) implemented; actual iPhone gate not run. Updated: 2026-10-29. See [Phase 1 evidence](test-runs/phase-1.md), [MOB-004 verification](test-runs/command-bridge.md), [MOB-005 touch verification](test-runs/touch-commands.md), [MOB-006 camera evidence](test-runs/touch-camera.md) and [MOB-007 layout evidence](test-runs/phone-layout.md). MOB-007 remains blocked on actual iPhone layout acceptance. Complete mission flow remains planned in MOB-008.
 
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 

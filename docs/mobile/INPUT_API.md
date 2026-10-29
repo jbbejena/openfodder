@@ -133,8 +133,8 @@ After selecting the campaign, expand **Control bridge test panel** below the
 canvas. Use the engine map coordinates, squad/weapon buttons, Move, held primary
 fire, camera arrows/follow, Pause/Resume and Cancel. The JSON readout reflects the
 actual engine. Empty squads and unavailable weapons are disabled. The panel is
-not the production touch combat layout. Leave **Touch commands** unchecked for
-the original desktop canvas controls; the checkbox defaults off for a fine
+not the production touch combat layout. Leave **Guide → Touch controls** unchecked
+for the original desktop canvas controls; the checkbox defaults off for a fine
 pointer. Touch devices enable the production controller by default.
 
 ```sh

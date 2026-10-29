@@ -40,6 +40,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
 | B07 | Normal-play cheats are off; diagnostics are explicit | Pass — normal off / explicit checkbox opt-in |
+| B08 | Consecutive composited battlefield frames retain stable background/HUD brightness after entry fade and through controls/return/retry | Desktop/local and public pass: 53 images each, old build fails; [focused flicker record](test-runs/battlefield-flicker.md). Physical iPhone Safari NOT RUN |
 
 ## M2: touch controls, layout and mission flow
 

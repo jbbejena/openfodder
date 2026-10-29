@@ -183,7 +183,13 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 13, fork build `d3edef36fc529ab051060524516168dc976a53ee`.
+Sites version 14, fork build `01231e740c9387b444dea68e0eab6c38b411df57`.
+The focused [battlefield flicker correction and temporal check](test-runs/battlefield-flicker.md)
+clears immediately before each complete web redraw; existing fades/presentation
+remain. Old additive accumulation reproduces on the previous build; 53 local
+and 53 public composited images pass on this build. Actual iPhone confirmation
+remains **NOT RUN**. See the record for exact commands, source/renderer identity,
+thresholds, exclusions and phone steps.
 MOB-011 adds **Guide → Performance test** for opt-in submission pacing, Wasm
 capacity and load measurements with a local JSON report. [Desktop observations
 and phone procedure](PERFORMANCE.md); ten-minute Safari performance NOT RUN.

@@ -1,11 +1,15 @@
 # Agent task ledger and specifications
 
-**Active focused defect, FIX-MOBILE-FLICKER (2026-10-29):** Codex,
-`fix/mobile-battlefield-flicker`, base master
-`8bf8290f2f78e5d4a3c2b44128c2d935037c5c6d`. Reproduce Cannon Soccer brightness
-flutter, fix the evidenced frame lifecycle, add composited temporal regression
-and verify affected paths. No unrelated roadmap advancement; phone gates remain
-open. Results will be recorded in `test-runs/battlefield-flicker.md`.
+**FIX-MOBILE-FLICKER — implemented / desktop and public pass (2026-10-29).**
+Codex, `fix/mobile-battlefield-flicker`, base master
+`8bf8290f2f78e5d4a3c2b44128c2d935037c5c6d`; fix `1b7c4f3`, published runtime
+`01231e740c9387b444dea68e0eab6c38b411df57`. Pre-redraw clear prevents additive
+complete images accumulating before browser composition. The old runtime fails
+nine temporal jumps; 53 local + 53 public images pass, with lifecycle/layout/
+performance regressions, native syntax and artifact checks. [Evidence, preview,
+commits and phone steps](test-runs/battlefield-flicker.md). **Actual iPhone Safari
+verification NOT RUN**; inherited milestone gates stay open. This focused defect
+does not advance MOB-012 or unrelated roadmap features.
 
 Updated: 2026-10-29. Phase 1 implemented by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. [Verification record](test-runs/phase-1.md) and [merged PR #1](https://github.com/jbbejena/openfodder/pull/1). The actual iPhone gate remains unpassed.
 

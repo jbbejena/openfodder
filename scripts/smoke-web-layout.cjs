@@ -42,9 +42,8 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright-core');
         assert.equal(upstream.length,20);
       }else await page.locator('#pack').setInputFiles(pack);
       await page.locator('#start').click();await page.waitForFunction(()=>document.body.dataset.gameState==='menu');await stable();
-      const menu=await page.locator('#canvas').boundingBox();
-      if(mobile){await touch('touchStart',1,{x:menu.x+menu.width*.5,y:menu.y+menu.height*.315});await page.waitForTimeout(200);await touch('touchEnd',1);}
-      else{await page.mouse.move(menu.x+menu.width*.5,menu.y+menu.height*.315);await page.mouse.down();await page.waitForTimeout(200);await page.mouse.up();}
+      if(mobile){await page.locator('[data-mission="1"]').tap();await page.locator('#mission-deploy').tap();}
+      else{await page.locator('[data-mission="1"]').click();await page.locator('#mission-deploy').click();}
       await page.waitForFunction(()=>fodderInput.state().ready);await stable();
       await page.evaluate(()=>{
         window.layoutCommands=[];const send=Module._of_web_command;

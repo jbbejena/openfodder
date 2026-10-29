@@ -59,6 +59,7 @@ void Release(cFodder& e) {
 }
 int Validate(const cFodder& e, int action, int a, int b) {
     if (action == Cancel || action == FireStop) return Ok;
+    if (action >= WebInput::SelectMission) return WebInput::ValidateMission(action, a, b);
     if (!Battlefield(e)) return NotBattlefield;
     if (action == Pause) return (a == 0 || a == 1) && (b == 1 || b == 2 || b == 4 || b == 8) ? Ok : Invalid;
     if (CurrentPauseReasons(e)) return Paused;
@@ -126,6 +127,7 @@ void PanBy(cFodder& e, int dx, int dy) {
 }
 
 namespace WebInput {
+Stage GetStage() { return stage; }
 void SetStage(Stage value) {
     pending.clear();
     if (g_Fodder) Release(*g_Fodder);
@@ -150,6 +152,11 @@ void ApplyPending(cFodder& e) {
         lastResult = Validate(e, command.action, command.a, command.b);
         if (lastResult != Ok) continue;
         ownsInput = true;
+        if (command.action >= SelectMission) {
+            Release(e);
+            RequestMission(command.action, command.a);
+            continue;
+        }
         switch (command.action) {
         case Cancel: Release(e); manualCamera = false; break;
         case FireStop: Release(e); break;
@@ -220,17 +227,21 @@ void Fire(cFodder& e) {
 
 extern "C" {
 EMSCRIPTEN_KEEPALIVE int of_web_command(int action, double a, double b) {
-    if (action < Cancel || action > Secondary || !std::isfinite(a) || !std::isfinite(b) ||
+    if (action < Cancel || action > WebInput::ContinueMission || !std::isfinite(a) || !std::isfinite(b) ||
         a != std::floor(a) || b != std::floor(b) || std::abs(a) > 32700 || std::abs(b) > 32700) return Invalid;
     if (!g_Fodder || stage == WebInput::Stage::Uninitialized)
         return action == Cancel || action == FireStop ? Ok : Uninitialized;
     const int result = Validate(*g_Fodder, action, static_cast<int>(a), static_cast<int>(b));
     if (result != Ok) return result;
+    // One transition per frame. Cancel/fire-stop cannot discard a mission
+    // request and leave its caller waiting for an acknowledgement forever.
+    if (action >= WebInput::SelectMission && std::any_of(pending.begin(), pending.end(),
+        [](const Command& c) { return c.action >= WebInput::SelectMission; })) return Busy;
     const bool safety = action == Cancel || action == FireStop || action == Pause;
     if (safety) {
         pending.erase(std::remove_if(pending.begin(), pending.end(), [&](const Command& c) {
             if (action == Pause) return c.action == Pause && c.b == b;
-            if (action == Cancel) return c.action != Pause;
+            if (action == Cancel) return c.action != Pause && c.action < WebInput::SelectMission;
             return c.action == FireStart || c.action == FireAim || c.action == FireStop || c.action == Secondary;
         }), pending.end());
     }
@@ -242,10 +253,13 @@ EMSCRIPTEN_KEEPALIVE const char* of_web_state() {
     static std::string output;
     Json state;
     state["api"] = 1;
-    state["stage"] = stage == WebInput::Stage::Battlefield ? "battlefield" : stage == WebInput::Stage::Menu ? "menu" : "uninitialized";
+    const char* names[] = {"uninitialized", "menu", "briefing", "battlefield", "ending", "result"};
+    state["stage"] = names[static_cast<int>(stage)];
     state["last"] = {{"id", lastId}, {"code", lastResult}};
     state["pending"] = pending.size();
     state["ready"] = false;
+    if (g_Fodder && stage != WebInput::Stage::Uninitialized)
+        state["mission"] = Json::parse(WebInput::MissionState());
     // Mission-only fields are initialized by Game_Setup/Phase_Prepare, after
     // the campaign menu. Do not read them from the pre-mission snapshot.
     if (g_Fodder && stage == WebInput::Stage::Battlefield) {

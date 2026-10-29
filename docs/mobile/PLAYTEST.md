@@ -1,6 +1,6 @@
 # Mobile acceptance checklist
 
-Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). MOB-005 emulated-touch results are in [touch-commands.md](test-runs/touch-commands.md). MOB-006 [camera results](test-runs/touch-camera.md) add desktop emulation at DPR 1/2. MOB-007 [layout results](test-runs/phone-layout.md) cover fitted controls, simulated safe areas/visual viewport, portrait and DPR 3 aiming. No actual iPhone Safari test has run. Later milestone rows remain untested.
+Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. No actual iPhone Safari test has run. Later milestone rows remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -35,7 +35,7 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `ecdf5587ce78`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `7ec50c315b0e`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — Chromium/SwiftShader, mouse |
 | B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
@@ -53,16 +53,16 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | I06 | Pan the camera without a stray movement/fire action | Emulated Move two-finger pan and explicit Pan passed with no player ground command; phone not run |
 | I07 | Add/remove a second finger during a gesture without leaking an unintended command | Emulated both pan lift orders, third finger, HUD-first ownership and Fire cancellation passed; phone not run |
 | I08 | Aim/move coordinates stay correct after pan, resize and rotation | Emulated actual aim after pan/Follow/portrait round trip and pan distances after resize passed; DPR 1/2/3 covered; real Safari rotation not run |
-| I09 | Open help/menu, pause/resume, cancel targeting and return to play using touch only | Emulated Guide touch/scroll/close and independent shell/user pause passed; native P passed; complete mission menus pending |
+| I09 | Open help/menu, pause/resume, cancel targeting and return to play using touch only | Emulated mission selection/briefing/deploy, Guide pause/scroll/close/resume, retry and menu passed; actual phone NOT RUN |
 | I10 | Finger cancellation, leaving the canvas and switching modes release held inputs | Emulated canvas exit, touchCancel, HUD/mode change and resize released fire; desktop pause/blur/API/harness checks passed; phone not run |
 | U01 | Controls are readable and reachable around cutouts and the home indicator | Emulated 44×44 minimum controls and simulated 44px side/21px bottom safe areas passed; actual iPhone NOT RUN |
 | U02 | Center battlefield stays usable; menus collapse and do not obstruct live combat | Emulated rails outside canvas, contextual weapons and paused scrollable Guide passed; actual iPhone NOT RUN |
 | U03 | Portrait guidance is usable; rotating back restores a working landscape layout | Emulated prompt, portrait opt-in, independent pause and landscape aiming passed; actual rotation NOT RUN |
 | U04 | Browser-bar changes do not clip controls or misalign targets | Synthetic visualViewport height/offset recomputed bounds and released fire; physical Safari bars NOT RUN |
-| G01 | Start and complete the selected mission entirely with touch | Not run |
-| G02 | Lose/retry a mission and return to the menu without keyboard input | Not run |
-| G03 | Abort has a clear outcome distinct from victory/defeat | Not run |
-| G04 | Original desktop mouse/keyboard controls still work | SDL menu, right-button aim and P passed; full native mission/hotkey coverage not run |
+| G01 | Start and complete the selected mission entirely with touch | Unmodified combat victory NOT RUN; local empty-goal fixtures exercised native win/continue/final result; actual phone NOT RUN |
+| G02 | Lose/retry a mission and return to the menu without keyboard input | Pass in local/public touch emulation: unmodified mapm1 defeat, same-mission fresh-recruit retry, menu, mapm2 selection/replay; actual phone NOT RUN |
+| G03 | Abort has a clear outcome distinct from victory/defeat | Pass in emulation: confirmation cancellation kept play active; confirmed native abort produced stable aborted result and no continuation |
+| G04 | Original desktop mouse/keyboard controls still work | Browser uses DOM mission menus; SDL battlefield right-button aim and P passed; native desktop startup source unchanged; full native mission/hotkey coverage not run |
 
 ## M3/M4: persistence, interruptions and performance
 

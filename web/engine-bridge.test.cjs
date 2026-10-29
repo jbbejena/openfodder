@@ -41,9 +41,16 @@ test('invalid JS inputs are rejected before crossing the Wasm boundary', () => {
   let calls=0;
   const bridge=create({_of_web_command:()=>{calls++;return 1;}},canvas({left:0,top:0,width:960,height:600}));
   for(const receipt of [bridge.moveTo({x:Infinity,y:5}),bridge.fireStart(null),bridge.pan(NaN,0),
-    bridge.selectSquad(1.5),bridge.selectWeapon('laser'),bridge.setPaused('false'),bridge.setPaused(true,'other')])
+    bridge.selectSquad(1.5),bridge.selectMission(1.5),bridge.selectMission(Infinity),bridge.selectWeapon('laser'),bridge.setPaused('false'),bridge.setPaused(true,'other')])
     assert.equal(receipt.ok,false);
   assert.equal(calls,0);
+});
+test('mission actions retain stable numeric commands and carry no outcome from JavaScript',()=>{
+  const calls=[];
+  const bridge=create({_of_web_command:(...args)=>{calls.push(args);return calls.length;}},canvas({left:0,top:0,width:960,height:600}));
+  for(const [method,args] of [['selectMission',[2]],['deployMission',[]],['retryMission',[]],['abortMission',[]],['returnToMenu',[]],['continueMission',[]]])
+    assert(bridge[method](...args).ok);
+  assert.deepEqual(calls,[[11,2,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0]]);
 });
 test('a pre-runtime bridge reports uninitialized and cannot submit orders', () => {
   const bridge=create({},canvas({left:0,top:0,width:960,height:600}));

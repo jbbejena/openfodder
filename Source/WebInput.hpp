@@ -2,10 +2,17 @@
 #pragma once
 
 #ifdef EMSCRIPTEN
+#include <string>
 class cFodder;
 namespace WebInput {
-    enum class Stage { Uninitialized, Menu, Battlefield };
+    enum class Stage { Uninitialized, Menu, Briefing, Battlefield, Ending, Result };
+    // Additive action numbers; the existing combat API (0..10) stays stable.
+    enum MissionAction { SelectMission = 11, DeployMission, RetryMission, AbortMission, ReturnToMenu, ContinueMission };
     void SetStage(Stage stage);
+    Stage GetStage();
+    int ValidateMission(int action, int a, int b);
+    void RequestMission(int action, int a);
+    std::string MissionState();
     void ApplyPending(cFodder& engine);
     bool OwnsCamera();
     bool OwnsInput();

@@ -88,7 +88,7 @@ body.game-running { overflow: hidden; overscroll-behavior: none; }
   max-width: none; margin: 0; display: flex; flex-direction: column; gap: 4px;
   padding: calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px);
 }
-.game-running #topbar { min-height: 44px; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; border: 0; }
+.game-running #topbar { position: relative; z-index: 12; min-height: 44px; flex-wrap: nowrap; flex-shrink: 0; gap: 8px; border: 0; }
 .game-running #topbar strong { font-size: .8rem; letter-spacing: .09em; }
 .game-running #preview-label { display: none; }
 .game-running #field-info { display: flex; flex-direction: column; min-width: 0; font-size: .75rem; line-height: 1.25; }
@@ -128,6 +128,29 @@ body[data-orientation=portrait][data-touch-controls=true] #action-rail button { 
 #portrait-guide button { margin-top: 14px; }
 .orientation-mark { font-size: 3rem; color: var(--accent); }
 body[data-portrait-blocked=true] #playfield, body[data-portrait-blocked=true] .rail { visibility: hidden; }
+
+/* Mission screens replace canvas-only menus and never cover live combat. */
+#mission-screen { position: absolute; inset: 0; z-index: 11; display: flex; padding: 8px; background: var(--ground); min-height: 0; }
+.mission-card { width: min(100%, 36rem); max-height: 100%; overflow: auto; margin: auto;
+  padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+  overscroll-behavior: contain; touch-action: pan-y; line-height: 1.5; }
+.mission-card h1 { font-size: 1.35rem; line-height: 1.2; margin: 6px 0 12px; }
+.mission-card p { margin: 10px 0; }
+.eyebrow { color: var(--accent); font-size: .75rem; letter-spacing: .08em; }
+body:not([data-game-state=battlefield]) #field-info { display: none; }
+#mission-selected-name:empty { display: none; }
+#mission-list { display: grid; gap: 8px; }
+#mission-list button { text-align: left; }
+.mission-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#mission-deploy, #mission-next { background: var(--accent); color: var(--ground); }
+.save-note { color: var(--warning); font-size: .875rem; }
+#mission-message, #mission-guide-message { color: var(--warning); }
+#mission-guide { border-top: 1px solid var(--line); padding: 8px 0 16px; }
+#mission-guide h3 { margin: 8px 0; font-size: .95rem; }
+#abort-confirmation { border-left: 3px solid var(--warning); padding-left: 12px; }
+#abort-confirmation button { margin: 4px 8px 4px 0; }
+body[data-game-state=menu] #playfield, body[data-game-state=briefing] #playfield,
+body[data-game-state=result] #playfield { visibility: hidden; }
 
 dialog { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: inherit; padding: 0; margin: 0; position: fixed;
   left: calc(var(--viewport-left, 0px) + (var(--viewport-width, 100vw) + var(--safe-left) - var(--safe-right)) / 2);

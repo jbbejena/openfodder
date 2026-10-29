@@ -37,9 +37,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
         Module.FS.writeFile(name,JSON.stringify(campaign));
       });
       await page.waitForTimeout(1000);
-      const rect=await page.locator('#canvas').boundingBox();
-      await touch('touchStart',1,{x:rect.x+rect.width*.5,y:rect.y+rect.height*.315});
-      await page.waitForTimeout(200);await touch('touchEnd',1);
+      await page.locator('[data-mission="1"]').tap();await page.locator('#mission-deploy').tap();
       await page.waitForFunction(()=>fodderInput.state().ready && !document.querySelector('#touch-commands').hidden);
       await page.waitForTimeout(100);
       await page.evaluate(()=>{

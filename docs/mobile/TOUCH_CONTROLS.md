@@ -4,12 +4,13 @@ The existing C++/SDL engine owns soldiers, movement, targeting, weapons and ammo
 The browser provides one pointer controller in `web/touch-controls.js`, using
 the [engine command boundary](INPUT_API.md). MOB-006 adds camera gestures and
 Follow squad. MOB-007 adds the [landscape shell and control rails](PHONE_LAYOUT.md).
-Complete touch menus remain MOB-008. Real iPhone Safari acceptance and a complete touch-only mission
-have **not run**.
+MOB-008 adds [touch mission menus and results](MISSION_FLOW.md). An unmodified
+mission was played to defeat through emulated touch. Real iPhone Safari acceptance
+and an unmodified combat victory have **not run**.
 
 ## Play this build
 
-Load demo → Start game → briefly hold the Christmas Special campaign row.
+Load demo → Start game → choose a mission → read objectives → Deploy mission.
 The touch rails appear on the battlefield. Touch commands default on with a
 coarse pointer; the first battlefield touch also enables them on a hybrid device.
 On desktop, open **Guide** and check **Touch controls** to try the same loop with a mouse. Uncheck

@@ -9,7 +9,8 @@ squad/path/weapon/camera routines. The browser remains single-threaded.
 MOB-005 adds [touch command modes](TOUCH_CONTROLS.md) and deliberate secondary
 fire to this foundation. MOB-006 adds touch camera gestures and Follow using the same existing
 engine intents. MOB-007 adds the [viewport shell/HUD](PHONE_LAYOUT.md) and its independent
-presentation pause. Mission menus remain MOB-008. Vehicles receive `unsupported` rather than an invented order.
+presentation pause. MOB-008 adds [mission states and touch menus](MISSION_FLOW.md).
+Vehicles receive `unsupported` rather than an invented order.
 Native mouse/keyboard paths remain in use when the bridge does not own input.
 
 ## JavaScript surface
@@ -19,6 +20,12 @@ After runtime initialization, `window.fodderInput` exposes these methods:
 | Method | Meaning |
 | --- | --- |
 | `state()` | Read the engine/adapter snapshot; never a writable engine object |
+| `selectMission(number)` | Select a loaded demo mission from the menu and show its briefing |
+| `deployMission()` | Deploy from that briefing through native phase preparation |
+| `retryMission()` | Restart the result's mission from its first phase with fresh native game data/recruits |
+| `abortMission()` | End an active attempt through native abort handling; available while paused |
+| `returnToMenu()` | Leave briefing/results and discard the current run |
+| `continueMission()` | Advance a winning result through native `Phase_Next`, if another phase/mission exists |
 | `selectSquad(0..2)` | Select a populated engine squad; clears held input |
 | `moveTo({x,y})` / `moveAt(clientX,clientY)` | Issue an on-foot engine movement order; preserves native path/waypoint rules |
 | `fireStart({x,y})` / `fireStartAt(clientX,clientY)` | Hold primary fire at a map target; repeated starts update aim without resetting the fire cooldown |
@@ -48,7 +55,7 @@ are not part of this API.
 | Engine condition | Result |
 | --- | --- |
 | Runtime/engine not started | `uninitialized`; cancel/stop safe |
-| Menu, finished/aborted phase, or map overview | `not-battlefield`; cancel/stop safe |
+| Menu, finished/aborted phase, or map overview | Combat commands return `not-battlefield`; cancel/stop safe; mission commands follow the stage rules below |
 | Paused | Gameplay commands rejected as `paused`; explicit pause/resume/cancel/stop accepted |
 | Input disabled or camera start adjustment running | `busy`; retry only after state becomes ready |
 | Empty squad, unavailable secondary ammo/weapon, or secondary fire while the leader is in water | `unavailable` |
@@ -60,7 +67,7 @@ are not part of this API.
 Arguments are validated in JS and C++; C++ revalidates at application time because
 selection/phase/pause can change after enqueue. Safety commands coalesce and keep
 reserved capacity; cancel cannot be blocked by a full normal queue. Cancelling
-retains pending pause requests. Fire-stop removes pending fire starts/aims and secondary requests. An
+retains pending pause and mission-transition requests. Fire-stop removes pending fire starts/aims and secondary requests. An
 accepted order may therefore be superseded or rejected at the input boundary.
 
 `state()` includes API/stage/readiness, last applied ID/result, pending count,
@@ -69,6 +76,15 @@ selected squad, actual squad counts/ammo/secondary weapon, and leader
 position/destination/aim. The viewport and map bounds also come from the engine.
 The numeric applied result codes are 0 success, -1 invalid, -2 uninitialized,
 -3 not-battlefield, -4 paused, -5 no-squad, -6 unavailable, -7 busy, -8 unsupported.
+Mission commands are additive actions **11–16** in the table's order; they accept
+only a mission number for Select and zero arguments otherwise. Wrong-stage
+mission actions return `unavailable`, invalid IDs/arguments return `invalid`,
+and a second pending transition returns `busy`. They are revalidated at the
+input boundary; scene preparation runs afterward, outside the queue/redraw lock.
+`stage` additionally reports `briefing`, `ending` and `result`. `mission` contains
+engine-read campaign/mission/map/objectives, available missions, attempt counter,
+transition pending state, `canContinue` and a frozen `result` (or null).
+See [mission semantics](MISSION_FLOW.md) for result fields and supported scope.
 
 A primary-fire hold owns aiming until stopped/cancelled. Engine targeting and
 cooldowns remain authoritative; holding fire does not generate a new mouse-down
@@ -129,7 +145,7 @@ movement orders or simulation time.
 ## Diagnostic harness and checks
 
 Before Start game, expand Diagnostics and check **Show input API test panel**.
-After selecting the campaign, expand **Control bridge test panel** below the
+After choosing and deploying a mission, expand **Control bridge test panel** below the
 canvas. Use the engine map coordinates, squad/weapon buttons, Move, held primary
 fire, camera arrows/follow, Pause/Resume and Cancel. The JSON readout reflects the
 actual engine. Empty squads and unavailable weapons are disabled. The panel is

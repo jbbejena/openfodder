@@ -9,6 +9,7 @@ const fileProgress = document.getElementById('file-progress');
 const localFiles = new Map();
 const canvas = document.getElementById('canvas');
 let phoneShell = null;
+let missionUI = null;
 let runtimeReady = false;
 let pack = null;
 let manifest;
@@ -58,6 +59,7 @@ var Module = {
     window.fodderInput = OpenFodderInput.create(Module, canvas);
     const physical = OpenFodderTouch.mount(window.fodderInput, canvas);
     phoneShell?.connect(window.fodderInput, physical);
+    missionUI = OpenFodderMission.mount(window.fodderInput, phoneShell);
     setupInputHarness(window.fodderInput);
     log(`Runtime ready in ${Math.round(performance.now() - bootStarted)} ms.`);
     ready();
@@ -66,8 +68,10 @@ var Module = {
     document.body.dataset.gameState = state;
     document.body.dataset.cheats = cheats ? 'on' : 'off';
     document.getElementById('cheat-tag').hidden = !cheats;
+    missionUI?.refresh();
     phoneShell?.setGameState(state);
-    status(`${state === 'menu' ? 'Campaign menu' : state === 'battlefield' ? 'Battlefield loaded' : 'Starting game'} · cheats ${cheats ? 'ON (diagnostic)' : 'off'} · audio disabled`);
+    const label = { menu: 'Mission menu', briefing: 'Mission briefing', battlefield: 'Battlefield loaded', ending: 'Mission ending', result: 'Mission result' }[state] || 'Starting game';
+    status(`${label} · cheats ${cheats ? 'ON (diagnostic)' : 'off'} · audio disabled`);
     log(`Engine state: ${state}; cheats=${Boolean(cheats)}`);
   }
 };

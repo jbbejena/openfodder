@@ -65,13 +65,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     assert.equal(await page.getAttribute('body', 'data-cheats'), 'off');
     await page.screenshot({ path: path.join(evidenceDir, 'menu.png') });
     result.checks.menu = 'pass';
-    const canvas = await page.locator('#canvas').boundingBox();
-    // Existing canvas menu row. Hold across an engine input tick; a zero-delay
-    // down/up pair can fall between the legacy menu's sampled button reads.
-    await page.mouse.move(canvas.x + canvas.width / 2, canvas.y + canvas.height * 0.315);
-    await page.mouse.down();
-    await page.waitForTimeout(200);
-    await page.mouse.up();
+    await page.locator('[data-mission="1"]').click();await page.locator('#mission-deploy').click();
     await page.waitForFunction(() => document.body.dataset.gameState === 'battlefield', null, { timeout: 30000 });
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(evidenceDir, 'battlefield.png') });
@@ -111,11 +105,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core')
     await page.waitForFunction(() => document.body.dataset.gameState === 'menu');
     await page.waitForTimeout(1200);
     await page.screenshot({ path: path.join(evidenceDir, 'upstream-menu.png') });
-    const rect = await page.locator('#canvas').boundingBox();
-    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height * 0.315);
-    await page.mouse.down();
-    await page.waitForTimeout(200);
-    await page.mouse.up();
+    await page.locator('[data-mission="1"]').click();await page.locator('#mission-deploy').click();
     await page.waitForFunction(() => document.body.dataset.gameState === 'battlefield');
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(evidenceDir, 'upstream-battlefield.png') });

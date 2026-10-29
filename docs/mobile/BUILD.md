@@ -3,8 +3,8 @@
 The pinned Phase 1 build now includes the Phase 2 command foundation (MOB-004)
 and [touch commands/camera](TOUCH_CONTROLS.md) (MOB-005/006). The [command API](INPUT_API.md)
 and squad/Move/Fire/secondary/Pan/Follow controls plus the [phone shell/HUD](PHONE_LAYOUT.md)
-(MOB-007) are implemented; a complete phone mission
-and actual iPhone acceptance remain pending.
+(MOB-007) and [mission flow](MISSION_FLOW.md) (MOB-008) are implemented. An unmodified
+mission reached defeat through emulated touch; actual iPhone acceptance remains pending.
 [Baseline and game-data permissions](BUILD_BASELINE.md) are separate from engine
 licensing. The build hosts **no game data**, including the campaign descriptor.
 
@@ -105,9 +105,8 @@ Keep it local. **Do not upload it to hosting, Git, CI artifacts or this PR.** No
 redistribution grant for the demo/campaign has been established. A player supplies
 their own files, subject to their applicable terms; the helper is not a license.
 
-Select that file in the preview, choose **Start game**, then click and briefly hold
-the Christmas Special campaign row. This web entry point starts the battlefield
-directly; it does not implement the native briefing/recruit flow. The importer
+Select that file in the preview, choose **Start game**, select a mission, read
+its objectives, then **Deploy mission**. The importer
 checks every path/size/SHA-256 before writing anything into the in-memory filesystem.
 It accepts only the selected pack, not arbitrary scripts or retail content.
 No pack data leaves the browser, and reload clears the imported data and saves.
@@ -179,15 +178,17 @@ The separate Sites hosting source stores no demo pack. No automatic deployment
 from untrusted PRs is configured.
 
 Current [public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), no sign-in required:
-Sites version 7, fork build `ecdf5587ce784a12f22354ec2e5757c3225ddb66`.
-The layout build passed local and anonymous hosted actual-engine emulation at
-DPR 1/2/3. [The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fphone-layout)
+Sites version 9, fork build `7ec50c315b0e98d3ca6b8247b604e47f8bfb645c`.
+The mission build passed local and anonymous hosted actual-engine touch emulation:
+menu/briefing, unmodified defeat, retry, pause/resume, abort and return to menu.
+Local-only goal fixtures checked victory/continuation, not an unmodified combat
+victory. [The branch PR checks](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Amobile%2Fmission-flow)
 provide the focused web CI and downloadable artifact for its final handoff.
-Source/notices remain included; no game assets are hosted. A single Emscripten-only
-C++ validation change admits the independent shell pause reason. The Windows
+Source/notices remain included; no game assets are hosted. Emscripten-only
+C++ changes add the mission state machine and validated transition commands. The Windows
 scope classifier returns `native: false`; its compiler matrix skips. Linux's
 existing Source-path check still runs. CMake, pins and workflows are unchanged.
-[The layout record](test-runs/phone-layout.md) contains exact hosting identity,
+[The mission record](test-runs/mission-flow.md) contains exact hosting identity,
 sizes, commands and remaining checks. Prior Phase 1/bridge/touch records remain
 historical evidence for those builds.
 
@@ -199,14 +200,15 @@ No real iPhone is attached to this environment. To perform B05:
    required. Record iPhone model, iOS/Safari version and the visible fork commit.
 2. Tap **Load demo from GitHub**, wait for all 20 files to verify, and leave cheats
    unchecked. A failure should offer retry or local files; record its exact text.
-3. Rotate to landscape and choose **Start game**. Confirm the campaign menu is
+3. Rotate to landscape and choose **Start game**. Confirm the mission menu is
    visible. No Files-app import is required for the default route.
-4. Tap/briefly hold the Christmas Special row. Confirm the snow battlefield, troops
+4. Choose **LAND OF HOPE AND GLORY**, read its objectives, then **Deploy mission**.
+   Confirm the snow battlefield, troops
    and squad sidebar are displayed. If taps fail, record that failure; do not
    convert a desktop mouse pass into a phone pass.
 5. Record menu/map screenshots privately and loading/errors against that build.
-   Full touch combat, mission completion, audio, saves and Home Screen/PWA checks
-   are separate later milestones. B05 and M1 remain unpassed until this real test.
+   Full on-device mission play, audio, saves and Home Screen/PWA checks remain
+   separate evidence. B05 and M1 remain unpassed until this real test.
 
 ## Try the touch commands — real-device verification still required
 
@@ -224,5 +226,8 @@ The fitted landscape shell keeps controls beside the battlefield. Open **Guide**
 to pause and read controls, then **Back to game** to return; a prior user pause
 stays paused. Rotate to portrait for guidance or choose **Keep playing in portrait**.
 Record actual cutout/home-indicator clearance, browser-bar changes and aim after
-rotating back. These real-device checks have **not run**. Complete touch mission
-menus/retry/abort/results remain MOB-008.
+rotating back. These real-device checks have **not run**. In Guide, try
+**Abort mission → Confirm abort**, check the distinct aborted result, then Retry
+and Return to menu. [Mission semantics](MISSION_FLOW.md) explain fresh-recruit
+replay and the lack of persistent checkpoints. Persistence is the next task,
+MOB-009; it is not implemented by these menu controls.

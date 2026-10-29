@@ -150,4 +150,4 @@ input check. Seven git-fixture tests passed locally and the actual Phase 1 diff
 returned `native: false`. Shared C++/headers, native CMake/dependencies and Windows
 compiler-job edits retain coverage; ambiguous CMake runs Windows conservatively.
 Only CI/docs changed; the tested/deployed game build and unperformed phone gate
-above remain the same. [Details](../../../AGENT_HANDOFF.md#ci-follow-up-skip-unnecessary-windows-builds).
+above remain the same. [Details](../BUILD.md#ci-and-preview).

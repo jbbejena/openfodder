@@ -1,6 +1,6 @@
 # Mobile browser roadmap
 
-Status: Phase 1 desktop build/preview and Phase 2 implementation (MOB-004–008) have desktop/emulation evidence; actual iPhone gates remain unpassed. Updated: 2026-10-29. See [Phase 1](test-runs/phase-1.md), [command bridge](test-runs/command-bridge.md), [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [phone layout](test-runs/phone-layout.md) and [mission flow](test-runs/mission-flow.md). MOB-008 plays the unmodified demo to defeat with emulated touch and supports retry/abort/results; local-only goal fixtures check victory/continuation. MOB-007/008 await actual iPhone acceptance. Persistence remains MOB-009.
+Status: Phase 1 desktop build/preview and Phase 2 implementation (MOB-004–008) have desktop/emulation evidence; actual iPhone gates remain unpassed. Updated: 2026-10-29. See [Phase 1](test-runs/phase-1.md), [command bridge](test-runs/command-bridge.md), [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [phone layout](test-runs/phone-layout.md) and [mission flow](test-runs/mission-flow.md). MOB-008 plays the unmodified demo to defeat with emulated touch and supports retry/abort/results; local-only goal fixtures check victory/continuation. MOB-009 implements [mission-start checkpoints](CHECKPOINTS.md) with Chromium IndexedDB close/reopen and native recruit round-trip evidence. Actual iPhone storage/layout/mission checks remain NOT RUN. Lifecycle/audio is the next implementation task, MOB-010; M1–M3 remain unpassed.
 
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 
@@ -35,7 +35,7 @@ The planning base is `4312ff7c1abe3b6750483921893651d9d3c55b33` on `master`, ins
 | Content | Run/data and Scripts are nested submodules | Exact usable campaign files, provenance and publication terms |
 | Input | Basic finger-to-mouse translation exists | Reliable fire, secondary weapons, pointer cancellation and camera gestures |
 | Forces | Nine allocated mission soldiers; three controlled squads | No platoon expansion in this mobile pass |
-| Campaign data | Recruit IDs, ranks and kills exist; JSON save functions exist | Browser persistence, checkpoint fidelity and stable application mapping |
+| Campaign data | Native JSON and browser mission-start checkpoint persistence/restore exist; Chromium recruit round trips tested | Actual iPhone storage durability, other campaigns/phases and stable application mapping |
 | CI | Linux and Windows workflows trigger for every push/PR | Focused web CI, caching and economical path filters |
 | Device evidence | No fork iPhone acceptance result | Actual Safari and, later, Home Screen testing |
 | H Hour interface | No implemented mission/result bridge | Versioned schema, engine hooks, harness and application integration |

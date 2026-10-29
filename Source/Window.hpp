@@ -55,6 +55,9 @@ class cWindow {
 
         std::vector<cEvent>* EventGet();
 		virtual void		EventCheck();
+#ifdef EMSCRIPTEN
+        void                FrameBegin();
+#endif
 		virtual void		FrameEnd();
 
 		virtual bool		InitWindow( const std::string& pWindowTitle );

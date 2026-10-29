@@ -398,6 +398,9 @@ void cFodder::Phase_Paused()
             mSurface->palette_FadeTowardNew();
 
         // Draw background with faded palette, then overlay text using its own palette.
+#ifdef EMSCRIPTEN
+        mWindow->FrameBegin();
+#endif
         mSurface->draw();
         mSurface2->draw();
         mSurface->mergeSurfaceBuffer(mSurface2);
@@ -3237,6 +3240,9 @@ void cFodder::Video_SurfaceRender(const bool pRestoreSurface, const bool pShrink
         pSurface = mSurface;
     }
 
+#ifdef EMSCRIPTEN
+    mWindow->FrameBegin();
+#endif
     pSurface->draw(pSkip == true ? 16 : 0, pSkip == true ? 16 : 0);
     if (pShrink)
     {

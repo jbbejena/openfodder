@@ -1,5 +1,14 @@
 # Current handoff
 
+Active 2026-10-29: Codex claims **FIX-MOBILE-FLICKER**, branch
+`fix/mobile-battlefield-flicker`, from fetched master
+`8bf8290f2f78e5d4a3c2b44128c2d935037c5c6d`, starting clean. Reproduce the
+Cannon Soccer brightness flutter, correct the demonstrated rendering cause,
+and add temporal composited-frame coverage. Preserve newer input, lifecycle,
+checkpoints and performance work. This bounded bug fix does not advance mobile
+acceptance gates. Original user MP4 is unavailable in this workspace; direct
+reproduction and evidence are in progress. Physical iPhone Safari: NOT RUN.
+
 Updated 2026-10-29. **MOB-011 diagnostics are implemented and publicly available.
 The actual ten-minute iPhone Safari session, displayed-FPS target and inherited
 phone gates remain NOT RUN. MOB-011 acceptance is blocked; M1/M2/M3 remain

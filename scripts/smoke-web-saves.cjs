@@ -26,7 +26,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright-core');
   const tap=selector=>page.locator(selector).tap();
   async function choose(number){await tap(`[data-mission="${number}"]`);await page.waitForFunction(()=>fodderInput.state().stage==='briefing');}
   async function menu(){await tap('#mission-menu');await page.waitForFunction(()=>fodderInput.state().stage==='menu');}
-  async function save(){await tap('#checkpoint-save');await page.waitForFunction(()=>!fodderSaves.state().busy&&fodderSaves.state().message.startsWith('Saved checkpoint'));}
+  async function save(){const revision=await page.evaluate(()=>fodderSaves.state().revision);await tap('#checkpoint-save');await page.waitForFunction(previous=>fodderSaves.state().revision>previous&&!fodderSaves.state().busy&&fodderSaves.state().message.startsWith('Saved checkpoint'),revision);}
   async function resume(){await tap('#checkpoint-continue');await page.waitForFunction(()=>fodderInput.state().stage==='briefing');}
   async function finish(){assert.deepEqual(errors,[]);assert.deepEqual(network,[]);await context.close();active=null;}
   return{page,state,raw,native,tap,choose,menu,save,resume,finish,context};
@@ -35,6 +35,10 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright-core');
  try{
   let f=await boot();await f.choose(1);await f.save();await f.menu();await f.choose(2);await f.save();
   const saved=await f.raw(),savedNative=JSON.parse(saved).native;
+  await f.menu();await f.tap('#checkpoint-previous');await f.page.waitForFunction(()=>fodderInput.state().stage==='briefing');
+  assert.equal((await f.state()).mission.number,1);assert.equal(await f.raw(),saved);await f.menu();await f.resume();
+  assert.equal((await f.state()).mission.number,2);
+  results.checks.explicitPrevious='Use previous checkpoint restored mission 1 without overwriting current mission 2; Continue still restored mission 2';
   const downloadPromise=f.page.waitForEvent('download');await f.tap('#checkpoint-export');const download=await downloadPromise;
   const exported=path.resolve(evidence,'checkpoint-export.json');await download.saveAs(exported);
   assert.equal(JSON.parse(fs.readFileSync(exported)).native.mMissionNumber,2);
@@ -56,7 +60,12 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright-core');
    assert.equal(await f.raw(),before);assert.equal((await f.state()).stage,'menu');
   }
   results.checks.invalidImport='Malformed/schema/content mismatch and correctly checksummed invalid native mission, roster length, counts, version and rank rejected; durable checkpoint and current scene unchanged';
-  await f.page.locator('#checkpoint-import').setInputFiles(exported);await f.page.waitForFunction(()=>!fodderSaves.state().busy&&fodderSaves.state().message.startsWith('Saved checkpoint'));
+  await f.choose(1);await f.save();await f.menu();
+  assert.equal(JSON.parse(await f.raw()).native.mMissionNumber,1);
+  const importRevision=await f.page.evaluate(()=>fodderSaves.state().revision);
+  await f.page.locator('#checkpoint-import').setInputFiles(exported);await f.page.waitForFunction(previous=>fodderSaves.state().revision>previous&&!fodderSaves.state().busy&&fodderSaves.state().message.startsWith('Saved checkpoint'),importRevision);
+  assert.equal(JSON.parse(await f.raw()).native.mMissionNumber,2);assert.equal(await f.page.evaluate(()=>fodderSaves.state().previous.summary.number),1);
+  results.checks.backupImport='Downloaded mission-2 backup replaced a different mission-1 save and retained mission 1 as previous';
   await f.choose(1);
   await f.page.evaluate(()=>{window.originalSaveSync=Module.FS.syncfs;Module.FS.syncfs=(populate,callback)=>populate?originalSaveSync(populate,callback):callback(new Error('Quota failure for test'));});
   await f.tap('#checkpoint-save');await f.page.waitForFunction(()=>!fodderSaves.state().busy&&fodderSaves.state().message.includes('Quota failure'));

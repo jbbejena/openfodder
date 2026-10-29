@@ -10,9 +10,11 @@
     const app = document.getElementById('app'), field = document.getElementById('playfield');
     const dialog = document.getElementById('field-dialog'), guideButton = document.getElementById('field-guide');
     const portrait = document.getElementById('portrait-guide'), dock = document.getElementById('debug-dock');
+    const mission = document.getElementById('mission-screen');
     let bridge, controller, running = false, failed = false, portraitAllowed = false;
+    let gameStage = 'uninitialized';
     let frame = null, previousBox = '', previousOrientation = '';
-    function blocked() { return failed || dialog.open || !portrait.hidden; }
+    function blocked() { return failed || dialog.open || !portrait.hidden || !mission.hidden; }
     function release() {
       if (!failed && controller?.snapshot().enabled) controller.cancel('View changed. Input released.');
     }
@@ -41,13 +43,13 @@
       document.body.dataset.orientation = orientation;
       document.body.dataset.compact = String(height < 380);
       const touch = document.getElementById('touch-enabled').checked || root.matchMedia('(pointer: coarse)').matches;
-      const showPortrait = orientation === 'portrait' && touch && !portraitAllowed && !failed;
+      const showPortrait = gameStage === 'battlefield' && orientation === 'portrait' && touch && !portraitAllowed && !failed;
       if (portrait.hidden === showPortrait) {
         release(); portrait.hidden = !showPortrait;
       }
       document.body.dataset.portraitBlocked = String(showPortrait);
-      field.inert = showPortrait || failed;
-      dock.inert = showPortrait || dialog.open || failed;
+      field.inert = showPortrait || !mission.hidden || failed;
+      dock.inert = showPortrait || dialog.open || !mission.hidden || failed;
       syncPause();
     }
     function fit() {
@@ -103,7 +105,7 @@
     for (const type of ['pointerdown', 'pointermove', 'touchstart', 'touchmove', 'mousedown', 'mousemove', 'keydown', 'keyup']) {
       document.addEventListener(type, event => {
         if (!running || !blocked()) return;
-        if (event.target.closest?.('#field-dialog, #field-guide, #portrait-guide, #status-region')) return;
+        if (event.target.closest?.('#field-dialog, #field-guide, #portrait-guide, #mission-screen, #status-region')) return;
         if (event.cancelable) event.preventDefault();
         event.stopImmediatePropagation();
       }, { capture: true, passive: false });
@@ -114,18 +116,22 @@
     new MutationObserver(requestFit).observe(canvas, { attributes: true, attributeFilter: ['width', 'height'] });
     new MutationObserver(requestFit).observe(document.body, { attributes: true, attributeFilter: ['data-touch-controls'] });
     new MutationObserver(requestFit).observe(document.getElementById('input-harness'), { attributes: true, attributeFilter: ['hidden', 'open'] });
+    new MutationObserver(requestFit).observe(mission, { attributes: true, attributeFilter: ['hidden'] });
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(requestFit) : null;
     observer?.observe(field); observer?.observe(dock); observer?.observe(app);
     const timer = root.setInterval(() => { if (running && !failed) syncPause(); }, 100);
     root.addEventListener('pagehide', () => root.clearInterval(timer), { once: true });
     return Object.freeze({
       connect(input, physical) { bridge = input; controller = physical; },
+      closeGuide,
       start() {
         running = true; document.body.classList.add('game-running');
         document.getElementById('battle-ui').hidden = false; guideButton.hidden = false;
         root.scrollTo(0, 0); fit();
       },
       setGameState(stage) {
+        gameStage = stage;
+        if (stage !== 'battlefield' && dialog.open) closeGuide();
         document.getElementById('scene-feedback').textContent = stage === 'menu' ? 'Choose the Christmas Special campaign.' :
           stage === 'battlefield' ? 'Mouse and keyboard active. Open Guide for controls.' : 'Starting game…';
         requestFit();

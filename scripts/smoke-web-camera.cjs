@@ -60,8 +60,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       } else await page.locator('#pack').setInputFiles(pack);
       await page.locator('#start').tap();await page.waitForFunction(()=>document.body.dataset.gameState==='menu');
       await page.waitForTimeout(1000);
-      const menu=await page.locator('#canvas').boundingBox();
-      await touch('touchStart',1,{x:menu.x+menu.width*.5,y:menu.y+menu.height*.315});await page.waitForTimeout(200);await touch('touchEnd',1);
+      await page.locator('[data-mission="1"]').tap();await page.locator('#mission-deploy').tap();
       await ready();await page.waitForFunction(()=>!document.querySelector('#touch-commands').hidden);await page.waitForTimeout(100);
       await page.evaluate(()=>{
         window.cameraCommands=[];const send=Module._of_web_command;

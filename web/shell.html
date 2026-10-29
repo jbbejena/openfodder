@@ -47,7 +47,7 @@
       </details>
       </details>
       <button id="start" disabled>Start game</button>
-      <p>Start the game, then tap or click and briefly hold the Christmas Special campaign row.
+      <p>Start the game, choose a mission, read its objectives, then deploy.
         On the battlefield, touch commands provide squad selection and Move/Fire modes.
         Use two fingers in Move mode, or one finger in Pan mode, to move the camera.
         The field guide explains the controls. Progress is not saved; reloading starts a new game.</p>
@@ -93,6 +93,24 @@
         <span id="touch-target" aria-hidden="true" hidden></span>
       </div>
       <p id="scene-feedback">Choose the Christmas Special campaign.</p>
+      <section id="mission-screen" aria-labelledby="mission-title" hidden>
+        <div class="mission-card">
+          <p id="mission-campaign" class="eyebrow"></p>
+          <h1 id="mission-title" tabindex="-1"></h1>
+          <p id="mission-selected-name"></p>
+          <p id="mission-description"></p>
+          <div id="mission-list" aria-label="Demo missions"></div>
+          <ul id="briefing-objectives" aria-label="Mission objectives"></ul>
+          <div class="mission-actions">
+            <button id="mission-deploy" hidden>Deploy mission</button>
+            <button id="mission-retry" hidden>Retry mission</button>
+            <button id="mission-next" hidden>Next mission</button>
+            <button id="mission-menu" hidden>Return to menu</button>
+          </div>
+          <p class="save-note">Progress is not saved. Returning to menu or reloading discards this run. Audio is off.</p>
+          <p id="mission-message" role="status" aria-live="polite"></p>
+        </div>
+      </section>
       <section id="portrait-guide" aria-labelledby="portrait-title" hidden>
         <div class="orientation-mark" aria-hidden="true">↻</div>
         <h1 id="portrait-title">Turn for a wider battlefield</h1>
@@ -138,6 +156,18 @@
     </header>
     <div class="dialog-scroll">
       <p>Reading the guide pauses combat. Closing it returns to your previous pause state.</p>
+      <section id="mission-guide" hidden>
+        <h3 id="current-mission-name"></h3>
+        <ul id="mission-objectives" aria-label="Current objectives"></ul>
+        <button id="mission-resume" hidden>Resume combat</button>
+        <button id="mission-abort">Abort mission</button>
+        <div id="abort-confirmation" hidden>
+          <p>End this attempt? It will be marked aborted. You can then retry with fresh recruits or return to the menu.</p>
+          <button id="confirm-abort">Confirm abort</button>
+          <button id="cancel-abort">Keep playing</button>
+        </div>
+        <p id="mission-guide-message" role="status" aria-live="polite"></p>
+      </section>
       <div class="guide-controls">
         <p><strong>Move</strong> — tap ground. <strong>Fire</strong> — hold, slide to aim, lift to stop.</p>
         <p><strong>Camera</strong> — use two fingers in Move, or choose Pan and drag one. Lift all fingers before a new command. Follow squad brings the camera back.</p>
@@ -159,6 +189,7 @@
   <script src="touch-controls.js"></script>
   <script src="input-harness.js"></script>
   <script src="phone-shell.js"></script>
+  <script src="mission-flow.js"></script>
   <script src="bootstrap.js"></script>
   {{{ SCRIPT }}}
 </body>

@@ -7,6 +7,13 @@ are NOT RUN. M1/B05 and M2 remain unpassed.**
 
 ## Branch and review
 
+Active claim: Codex / **MOB-008**, `mobile/mission-flow` from user-merged master
+`7e6b537bbcb9a587f30ec27b7fdca1a71e3aef76` (PR #7). Scope: explicit browser
+mission states, engine-backed briefing/outcomes and touch start/pause/retry/abort/
+return-to-menu. Implementation and verification in progress. MOB-007's real
+iPhone gate remains unpassed; this independent work is explicitly user-authorized.
+The preview/evidence below still describe MOB-007 until publication is complete.
+
 - Codex / MOB-007, branch `mobile/phone-layout`, from user-merged master
   `15b5ff1aa63a1556f74ff35475c9d12c4d938cf3` (PR #6). User work preserved.
 - **Tested/published code:** `ecdf5587ce784a12f22354ec2e5757c3225ddb66`, viewport

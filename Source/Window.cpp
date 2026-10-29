@@ -22,6 +22,9 @@
 
 #include "stdafx.hpp"
 #include <sstream>
+#ifdef EMSCRIPTEN
+#include "WebPerformance.hpp"
+#endif
 
 cWindow::cWindow() {
 
@@ -341,7 +344,7 @@ void cWindow::FrameEnd() {
 	#else
 	// SDL3 batches renderer commands. Present them before the browser composites
 	// the canvas; a running engine/updated DOM alone does not display a frame.
-	SDL_RenderPresent(mRenderer);
+	WebPerformance::Presented(SDL_RenderPresent(mRenderer));
 	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 0);
 	//SDL_RenderClear( mRenderer );
 #endif

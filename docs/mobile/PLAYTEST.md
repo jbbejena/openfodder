@@ -1,6 +1,12 @@
 # Mobile acceptance checklist
 
-Status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. MOB-009 adds [checkpoint semantics](CHECKPOINTS.md) and [Chromium persistence evidence](test-runs/checkpoints.md). MOB-010 adds [interruption policy](LIFECYCLE.md) and [Chrome focus/cache/pixel evidence](test-runs/lifecycle.md), correcting the earlier black battlefield. Actual iPhone Safari, audible audio and phone performance remain untested.
+Current MOB-012: [complete acceptance evidence](test-runs/mobile-acceptance.md) and
+[one-command desktop run / phone procedure](ACCEPTANCE.md). Ten automated suites
+pass on clean public **01231e740c93**; all physical-phone rows remain NOT RUN.
+The user reports the flicker appears fixed after reload; exact device/build
+details and the full phone session are unrecorded.
+
+Historical status: Phase 1 desktop results are recorded in [test-runs/phase-1.md](test-runs/phase-1.md). See [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [layout](test-runs/phone-layout.md) and [MOB-008 mission flow](test-runs/mission-flow.md) for desktop/emulation evidence. MOB-008 played unmodified mapm1 to defeat through touch emulation and checked retry/abort/menu; local-only goal fixtures checked victory/continuation. MOB-009 adds [checkpoint semantics](CHECKPOINTS.md) and [Chromium persistence evidence](test-runs/checkpoints.md). MOB-010 adds [interruption policy](LIFECYCLE.md) and [Chrome focus/cache/pixel evidence](test-runs/lifecycle.md), correcting the earlier black battlefield. Actual iPhone Safari, audible audio and phone performance remain untested.
 
 Use this with [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md) and [AGENT_HANDOFF.md](../../AGENT_HANDOFF.md). Keep results tied to one exact artifact and content set.
 
@@ -35,9 +41,9 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | --- | --- | --- |
 | B01 | Clean pinned build produces HTML/JS/Wasm/data without missing dependencies | Pass — Phase 1 record |
 | B02 | Incremental rebuild and documented startup work from the recorded revisions | Pass — Phase 1 record |
-| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `d3edef36fc52`, direct pinned upstream loading; local-file fallback |
+| B03 | The preview identifies the fork commit and loads the intended content | Pass — public anonymous access, `01231e740c93`, direct pinned upstream loading; local-file fallback |
 | B04 | A desktop browser reaches the menu and loads a map | Pass — current Chromium/SwiftShader screenshot + composited-pixel checks; see MOB-010 correction |
-| B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — no real iPhone available |
+| B05 | Actual iPhone Safari reaches the menu and displays the map | Not run — structured device/build/session evidence not yet recorded |
 | B06 | Missing data/download/renderer failure gives a useful error rather than a permanent blank screen | Pass for missing/corrupt pack, Wasm failure and context loss — Phase 1 record |
 | B07 | Normal-play cheats are off; diagnostics are explicit | Pass — normal off / explicit checkbox opt-in |
 | B08 | Consecutive composited battlefield frames retain stable background/HUD brightness after entry fade and through controls/return/retry | Desktop/local and public pass: 53 images each, old build fails; [focused flicker record](test-runs/battlefield-flicker.md). Physical iPhone Safari NOT RUN |

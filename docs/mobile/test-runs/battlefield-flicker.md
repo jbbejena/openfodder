@@ -200,8 +200,10 @@ texels through the old build's diagnostic jumps. No test content was modified.
 Code/fix commit `1b7c4f3bbc96f1df9b2e5e095134c216b7ee83b7`;
 harness transition correction / **published runtime**
 `01231e740c9387b444dea68e0eab6c38b411df57`. Final documentation follows that
-runtime commit. [Draft branch review](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Afix%2Fmobile-battlefield-flicker)
-targets master and stays unmerged.
+runtime commit. [PR #12](https://github.com/jbbejena/openfodder/pull/12) was opened as a draft;
+the user merged it as `7c8413a159a51c9fbd6460f2bed2499bf36e3274`. The user later
+reported that flashing appears fixed after reload; formal phone-session evidence
+is tracked by [MOB-012](mobile-acceptance.md).
 
 [Public preview](https://openfodder-phase-one.zanysky263.chatgpt.site): **Sites v14**,
 visible **01231e740c93**; audience remains public, access revision 2.

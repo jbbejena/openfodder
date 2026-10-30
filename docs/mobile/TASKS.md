@@ -1,5 +1,11 @@
 # Agent task ledger and specifications
 
+**Repository move (2026-10-29 Pacific / 2026-10-30 UTC):** future game work is in
+`jbbejena/open-h-hour`, default `main`; see its current handoff and switch PR #2.
+This ledger is historical. Retirement [PR #15](https://github.com/jbbejena/openfodder/pull/15)
+disables automatic CI here while retaining manual web builds. Physical-device
+gates remain unpassed; moving source does not complete them.
+
 **FIX-MOBILE-FLICKER — implemented / desktop and public pass (2026-10-29).**
 Codex, `fix/mobile-battlefield-flicker`, base master
 `8bf8290f2f78e5d4a3c2b44128c2d935037c5c6d`; fix `1b7c4f3`, published runtime

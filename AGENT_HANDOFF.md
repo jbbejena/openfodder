@@ -1,5 +1,31 @@
 # Current handoff
 
+## Repository move — 2026-10-29 Pacific / 2026-10-30 UTC
+
+The user explicitly requests future game changes in **jbbejena/open-h-hour** and
+turning off CI except the relevant web build. Continue implementation there,
+default branch `main`, switch branch `build/open-h-hour-playable`. Preserve its
+existing import of this engine and its current handoff/test record. Its source
+metadata/launcher/publication identify Open H Hour; this repository is historical.
+
+This retirement branch `build/retire-openfodder-ci` starts at fetched master
+`2618a60bc03f424282f6ea63a0f1fa8f33caf92a`. Windows/Linux definitions are moved
+unchanged to `.github/disabled-workflows/`; web CI becomes manual-only. No
+engine, dependencies, artifacts, protections, secrets or releases change.
+Static diff/policy checks suffice here; current build/browser verification is
+performed in Open H Hour. Open a draft PR targeting master and leave it unmerged.
+Default-branch triggers change only after merge; this does not cancel old runs.
+No CI settings API is used and no required check is bypassed.
+
+The existing public play URL is retained:
+https://openfodder-phase-one.zanysky263.chatgpt.site. Consult Open H Hour's
+`docs/mobile/test-runs/open-h-hour-switch.md` for the actual newly served commit,
+verification and preview publication. This move does not connect the private
+H Hour story application or pass physical iPhone/M1–M4 acceptance.
+
+The following MOB-013 handoff is historical and must not direct new work back
+into this repository.
+
 Updated 2026-10-29 Pacific / 2026-10-30 UTC. **MOB-013 candidate preparation is
 implemented and locally verified. Bundles remain UNAPPROVED; accepted mobile
 baseline and M1–M4 remain blocked on MOB-012 phone evidence.** No tag, release,

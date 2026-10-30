@@ -1,5 +1,15 @@
 # Codex agent instructions
 
+## Repository retired for new game work
+
+The user moved future engine/mobile changes to `jbbejena/open-h-hour` (`main`)
+on 2026-10-29 Pacific / 2026-10-30 UTC. Continue there and read its handoff.
+This repository retains historical source/evidence. The user's CI instruction
+supersedes the old policy below: native workflows are archived outside the
+active workflow directory, and this old repository's web workflow is manual-only.
+Do not restart automatic/native CI here or infer that phone acceptance passed.
+Review: Open H Hour PR #2 and this repository's retirement PR #15, left unmerged.
+
 ## Purpose and current scope
 
 This fork is being prepared for a standalone, landscape-first mobile-browser version of Open Fodder. The first product target is a complete touch-only mission on iPhone Safari with a supported persistent checkpoint. H Hour integration follows a verified mobile baseline.

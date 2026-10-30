@@ -2,29 +2,6 @@ name: web-build
 
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - 'Source/**'
-      - 'CMakeLists.txt'
-      - 'cmake/**'
-      - '.gitmodules'
-      - 'Run'
-      - 'scripts/**'
-      - 'web/**'
-      - 'COPYING*'
-      - '.github/workflows/web-build.yml'
-  pull_request:
-    paths:
-      - 'Source/**'
-      - 'CMakeLists.txt'
-      - 'cmake/**'
-      - '.gitmodules'
-      - 'Run'
-      - 'scripts/**'
-      - 'web/**'
-      - 'COPYING*'
-      - '.github/workflows/web-build.yml'
 
 permissions:
   contents: read

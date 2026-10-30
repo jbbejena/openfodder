@@ -1,5 +1,18 @@
 # Open Fodder
 
+**Game development has moved to [jbbejena/open-h-hour](https://github.com/jbbejena/open-h-hour).**
+Make future code changes there, on `main`. [Play the game](https://openfodder-phase-one.zanysky263.chatgpt.site)
+without an account; reload an old tab, then Load demo from GitHub → Start game →
+LAND OF HOPE AND GLORY → Deploy mission. Loading data does not update a running
+engine. Do not clear website data just to update; it may erase checkpoints.
+
+At the user's request this repository retires automatic CI: Windows/Linux
+definitions are retained outside `.github/workflows/`, and the old web build
+is manual-only. The new repository keeps the cached web build on relevant PRs
+and `main` pushes. These policies take effect on each default branch after its
+switch PR is merged; no branch protections change and no existing runs are
+cancelled. The historical evidence below belongs to this Open Fodder fork.
+
 ## Mobile browser work in this fork
 
 This fork retains the C++/SDL/Emscripten engine with a pinned browser build and a

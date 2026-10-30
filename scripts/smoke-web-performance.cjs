@@ -5,6 +5,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright-core');
 const assertWebFrame=require('./assert-web-frame.cjs');
+const assertPerformanceSampling=require('./assert-web-performance.cjs');
 (async()=>{
   const [url,pack,evidence,expected]=process.argv.slice(2);assert(url&&pack&&evidence);fs.mkdirSync(evidence,{recursive:true});
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,
@@ -94,9 +95,11 @@ const assertWebFrame=require('./assert-web-frame.cjs');
     await page.setViewportSize({width:844,height:390});await tap('#close-guide');await ready();
     for(let i=0;i<5;i++){
       await record();await page.waitForTimeout(1200);await guide();await tap('#performance-stop');
-      const r=await page.evaluate(()=>fodderPerformance.report());assert(r.native.submittedFrames>0);assert(r.samples.length<=5);
+      const r=await page.evaluate(()=>fodderPerformance.report());
+      fs.writeFileSync(path.join(evidence,`cycle-${i}.json`),JSON.stringify(r,null,2)+'\n');
+      assert(r.native.submittedFrames>0);assertPerformanceSampling(r);
       results.cycles.push({attempt:(await state()).mission.attempt,capacityBytes:r.memory.endCapacityBytes,
-        samples:r.samples.length,events:r.events.length,activeMs:r.native.activeMs});
+        samples:r.samples.length,wallMs:r.wallMs,events:r.events.length,activeMs:r.native.activeMs});
       await abort();
       if(i%2===0){await tap('#mission-menu');await page.waitForFunction(()=>fodderInput.state().stage==='menu');await deploy();}
       else{await tap('#mission-retry');await ready();}

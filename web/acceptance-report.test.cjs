@@ -35,3 +35,16 @@ test('Every standalone playtest row has an explicit report disposition',()=>{
  const documented=[...text.matchAll(/^\| ([BIUGSLPR]\d{2}) \|/gm)].map(match=>match[1]).sort();
  assert.deepEqual(Object.keys(require('../scripts/web-acceptance-report.cjs').coverage).sort(),documented);
 });
+const sampling=require('../scripts/assert-web-performance.cjs');
+const recording=(times,wallMs)=>({recording:false,wallMs,limits:{samples:1800},samples:times.map(atMs=>({atMs}))});
+test('A slow browser may record more than five valid one-second samples',()=>{
+ sampling(recording([0,1000,2000,3000,4000,5000,6000,6500],6500));
+});
+test('Duplicate timer chains and sample-cap overflow still fail cadence checks',()=>{
+ assert.throws(()=>sampling(recording([0,1000,1200,2000,2200,3000],3000)));
+ assert.throws(()=>sampling({...recording([0,1000,2000],2000),limits:{samples:2}}));
+});
+test('An intentional stop sample may immediately follow a scheduled sample',()=>{
+ sampling(recording([0,1000,1001],1001));
+ assert.throws(()=>sampling(recording([0,1000,999],1001)));
+});

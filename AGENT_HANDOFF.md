@@ -1,5 +1,14 @@
 # Current handoff
 
+Active 2026-10-29 Pacific / 2026-10-30 UTC: Codex claims **MOB-013 preparation**,
+`release/mobile-candidate`, from fetched master
+`e57872b8f9c66732527363fd64da8d04a0f5dc78` (user-merged PR #13), starting clean.
+The user explicitly authorized reproducible candidate packaging, checksums,
+matching source/notices/pins and deployment/rollback instructions while phone
+acceptance is pending. Deliver an **UNAPPROVED** bundle and verify restoration;
+no tag, release, hosting promotion or accepted-baseline claim. MOB-012/phone gates
+remain open. Preserve the current public preview and newer work.
+
 Updated 2026-10-29 Pacific / 2026-10-30 UTC. **MOB-012 desktop acceptance
 work is implemented and all ten public browser suites pass. Formal iPhone
 acceptance remains BLOCKED / NOT RUN; M1–M4 remain unpassed.** The user authorized

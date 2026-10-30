@@ -19,7 +19,7 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       const page = await context.newPage();
       const errors=[];page.on('pageerror',error=>errors.push(error.message));
       const state=()=>page.evaluate(()=>fodderInput.state());
-      const ready=()=>page.waitForFunction(()=>fodderInput.state().ready && fodderInput.state().selectedSquad>=0);
+      const ready=()=>page.waitForFunction(()=>fodderInput.state().ready && !fodderInput.state().paused && fodderInput.state().selectedSquad>=0);
       async function command(method,...args) {
         const receipt=await page.evaluate(({method,args})=>fodderInput[method](...args),{method,args});
         assert(receipt.ok,method+': '+JSON.stringify(receipt));
@@ -176,6 +176,13 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       await command('fireStart',target);
       await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
       await page.waitForFunction(()=>!fodderInput.state().fireHeld);
+      const awayTick=(await state()).engineTick;
+      assert.deepEqual(await page.evaluate(t=>fodderInput.fireStart(t),target),{ok:false,reason:'paused'});
+      await page.waitForTimeout(250);
+      assert.equal((await state()).engineTick,awayTick,'Blur freezes native simulation until explicit return');
+      await page.evaluate(()=>window.dispatchEvent(new Event('focus')));
+      await page.locator('#lifecycle-return').click();
+      await ready();
       await command('fireStart',target);
       await command('setPaused',true);
       assert.equal((await state()).fireHeld,false,'Pause cancels held fire');
@@ -195,8 +202,8 @@ const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright-core');
       await page.waitForTimeout(250);await page.screenshot({path:path.join(evidence,`battlefield-dpr${dpr}.png`)});
       result.checks[`dpr${dpr}`]={uninitialized:'pass',invalid:'pass',squadAndWeapon:'pass',coordinates:projections,
         movement:'engine destination and position changed',heldFire:'engine aim changed; stop/cancel released intent',
-        pause:'idempotent; ticks frozen; independent reasons; native P preserved',cancellation:'API cancel, pause, synthetic window blur, real harness pointer release',
-        nativeMenu:'desktop SDL pointer passed',nativePrimaryFire:'real SDL right-button aiming passed',queueSafety:'32 accepted; overflow rejected; cancel preempted pending orders',harness:'real pointer down/up passed'};
+        pause:'idempotent; ticks frozen; independent reasons; native P preserved',cancellation:'API cancel, pause, synthetic blur/focus with required explicit Return, real harness pointer release',
+        missionMenus:'DOM mission selection/Deploy with desktop pointer passed',nativePrimaryFire:'real SDL right-button aiming passed',queueSafety:'32 accepted; overflow rejected; cancel preempted pending orders',harness:'real pointer down/up passed'};
       assert.deepEqual(errors,[]);
       await context.close();
     }

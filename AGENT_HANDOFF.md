@@ -1,5 +1,14 @@
 # Current handoff
 
+Active 2026-10-29 (Pacific): Codex claims **MOB-012**, branch
+`qa/mobile-acceptance`, from fetched master
+`7c8413a159a51c9fbd6460f2bed2499bf36e3274` (user-merged PR #12), starting clean.
+The user authorized independent acceptance work while phone checks remain open.
+Run one reproducible desktop acceptance pass against an exact build, fix
+reproduced failures, and report each phone gate separately. No release, tag,
+H Hour or unrelated combat work. The user reports flashing appears fixed after
+reload; device/iOS/build details and a structured full phone session are absent.
+
 Updated 2026-10-29. **FIX-MOBILE-FLICKER implemented, desktop and public-preview
 temporal checks passed. Actual physical iPhone Safari confirmation: NOT RUN.**
 M1/M2/M3 and inherited phone/full-mission/performance gates remain unpassed.

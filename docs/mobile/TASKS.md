@@ -45,7 +45,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | MOB-010 | M3 | blocked | MOB-004, MOB-008 | Codex / `mobile/browser-lifecycle`, from `965b90f` | `1de52e5`: [policy/audio audit](LIFECYCLE.md), [local/public focus/cache/pixel evidence](test-runs/lifecycle.md), [merged PR #10](https://github.com/jbbejena/openfodder/pull/10). Lifecycle implementation complete on desktop; actual Safari/OS interruption and audible-audio acceptance remain open (null backend retained). M3 remains unpassed |
 | MOB-011 | M3 | blocked | MOB-008, MOB-010 | Codex / `mobile/performance`, from `9daff60` | `d3edef3`: [recorder/phone steps](PERFORMANCE.md), [local/public desktop measurements and restart/export checks](test-runs/performance.md). Implementation delivered independently with user authorization; ten-minute actual Safari, displayed-FPS target, cold/warm/heat/response NOT RUN. M3 unpassed |
 | MOB-012 | M4 | blocked | MOB-003, MOB-008, MOB-009, MOB-010, MOB-011 | Codex / `qa/mobile-acceptance`, from `7c8413a`; independent work explicitly authorized | `46e15fe` runner and `62d28a7` cadence correction; all ten public browser suites + 61 Node cases pass. [41-row evidence/blocker record](test-runs/mobile-acceptance.md), [phone procedure](ACCEPTANCE.md). Formal iPhone mission/save/return/performance evidence NOT RUN; M4 unpassed |
-| MOB-013 | M4 | active | MOB-012 | Codex / `release/mobile-candidate`, from `e57872b`; independent preparation explicitly authorized | Reproducible UNAPPROVED bundle, matching source/notices/pins, checksums and verified rollback in progress. Accepted baseline remains blocked on MOB-012; no promotion/tag/release |
+| MOB-013 | M4 | blocked | MOB-012 | Codex / `release/mobile-candidate`, from `e57872b`; independent preparation explicitly authorized | `77186d1`: one-command UNAPPROVED bundle, full source/notices/pins, checksums, embedded verifier and exact local rollback. [Measured evidence](test-runs/mobile-candidate.md), [operator procedure](CANDIDATES.md). Preparation complete; accepted baseline blocked on MOB-012; no tag/release/promotion |
 | MOB-014 | M5 | deferred | MOB-013 | Unclaimed | — |
 | MOB-015 | M5 | deferred | MOB-014 | Unclaimed | — |
 | MOB-016 | M5 | deferred | MOB-015 | Unclaimed | — |
@@ -327,7 +327,9 @@ QA-assumption corrections. Complete public pass on `01231e740c93`; no engine/UI
 changes or redeployment. Fixtures and the informal user flicker observation do
 not pass real-phone gates. [Measured evidence](test-runs/mobile-acceptance.md)
 lists every standalone checklist row, actual commands and prioritized blockers.
-MOB-013 remains pending; no release candidate or H Hour work was advanced.
+User merged [PR #13](https://github.com/jbbejena/openfodder/pull/13) as `e57872b`.
+MOB-013 preparation is now independently authorized; phone acceptance and an
+accepted baseline remain blocked. H Hour work stays deferred.
 
 ## MOB-013: Establish the standalone mobile baseline
 
@@ -346,6 +348,16 @@ Record the exact accepted build, preview URL, supported content/device scope and
 - Mobile completion is backed by MOB-012, not inferred from a green native CI badge.
 - The baseline can be rebuilt and the previous working artifact can be restored.
 - Update the task ledger and handoff before starting integration work.
+
+MOB-013 preparation (2026-10-29 Pacific / 2026-10-30 UTC): user explicitly
+authorized independent packaging while formal phone acceptance is pending.
+`77186d1` adds an UNAPPROVED candidate command, historical/full-source/support
+validation, reproducible ZIP/checksums, embedded verifier and separate CI artifact.
+11 Python and 61 Node cases pass. New/exact-preview bundles verified without
+Git/SDK, rendered menu/map, and local atomic rollback restored previous bytes.
+[Artifact hashes, commands, browser coverage and limits](test-runs/mobile-candidate.md).
+Public preview stays v14 / `01231e740c93`; no release/tag/promotion. Accepted
+MOB-013 baseline and M1–M4 remain blocked on MOB-012. MOB-014 stays deferred.
 
 ## MOB-014: Evaluate fitness for H Hour
 

@@ -88,8 +88,8 @@ For each row use **pass**, **fail**, **blocked** or **not run**. Include an obse
 | P02 | Record sustained frame pacing during at least ten minutes or the full mission if longer | Optional recorder/export implemented; short desktop submission/RAF observations only. Ten-minute on-device session and rendered-FPS target NOT RUN |
 | P03 | Simulation/weapon timing remains correct across render rates | Clock/pacing unchanged; desktop callbacks advanced zero/one tick each. Cross-refresh weapon/phone check NOT RUN |
 | P04 | Repeated retry/menu/mission transitions show no unbounded memory/handler growth | Five short desktop recording/restart cycles: one start/stop each, bounded rows, stable Wasm capacity. Used memory/long-term leaks and actual Safari NOT RUN |
-| R01 | Accepted candidate has reproducible source/content revisions and linked evidence | Not run |
-| R02 | Source/notices and data terms match what is actually distributed | Not run |
+| R01 | Accepted candidate has reproducible source/content revisions and linked evidence | UNAPPROVED packaging/rollback preparation passed; [record](test-runs/mobile-candidate.md). Accepted candidate remains blocked on phone gates |
+| R02 | Source/notices and data terms match what is actually distributed | Source/support/notices and asset boundary verified for candidate bundles; [record](test-runs/mobile-candidate.md). Game-data mirroring permission remains unresolved |
 
 The initial performance target is responsive play with sustained 30 rendered FPS or better during ordinary combat where feasible. Report measured misses explicitly; do not alter simulation speed to make a frame counter look better.
 

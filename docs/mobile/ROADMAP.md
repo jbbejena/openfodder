@@ -8,6 +8,11 @@ Formal phone mission/recovery/performance evidence is still pending; M4 remains
 unpassed. The user reports apparent flicker resolution after reload, without a
 structured device/build/session record.
 
+MOB-013 independently authorized [candidate packaging and rollback preparation](CANDIDATES.md)
+is implemented with [measured bundle/restore evidence](test-runs/mobile-candidate.md).
+Bundles remain UNAPPROVED; the accepted standalone baseline is blocked on phone
+acceptance. No tag, release, public promotion or H Hour work.
+
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 
 ## Product target

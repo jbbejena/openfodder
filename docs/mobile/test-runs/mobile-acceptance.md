@@ -225,6 +225,7 @@ MOB-012. MOB-013's accepted candidate/release is also pending.
 
 [Exact phone procedure and report fields](../ACCEPTANCE.md#actual-iphone-session--pending).
 No tags, release promotion, new content, larger forces, tactical systems or H Hour
-integration. [Draft branch review](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Aqa%2Fmobile-acceptance)
-targets master and stays unmerged; the stable baseline remains MOB-013 after
-required acceptance evidence exists.
+integration. [PR #13](https://github.com/jbbejena/openfodder/pull/13) was opened as a draft;
+the user merged it as `e57872b8f9c66732527363fd64da8d04a0f5dc78`. Independent
+[MOB-013 packaging preparation](../CANDIDATES.md) now exists; an accepted stable
+baseline remains blocked on the required phone evidence.

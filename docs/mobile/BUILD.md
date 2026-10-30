@@ -307,3 +307,10 @@ Use the [MOB-012 acceptance command and iPhone procedure](ACCEPTANCE.md) to run
 all existing browser suites against one full clean build identity and retain a
 per-check report. Desktop pass, fixtures and physical-device evidence remain
 separate. [Current measured record](test-runs/mobile-acceptance.md).
+
+## Package a review candidate
+
+`python3 scripts/package-web-candidate.py` builds and verifies a committed
+**UNAPPROVED** ZIP/checksum bundle with matching source/notices and rollback
+metadata. [Commands, integrity limits and deployment/recovery procedure](CANDIDATES.md).
+This preparation does not pass the pending iPhone gates or publish a release.

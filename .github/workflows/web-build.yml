@@ -53,11 +53,25 @@ jobs:
         run: ./scripts/build-web.sh
       - name: Check browser input coordinates, ownership and validation
         run: node --test web/*.test.cjs
+      - name: Check candidate integrity, source and rollback safeguards
+        run: python3 -m unittest discover -s scripts -p 'test_web_candidate.py' -v
       - name: Verify artifact publication boundary
         run: python3 scripts/check-web-artifact.py
+      - name: Package an UNAPPROVED mobile candidate
+        run: |
+          python3 scripts/package-web-candidate.py --from-dist build-web/cmake/dist --expect-commit "${{ github.event.pull_request.head.sha || github.sha }}"
+          for candidate in build-web/candidates/*.zip; do
+            python3 scripts/package-web-candidate.py --verify "$candidate"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: openfodder-web-${{ github.event.pull_request.head.sha || github.sha }}
           path: build-web/cmake/dist/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openfodder-mobile-candidate-${{ github.event.pull_request.head.sha || github.sha }}
+          path: build-web/candidates/
           if-no-files-found: error
           retention-days: 30

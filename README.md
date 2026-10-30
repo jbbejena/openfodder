@@ -2,11 +2,20 @@
 
 ## Mobile browser work in this fork
 
-This fork has a reproducible Phase 1 browser engine build and a [standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site) (public; no sign-in required; demo loads directly from pinned upstream GitHub). Desktop Chromium reaches the menu and battlefield. Actual iPhone Safari testing, touch combat, browser persistence and later H Hour integration remain pending; existing upstream badges/demo links do not establish mobile readiness for this fork.
+This fork retains the C++/SDL/Emscripten engine with a pinned browser build and a
+[public standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site)
+(no sign-in; demo loads directly from pinned upstream GitHub). Touch controls,
+mission flow, mission-start checkpoints, interruption handling and optional
+performance recording have desktop/browser-emulation evidence. Formal iPhone
+mission/recovery/performance acceptance remains pending; M1–M4 are unpassed.
+The selected two-mission demo has one populated squad and zero secondary ammo;
+web audio stays silent. H Hour integration is deferred.
 
 - [Pinned web build and local demo-pack instructions](docs/mobile/BUILD.md)
-- [Phase 1 verification and remaining phone checkpoint](docs/mobile/test-runs/phase-1.md)
-- [Phase 2 command API and diagnostic harness](docs/mobile/INPUT_API.md) — MOB-004 implemented; [desktop/hosted results](docs/mobile/test-runs/command-bridge.md). Touch combat remains the next task.
+- [UNAPPROVED candidate packaging, verification and rollback](docs/mobile/CANDIDATES.md)
+- [One-command desktop acceptance and iPhone procedure](docs/mobile/ACCEPTANCE.md)
+- [Command API and diagnostic harness](docs/mobile/INPUT_API.md)
+
 - [Codex agent instructions](AGENTS.md)
 - [Current handoff and next task](AGENT_HANDOFF.md)
 - [Detailed roadmap](docs/mobile/ROADMAP.md)

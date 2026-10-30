@@ -2,7 +2,8 @@
 
 Open [the standalone preview](https://openfodder-phase-one.zanysky263.chatgpt.site)
 in Safari. No ChatGPT login, computer or local game files are required. Check the
-build identifier against the [test record](test-runs/performance.md). Load the
+build identifier against the [current acceptance record](test-runs/mobile-acceptance.md).
+The [original MOB-011 measurements](test-runs/performance.md) retain their older build identity. Load the
 demo from GitHub, Start game, select the first mission and Deploy.
 
 1. Open **Guide → Performance test**. Enter the actual iPhone model and iOS
@@ -99,7 +100,7 @@ the native boundary no longer answers. No telemetry service or new dependency.
 
 ```sh
 ./scripts/build-web.sh
-node --test --test-isolation=none web/*.test.cjs # Node 24, 52 individual tests
+node --test --test-isolation=none web/*.test.cjs # Node 24; includes current acceptance-report checks
 python3 scripts/check-web-artifact.py
 python3 -m http.server 8765 --bind 127.0.0.1 --directory build-web/cmake/dist
 ```

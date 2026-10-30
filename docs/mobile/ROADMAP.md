@@ -2,6 +2,12 @@
 
 Status: Phase 1 desktop build/preview and Phase 2 implementation (MOB-004–008) have desktop/emulation evidence; actual iPhone gates remain unpassed. Updated: 2026-10-29. See [Phase 1](test-runs/phase-1.md), [command bridge](test-runs/command-bridge.md), [touch modes](test-runs/touch-commands.md), [camera](test-runs/touch-camera.md), [phone layout](test-runs/phone-layout.md) and [mission flow](test-runs/mission-flow.md). MOB-008 plays the unmodified demo to defeat with emulated touch and supports retry/abort/results; local-only goal fixtures check victory/continuation. MOB-009 implements [mission-start checkpoints](CHECKPOINTS.md) with Chromium IndexedDB close/reopen and native recruit round-trip evidence. Actual iPhone storage/layout/mission checks remain NOT RUN. MOB-010 adds [interruption-safe return](LIFECYCLE.md), Chrome focus/cache checks and a battlefield rendering fix. MOB-011 adds [bounded performance recording and local export](PERFORMANCE.md) with [short desktop observations](test-runs/performance.md). Actual Safari/OS interruptions, audible audio and ten-minute phone performance remain open; MOB-012 acceptance is blocked on that evidence. M1–M3 remain unpassed.
 
+MOB-012 now has [a complete desktop acceptance pass and per-row blockers](test-runs/mobile-acceptance.md)
+on public build `01231e740c93`, plus [the repeatable command/phone procedure](ACCEPTANCE.md).
+Formal phone mission/recovery/performance evidence is still pending; M4 remains
+unpassed. The user reports apparent flicker resolution after reload, without a
+structured device/build/session record.
+
 This roadmap applies to the fork [jbbejena/openfodder](https://github.com/jbbejena/openfodder). Read the root [agent instructions](../../AGENTS.md), [current handoff](../../AGENT_HANDOFF.md), [task specifications](TASKS.md), and [playtest checklist](PLAYTEST.md) together. An implementation status requires evidence; a planned deliverable is not an existing feature.
 
 ## Product target

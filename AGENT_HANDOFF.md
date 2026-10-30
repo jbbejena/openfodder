@@ -1,142 +1,142 @@
 # Current handoff
 
-Updated 2026-10-29. **FIX-MOBILE-FLICKER implemented, desktop and public-preview
-temporal checks passed. Actual physical iPhone Safari confirmation: NOT RUN.**
-M1/M2/M3 and inherited phone/full-mission/performance gates remain unpassed.
-This is a bounded rendering fix; no unrelated roadmap advancement.
+Updated 2026-10-29 Pacific / 2026-10-30 UTC. **MOB-012 desktop acceptance
+work is implemented and all ten public browser suites pass. Formal iPhone
+acceptance remains BLOCKED / NOT RUN; M1–M4 remain unpassed.** The user authorized
+independent work after saying the full phone session had not yet been done.
 
-## Branch, commits and review
+## Branch, revisions and scope
 
-Codex / `fix/mobile-battlefield-flicker`, from fetched master
-`8bf8290f2f78e5d4a3c2b44128c2d935037c5c6d` (user-merged PR #11), starting clean.
-Fetched master again before handoff: still that revision. Unrelated local work
-was preserved. No worktree was needed; Run/Scripts pins stayed unchanged.
+Codex / `qa/mobile-acceptance`, from fetched clean master
+`7c8413a159a51c9fbd6460f2bed2499bf36e3274`. That is the user's merge of
+[PR #12](https://github.com/jbbejena/openfodder/pull/12), the battlefield flicker
+fix. The user subsequently reported flashing appears fixed after reload;
+model/iOS/build details and a structured session were not supplied. Treat it as
+an informal user observation, not a full physical-device pass.
 
-- `1b7c4f3bbc96f1df9b2e5e095134c216b7ee83b7`: pre-redraw clear, temporal regression and claim.
-- `01231e740c9387b444dea68e0eab6c38b411df57`: isolate ordinary samples from mission transitions; **clean published/tested runtime**.
-- Final documentation follows that runtime commit. Final branch head and CI are
-  visible in the [draft branch review](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Afix%2Fmobile-battlefield-flicker), targeting master. **Leave unmerged**.
+- `46e15fe0726d208fba23cffc681bcfe504563365`: one-command acceptance runner/report,
+  six initial reporting safeguards, corrected legacy blur/Return expectation.
+- `62d28a7ef3b2fc23f2eb996443ba102ae9d30864`: recorder cadence checks based on
+  elapsed time; regression cases and per-cycle evidence. **Runner used for the
+  complete verified public pass.** Final documentation follows these commits.
+- [Draft branch review](https://github.com/jbbejena/openfodder/pulls?q=is%3Apr+head%3Aqa%2Fmobile-acceptance)
+  targets master. Final head, observed CI/artifact links are recorded there.
+  Leave unmerged; no force push, tag, release or baseline promotion.
 
-The roadmap/Phase 1 and MOB-004–011 were already merged onto master. Preserve
-all newer touch, camera, mission, checkpoint, lifecycle and optional-performance
-work. No force push, dependency/CI/protection change or release.
+No C++/engine, browser-product UI, combat/timing, input contract, dependency,
+workflow/protection or hosting changes. New code is Node QA only. Current
+preview stays on the already verified runtime below; no player reload is needed
+for this QA-only PR. Touch/mission/save/lifecycle/performance and the flicker fix
+are retained. H Hour, larger forces and tactical changes remain deferred.
 
-## Demonstrated cause and correction
+## Delivered code and documentation
 
-The original MP4 is unavailable here; its described frames were not independently
-inspected. Rebuilt current master reproduced idle flashing. The prior live
-preview actually served clean `d3edef36fc529ab051060524516168dc976a53ee`, rather
-than the recording's `1de52e57c4c185dde254f679209d253af6009c82`.
-
-The complete base texture is additive. Web `FrameEnd` presented without clearing,
-so multiple complete native redraws before one browser composite added the same
-pixels together. Idle grass alternated RGB green 80/160/240/255; the original HUD
-brightened too. A stationary 1/3/2-callback diagnostic failed on the old clean
-runtime with **nine global jumps**, while CPU grass texels remained green 80.
-Palette restart/CSS scaling were not the demonstrated cause.
-
-Emscripten-only `Window::FrameBegin` now clears to opaque black immediately
-before a complete redraw, including the legacy paused composition. `FrameEnd`
-still presents exactly once per completed image and records its result; it does
-not clear afterward. No new image/lifecycle-paused callback clears the canvas.
-Existing additive overlays, palette fades and the earlier black-field correction
-remain. Native presentation and simulation scheduling/Sleep(10) are unchanged.
-
-Changed implementation: `Source/Window.cpp`, `Source/Window.hpp`,
-`Source/Fodder.cpp`, `scripts/smoke-web-rendering.cjs`. Documentation: this file,
-`docs/mobile/BUILD.md`, `TASKS.md`, `PLAYTEST.md` and the new
-[full reproduction/verification record](docs/mobile/test-runs/battlefield-flicker.md).
+- `scripts/smoke-web-acceptance.cjs`: ten existing suites sequentially, full clean
+  runtime identity before/after, fresh output/profile directories, per-suite logs,
+  timeout/failure continuation, runner revision and script hashes, focused reruns.
+- `scripts/web-acceptance-report.cjs`: all 41 standalone checklist rows; desktop,
+  partial/fixture, physical-phone and release results remain distinct. Missing,
+  wrong/dirty or incomplete reports cannot silently pass. Every phone cell stays
+  NOT RUN; green automation cannot establish an accepted mobile release.
+- `scripts/smoke-web-input.cjs`: verifies blur freezes/rejects Fire until the real
+  Return button, instead of bypassing the current lifecycle policy. Corrects DOM
+  mission-menu evidence wording.
+- `scripts/assert-web-performance.cjs` and performance smoke: validate actual
+  one-second sample cadence/wall time/endpoints and 1800-row cap instead of a
+  fixed five-sample ceiling. Save local per-cycle reports before validation.
+- `web/acceptance-report.test.cjs`: nine new meaningful Node cases. Original
+  52 + new 9 = **61 individual cases passed**.
+- [Acceptance command and phone procedure](docs/mobile/ACCEPTANCE.md),
+  [complete measured 41-row record](docs/mobile/test-runs/mobile-acceptance.md),
+  updated task/roadmap/playtest/build/performance notes. Current phone steps now
+  verify 01231e740c93 rather than stale earlier build IDs. Flicker history records
+  the user merge/apparent resolution.
 
 ## Commands and actual results
 
-Run at code commit `01231e740c9387b444dea68e0eab6c38b411df57`, before final docs:
-
 ```sh
+node --test --test-isolation=none web/*.test.cjs
 ./scripts/build-web.sh
 python3 scripts/check-web-artifact.py
-node --test --test-isolation=none web/*.test.cjs
-python3 scripts/ci/windows_scope.py --base 8bf8290f2f78e5d4a3c2b44128c2d935037c5c6d --head HEAD
-python3 -m http.server 8765 --bind 127.0.0.1 --directory build-web/cmake/dist
-export PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core
+python3 scripts/ci/windows_scope.py --base 7c8413a159a51c9fbd6460f2bed2499bf36e3274 --head HEAD
 ```
+
+First QA code commit `46e15fe`: clean pinned build and source/artifact guard pass,
+47 GPL/config runtime files, no game data; subsequent incremental **ninja: no
+work to do**. Final code has 61 passing Node cases. Changes are QA/docs only;
+Windows scope **native:false**. Native compiler matrices are unnecessary; final
+cached web CI/artifact status is linked in the PR.
 
 ```sh
-node scripts/smoke-web-rendering.cjs http://127.0.0.1:8765 build-web/local-only/christmas.ofdata build-web/local-only/flicker-final-01231e7 01231e740c9387b444dea68e0eab6c38b411df57
-node scripts/smoke-web-rendering.cjs https://openfodder-phase-one.zanysky263.chatgpt.site upstream build-web/local-only/flicker-public-01231e7 01231e740c9387b444dea68e0eab6c38b411df57
+PLAYWRIGHT_MODULE=/opt/codex/cua_node/lib/node_modules/playwright-core \
+CHROMIUM_PATH=/usr/bin/chromium \
+node scripts/smoke-web-acceptance.cjs \
+  https://openfodder-phase-one.zanysky263.chatgpt.site \
+  build-web/local-only/christmas.ofdata \
+  build-web/local-only/acceptance-verified-public-01231e7 \
+  01231e740c9387b444dea68e0eab6c38b411df57
 ```
 
-Existing `smoke-web-lifecycle.cjs`, `smoke-web-layout.cjs` and
-`smoke-web-performance.cjs` passed locally with the same URL/pack/commit and
-separate `build-web/local-only/flicker-{lifecycle,layout,performance}` evidence.
+**Final complete invocation: 10/10 PASS; identity stable; exit 0.** Structured
+report says `automatedChecksPassed:true`, `acceptance:BLOCKED`; all 41 phone rows
+NOT RUN. Initial attempts failed outdated blur/fixed-sample expectations, were
+retained, corrected and rerun; no failed record was overwritten or called passed.
 
-- Pinned build, committed build and incremental **ninja: no work to do** passed;
-  source/artifact guard passed (47 GPL/config runtime files; no game assets).
-  **52 individual Node cases passed**. Existing vendored warnings only.
-- **53 local + 53 anonymous public composited images** across idle, stationary
-  batching, real touch Move/held Fire/release, Pan/Follow, Guide, synthetic
-  interruption/explicit return and Retry: **zero unexplained jumps or blanks**.
-  Reviewed both full sequences visually: stable grass/HUD, visible moving/firing
-  units, no persistent trails/overbright accumulation. Stationary patch luminance
-  remained 57.216 across all 12 images. Old runtime fails the same check.
-- Six 12×12 background patches, 4/6 same-direction >12/255 and >20% threshold;
-  requested post-capture gap 90ms, actual local intervals 241–416ms / public
-  231–939ms. Fades/recentering/Guide/ending transitions excluded. QA-only paused
-  batching leaves simulation tick fixed; no production fixtures/controls added.
-- Diagnostic callbacks each had one clear/upload/draw. Overall local GL
-  draws/clears 2,697/2,697; public 2,708/2,708. Initial active samples separately
-  observed 132/131 successful SDL presents. Neither counter establishes displayed
-  FPS. Existing performance export/cycle checks passed without timing changes.
-- Lifecycle: actual Chromium focus and persisted Back/Forward Cache restore,
-  held-input release, composed pause and rendered pixels passed. Synthetic
-  hidden/freeze/rotation/context-loss tests passed separately. Actual CDP freeze
-  was not established. Layout/aim/native P passed at DPR 1/2/3 and narrow/portrait
-  sizes. Physical Safari/OS behavior remains NOT RUN.
-- Native GCC 14.2 syntax compilation of affected Window/Fodder units passed
-  without EMSCRIPTEN, using SDL 3.2.22 public headers and null-mixer define;
-  [exact command/limits](docs/mobile/test-runs/battlefield-flicker.md). Native-visible
-  code is unchanged. Windows scope **native:false**; Linux compile retains normal
-  Source triggering. Full linked native CI/artifact status is recorded in the PR.
-- An initial harness run outlived the ordinary squad and attempted Follow after
-  defeat. It now retries between bounded action groups and excludes native
-  ending transitions explicitly; no demo/combat changes. Full revised runs pass.
+Actual unmodified mapm1 defeat (cheats off), fresh-troop Retry, abort/cancellation,
+menu and mission-2 replay passed. Real Chromium IDBFS profile close/reopen restored
+mission 2/native progress; invalid imports, backup, failed-write rollback,
+previous recovery and denied storage passed. An unmodified combat victory remains
+NOT RUN. Input/touch ammo fixtures are explicitly partial, separate evidence.
 
-## Public preview and reproducibility
+Actual Chrome focus and persisted Back/Forward Cache restore passed, with held
+input released, explicit return and composed pause. Synthetic hidden/freeze/
+rotation/context-loss checks passed separately; actual CDP freeze was not
+established. Layout/aim/native P passed with DPR 1/2/3 and narrow/portrait sizes.
+Five recorder/stop/restart cycles passed; capacity/short pacing do not prove used
+memory, leaks, physical displayed FPS or ten active phone minutes.
 
-Open **https://openfodder-phase-one.zanysky263.chatgpt.site**, **Sites v14**, header
-**01231e740c93**, full runtime commit above. No ChatGPT sign-in. Anonymous public
-QA loaded the same 20 hash-verified upstream files and matched the visible ID.
-Served HTML/JS/Wasm/support data/build-info hashes also matched the clean artifact.
-Wasm SHA-256 `ef5e3b859c83f40bf7b95d09072faa6c87ee207bda940f43a9220100c958c6e6`.
+**53 temporal composited frames: zero global jumps or blank frames**, actual
+intervals 236–443ms. Reviewed all frames, Guide, 35 UI images and representative
+full-size save/safe-area/return images. Units/field/HUD remain visible, no trails
+or overbright accumulation, controls/overlays match observed states. This is
+Linux Chromium **154.0.8037.57**, Playwright **1.57.0**, Node **24.19.0**,
+opengles2/WebGL1 ANGLE/Vulkan **SwiftShader**, emulated touch. Not physical Safari.
+Raw reports, profiles, exports, screenshots and local pack stay ignored under
+`build-web/local-only/acceptance-*`; nothing uploaded. TLS verified; temporary
+browser proxy-CA trust removed after QA.
 
-Project `appgprj_6ae24fbe89788191a38778521e56e855`; saved version
-`appgprj_6ae24fbe89788191a38778521e56e855~appgver_a71da610185c8191b164ddb907d46afe`;
-deployment `appgdep_6ae3d6e62e308191add7201c111610f3` **succeeded**.
-Hosting source `5b446e10f9379ebb3f97fce862a63f4637ea6075` pushed before saving;
-public access revision 2 preserved. Source/notices/executable modes retained;
-no assets, test evidence or profiles uploaded. Temporary browser proxy CA removed.
+## Preview, pins and publication boundary
+
+[Public preview](https://openfodder-phase-one.zanysky263.chatgpt.site), **Sites v14**,
+header **01231e740c93**, full clean runtime
+`01231e740c9387b444dea68e0eab6c38b411df57`. No sign-in. Same live build before/after
+all ten suites. This QA branch is newer source for tooling/docs, not a new
+published engine. [Prior build/source/hash/publication record](docs/mobile/test-runs/battlefield-flicker.md).
 
 Run `070a6086c62164e859fc3274b75b5f536fa9d902`; Scripts
 `dad04730860bcdd1189aa8562860e379b0f5d783`; emsdk
 `c0bb220cb6e6f4e0fabb6f6db9efd53390ef5e56`; emcc 4.0.23
 `7a5d93b50f6a3a35e85a0d2fc9e667b8498e6aed`; SDL 3.2.22;
-CMake 3.31.6/Ninja 1.11.1. Core runtime/support 3,048,293 + external demo 223,382 =
-3,271,675 logical bytes before compression; source ZIP 1,968,706, all hosted files
-5,135,589. GPL engine/Scripts terms remain separate from unresolved data-mirroring
-permission. Browser fetches pinned existing upstream or validates local data.
+CMake 3.31.6/Ninja 1.11.1. Original Christmas demo 20 files / 223,382 bytes;
+mapm1 LAND OF HOPE AND GLORY, mapm2 IT'S SNOW TIME! No pins/content changed.
 
-## Next check — physical iPhone Safari NOT RUN
+GPL engine/Scripts/source/notices remain hosted; no demo/campaign assets mirrored
+or uploaded. Browser uses pinned hash-verified upstream or local player data.
+Data-mirroring permission stays unresolved and separate from engine licensing.
+Audio remains silent through the existing null backend.
 
-On iPhone: open public URL → verify **01231e740c93** → Load demo / Start →
-**LAND OF HOPE AND GLORY (mission 1 / mapm1)** → Deploy, cheats off. After the
-entry fade, Pan south from the snowy strip onto the football pitch. Observe
-stationary grass/HUD for 20 seconds, then Move, held Fire/release, Pan/Follow,
-Guide open/close, app interruption / explicit Return, and abort/Retry. Record
-model/iOS/build/actions and any continuing flash. [Exact phone steps](docs/mobile/test-runs/battlefield-flicker.md#physical-iphone-safari--not-run).
+## Blocking next checks
 
-No physical iPhone, Safari/WebKit or alternate GPU was tested here. Audio stays
-silent through the null backend. Actual phone rendering, ten-minute performance,
-full touch mission/storage and inherited M1/M2/M3 gates remain open; MOB-012
-acceptance is blocked on that evidence. No tactical, force-size, engine or H Hour
-integration work was advanced. Prior contracts/evidence remain in
-[LIFECYCLE.md](docs/mobile/LIFECYCLE.md), [PERFORMANCE.md](docs/mobile/PERFORMANCE.md),
-[CHECKPOINTS.md](docs/mobile/CHECKPOINTS.md) and their linked test records.
+Follow [the exact iPhone procedure](docs/mobile/ACCEPTANCE.md#actual-iphone-session--pending):
+verify **01231e740c93**, record model/iOS/Safari, full unmodified touch mission and
+loss/Retry/abort; mission-2 briefing Save acknowledgement then real close/reopen/
+Continue; held-fire interruption, Guide pause, rotation/bars and history return;
+at least ten active minutes with observations and exported performance JSON.
+Record every required phone row as observed pass/fail/blocked/not run.
+
+Unmodified combat victory, physical-phone recovery/storage/layout/performance and
+cross-refresh weapon timing remain unverified. Original demo's zero secondary
+ammo and unsupported audible audio stay explicit limits. MOB-012 is **blocked**
+on this evidence; MOB-013 accepted baseline remains pending. Fix reproduced
+acceptance failures within scope; preserve the user-tested preview and all newer
+work. No release, force-size/cover/suppression or H Hour work is authorized here.

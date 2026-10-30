@@ -7,8 +7,9 @@ Codex, `fix/mobile-battlefield-flicker`, base master
 complete images accumulating before browser composition. The old runtime fails
 nine temporal jumps; 53 local + 53 public images pass, with lifecycle/layout/
 performance regressions, native syntax and artifact checks. [Evidence, preview,
-commits and phone steps](test-runs/battlefield-flicker.md). **Actual iPhone Safari
-verification NOT RUN**; inherited milestone gates stay open. This focused defect
+commits and phone steps](test-runs/battlefield-flicker.md). User merged [PR #12](https://github.com/jbbejena/openfodder/pull/12) as `7c8413a`
+and subsequently reported apparent resolution after reload. Structured physical
+verification remains NOT RUN; inherited milestone gates stay open. This focused defect
 does not advance MOB-012 or unrelated roadmap features.
 
 Updated: 2026-10-29. Phase 1 implemented by Codex on `build/mobile-phase-1`, starting at `6b851862a77c3dd9556b5cadae7c88d370b6095f`. [Verification record](test-runs/phase-1.md) and [merged PR #1](https://github.com/jbbejena/openfodder/pull/1). The actual iPhone gate remains unpassed.
@@ -43,7 +44,7 @@ Use the claim/evidence columns for an agent/session + branch and a commit/PR/tes
 | MOB-009 | M3 | done | MOB-002, MOB-008 | Codex / `mobile/browser-saves`, from `86c7031` | `f4696c5`: [native audit/semantics](CHECKPOINTS.md), [actual Chromium IDBFS close/reopen, recruit round-trip and error/recovery checks](test-runs/checkpoints.md), [merged PR #9](https://github.com/jbbejena/openfodder/pull/9). Desktop deliverables complete; actual iPhone storage durability NOT RUN. Inherited phone gates/M3 remain unpassed |
 | MOB-010 | M3 | blocked | MOB-004, MOB-008 | Codex / `mobile/browser-lifecycle`, from `965b90f` | `1de52e5`: [policy/audio audit](LIFECYCLE.md), [local/public focus/cache/pixel evidence](test-runs/lifecycle.md), [merged PR #10](https://github.com/jbbejena/openfodder/pull/10). Lifecycle implementation complete on desktop; actual Safari/OS interruption and audible-audio acceptance remain open (null backend retained). M3 remains unpassed |
 | MOB-011 | M3 | blocked | MOB-008, MOB-010 | Codex / `mobile/performance`, from `9daff60` | `d3edef3`: [recorder/phone steps](PERFORMANCE.md), [local/public desktop measurements and restart/export checks](test-runs/performance.md). Implementation delivered independently with user authorization; ten-minute actual Safari, displayed-FPS target, cold/warm/heat/response NOT RUN. M3 unpassed |
-| MOB-012 | M4 | pending | MOB-003, MOB-008, MOB-009, MOB-010, MOB-011 | Unclaimed | — |
+| MOB-012 | M4 | blocked | MOB-003, MOB-008, MOB-009, MOB-010, MOB-011 | Codex / `qa/mobile-acceptance`, from `7c8413a`; independent work explicitly authorized | `46e15fe` runner and `62d28a7` cadence correction; all ten public browser suites + 61 Node cases pass. [41-row evidence/blocker record](test-runs/mobile-acceptance.md), [phone procedure](ACCEPTANCE.md). Formal iPhone mission/save/return/performance evidence NOT RUN; M4 unpassed |
 | MOB-013 | M4 | pending | MOB-012 | Unclaimed | — |
 | MOB-014 | M5 | deferred | MOB-013 | Unclaimed | — |
 | MOB-015 | M5 | deferred | MOB-014 | Unclaimed | — |
@@ -319,6 +320,14 @@ Execute the playtest checklist against one exact preview build. Pair browser smo
 - Phone touch tests use real touch input, not desktop mouse events described as phone testing.
 - Mission-end, save/reopen and lifecycle results agree with engine state.
 - The first mobile release has no unresolved blocker preventing the core touch-only mission loop.
+
+MOB-012 independent work (2026-10-29 Pacific): one sequential browser command,
+conservative structured reports, fresh evidence/profile checks and two obsolete
+QA-assumption corrections. Complete public pass on `01231e740c93`; no engine/UI
+changes or redeployment. Fixtures and the informal user flicker observation do
+not pass real-phone gates. [Measured evidence](test-runs/mobile-acceptance.md)
+lists every standalone checklist row, actual commands and prioritized blockers.
+MOB-013 remains pending; no release candidate or H Hour work was advanced.
 
 ## MOB-013: Establish the standalone mobile baseline
 

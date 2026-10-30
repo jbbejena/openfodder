@@ -256,7 +256,7 @@ briefing; the current battlefield cannot be saved.
 
 ## Try mission checkpoints — actual iPhone NOT RUN
 
-1. In Safari open the public URL and verify **`d3edef36fc52`**. Record model/iOS.
+1. In Safari open the public URL and verify **`01231e740c93`**. Record model/iOS.
    Load demo → wait for 20 verified files → Start game → choose mission 1.
 2. At its briefing tap **Save checkpoint**. Wait for **Saved checkpoint** before
    closing the tab. Reopen the same URL in the same Safari browser/profile.
@@ -276,7 +276,7 @@ performance remains MOB-011.
 
 ## Try interruptions — actual iPhone NOT RUN
 
-1. In Safari verify **`d3edef36fc52`**, load demo, Start → choose mission → Deploy.
+1. In Safari verify **`01231e740c93`**, load demo, Start → choose mission → Deploy.
    Confirm a visible snow battlefield, troops and sidebar.
 2. In Fire mode hold aim, then switch apps/tabs or lock/unlock the phone. On return,
    check **Game paused while away**. Firing must have released and combat must
@@ -300,3 +300,10 @@ time is excluded; export before reload. [Full phone procedure and metric
 limits](PERFORMANCE.md), [separate desktop results](test-runs/performance.md).
 Submitted FPS and WebAssembly capacity do not establish displayed FPS or used
 Safari memory. The engine clock and rendering settings are unchanged.
+
+## Complete mobile acceptance
+
+Use the [MOB-012 acceptance command and iPhone procedure](ACCEPTANCE.md) to run
+all existing browser suites against one full clean build identity and retain a
+per-check report. Desktop pass, fixtures and physical-device evidence remain
+separate. [Current measured record](test-runs/mobile-acceptance.md).
